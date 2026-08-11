@@ -113,7 +113,28 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
 
     reader.onload = async (e) => {
       try {
-        const content = e.target?.result as string
+        // ✅ 改动1：读取为 ArrayBuffer（而不是直接读成字符串）
+        const buffer = e.target?.result as ArrayBuffer
+        
+        // ✅ 改动2：尝试用 GBK 解码（中文 Windows 默认编码）
+        let content = ''
+        try {
+          // 先用 GBK 解码
+          content = new TextDecoder('GBK').decode(buffer)
+          console.log('✅ 使用 GBK 编码解码')
+        } catch {
+          // 如果 GBK 失败，降级到 UTF-8
+          content = new TextDecoder('UTF-8').decode(buffer)
+          console.log('✅ 使用 UTF-8 编码解码')
+        }
+
+        // 如果还是乱码，试试这个（移除 BOM 头）
+        if (content.charCodeAt(0) === 0xFEFF) {
+          content = content.slice(1)
+        }
+
+        console.log('📄 解码后的内容前100字符:', content.substring(0, 100))
+
         const lines = content.split('\n').filter(line => line.trim())
 
         if (lines.length < 2) {
@@ -128,8 +149,13 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
         }
 
         const headers = parseCSVLine(lines[0])
+        console.log('📋 原始标题行:', lines[0])
+        console.log('📋 解析后的 headers:', headers)
+        console.log('📋 headers 长度:', headers.length)
         const englishIndex = headers.findIndex(h => h.includes('英文') || h.toLowerCase().includes('english'))
         const chineseIndex = headers.findIndex(h => h.includes('中文') || h.toLowerCase().includes('chinese') || h.includes('释义'))
+        
+        console.log('englishIndex:', englishIndex, 'chineseIndex:', chineseIndex) 
 
         if (englishIndex === -1 || chineseIndex === -1) {
           alert('❌ CSV 格式无效：请确保包含 "英文" 和 "中文" 列')
@@ -174,7 +200,8 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
       setIsImporting(false)
     }
 
-    reader.readAsText(file, 'UTF-8')
+    // ✅ 改动3：改为 readAsArrayBuffer
+    reader.readAsArrayBuffer(file)
   }
 
   // 清空所有单词
