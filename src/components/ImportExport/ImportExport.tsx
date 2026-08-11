@@ -166,10 +166,35 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
           return
         }
 
-        const parseCSVLine = (line: string) => {
-          const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g)
-          if (!matches) return []
-          return matches.map(m => m.replace(/^"|"$/g, '').trim())
+        // ✅支持含空格的单词
+        const parseCSVLine = (line: string): string[] => {
+          const result: string[] = []
+          let current = ''
+          let inQuotes = false
+          
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i]
+            
+            if (char === '"') {
+              if (inQuotes && line[i + 1] === '"') {
+                current += '"'
+                i++
+              } else {
+                inQuotes = !inQuotes
+              }
+            } else if (char === ',' && !inQuotes) {
+              result.push(current.trim())
+              current = ''
+            } else {
+              current += char
+            }
+          }
+          
+          if (current || result.length > 0) {
+            result.push(current.trim())
+          }
+          
+          return result
         }
 
         const headers = parseCSVLine(lines[0])
