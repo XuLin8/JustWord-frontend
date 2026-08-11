@@ -1,3 +1,24 @@
+/**
+ * ============================================
+ * 文件用途：通用工具函数集合
+ * 主要功能：
+ *   - 生成唯一 ID（基于时间戳）
+ *   - 格式化日期显示
+ *   - 导出词库为 JSON 文件
+ *   - 导出词库为 CSV 文件
+ *   - 文件下载通用方法
+ * 依赖关系：
+ *   - 依赖 Word 类型定义（../types）
+ * 导出内容：
+ *   - generateId：生成 ID
+ *   - formatDate：格式化日期
+ *   - downloadFile：通用文件下载
+ *   - exportToJSON：导出 JSON 格式
+ *   - exportToCSV：导出 CSV 格式（含 BOM 头，解决 Excel 乱码）
+ * ============================================
+ */
+
+
 import type { Word } from '../types'
 
 export const generateId = (): string => {

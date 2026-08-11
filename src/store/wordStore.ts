@@ -1,3 +1,27 @@
+/**
+ * ============================================
+ * 文件用途：Zustand 状态管理 Store（单词数据核心）
+ * 主要功能：
+ *   - 单词 CRUD 操作（增、删、改、查）
+ *   - 批量导入单词（importWords）
+ *   - 清空所有单词（clearAllWords）
+ *   - 持久化存储（使用 localforage 保存到 IndexedDB）
+ *   - 单词去重检查（isWordExist）
+ *   - 加载状态管理（loading）
+ *   - 搜索关键词管理（searchTerm）
+ *   - 应用启动时自动加载已保存数据（loadWords）
+ * 依赖关系：
+ *   - zustand：状态管理
+ *   - localforage：IndexedDB 封装
+ *   - Word 类型定义（../types）
+ *   - generateId 工具函数（../utils/helpers）
+ * 导出内容：
+ *   - useWordStore：React Hook（包含所有状态和方法）
+ * 内部实例：
+ *   - wordStorage：独立 LocalForage 实例（JustWord/words）
+ * ============================================
+ */
+
 import { create } from 'zustand'
 import localforage from 'localforage'
 import type { Word, OperationResult, ImportResult } from '../types'

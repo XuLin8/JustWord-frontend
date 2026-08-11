@@ -1,3 +1,33 @@
+/**
+ * ============================================
+ * 文件用途：应用主入口组件（根组件）
+ * 主要功能：
+ *   - 页面整体布局（头部、表单、列表、统计）
+ *   - 单词添加表单（实时输入过滤、提交验证）
+ *   - 单词列表渲染（显示所有单词）
+ *   - 单词编辑功能（行内编辑模式）
+ *   - 单词删除功能（带确认弹窗）
+ *   - 词库导入/导出面板（可切换显示）
+ *   - 应用启动时自动加载已保存数据
+ *   - 全局加载状态显示
+ *   - 防抖 Alert（500ms 内不重复弹窗）
+ * 依赖关系：
+ *   - react（useState, useEffect）
+ *   - useWordStore（状态管理）
+ *   - ImportExport 组件（导入导出面板）
+ *   - 验证工具函数（isValidEnglish, isValidChinese）
+ *   - App.css（样式文件）
+ * 导出内容：
+ *   - App：默认导出根组件
+ * 交互流程：
+ *   1. 加载时自动读取 IndexedDB 数据
+ *   2. 用户通过表单添加单词（实时过滤非法字符）
+ *   3. 点击编辑进入行内编辑模式
+ *   4. 点击删除确认后删除
+ *   5. 点击"管理词库"切换导入导出面板
+ * ============================================
+ */
+
 import { useState, useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import ImportExport from './components/ImportExport/ImportExport'

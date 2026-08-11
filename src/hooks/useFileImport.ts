@@ -1,3 +1,24 @@
+/**
+ * ============================================
+ * 文件用途：文件导入功能的自定义 Hook
+ * 主要功能：
+ *   - 统一处理文件导入流程（验证 → 解码 → 解析）
+ *   - 管理导入状态（进行中、进度、错误）
+ *   - 支持导入成功/失败回调
+ *   - 可自定义验证配置（预设或自定义）
+ *   - 返回导入结果供组件使用
+ * 依赖关系：
+ *   - react（useState, useCallback）
+ *   - FileValidator（文件验证）
+ *   - FileEncoder（编码解码）
+ *   - CSVParser（CSV 解析）
+ * 导出内容：
+ *   - useFileImport：自定义 Hook
+ *   - UseFileImportOptions：配置选项接口
+ *   - UseFileImportReturn：返回值接口
+ * ============================================
+ */
+
 // hooks/useFileImport.ts
 
 import { useState, useCallback } from 'react'

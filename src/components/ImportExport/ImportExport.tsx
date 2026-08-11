@@ -1,3 +1,27 @@
+/**
+ * ============================================
+ * 文件用途：词库导入/导出 UI 组件
+ * 主要功能：
+ *   - 导出词库为 JSON 格式文件
+ *   - 导出词库为 CSV 格式文件（含 BOM 头，兼容 Excel）
+ *   - 导入 JSON 格式词库文件
+ *   - 导入 CSV 格式词库文件（自动检测 GBK/UTF-8 编码）
+ *   - 清空所有单词（二次确认防误删）
+ *   - 显示当前单词总数
+ *   - 导入/导出状态反馈
+ * 依赖关系：
+ *   - react（useRef, useState）
+ *   - useWordStore（单词状态管理）
+ *   - exportToJSON / exportToCSV（导出工具函数）
+ * 导出内容：
+ *   - ImportExport：默认导出组件
+ * 特殊处理：
+ *   - CSV 使用 ArrayBuffer + GBK 解码，解决中文乱码问题
+ *   - JSON 自动验证数据结构是否合法
+ *   - 清空需要两步确认（先点击"清空词库"，再点"再次确认清空"）
+ * ============================================
+ */
+
 import { useRef, useState } from 'react'
 import { useWordStore } from '../../store/wordStore'
 import { exportToJSON, exportToCSV } from '../../utils/helpers'

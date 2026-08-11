@@ -1,3 +1,23 @@
+/**
+ * ============================================
+ * 文件用途：文件验证工具类，用于校验上传文件的类型、大小、扩展名等
+ * 主要功能：
+ *   - 验证文件是否存在、是否为空
+ *   - 验证文件 MIME 类型（支持通配符，如 image/*）
+ *   - 验证文件扩展名
+ *   - 验证文件大小（最小/最大限制）
+ *   - 提供文件大小友好显示
+ *   - 预设常用文件类型的验证配置（CSV、图片、JSON、Excel）
+ * 依赖关系：
+ *   - 无外部依赖（纯 TypeScript）
+ * 导出内容：
+ *   - FileValidator：验证类（静态方法）
+ *   - FileValidationOptions：验证选项接口
+ *   - FileValidationResult：验证结果接口
+ *   - FileValidationPresets：预设配置对象
+ * ============================================
+ */
+
 // utils/file-validator.ts
 
 export interface FileValidationOptions {
