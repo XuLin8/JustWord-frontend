@@ -80,3 +80,70 @@
 .word-actions button:last-of-type:hover {
   background: #c0392b;
 }
+
+/* App.css 新增 */
+
+/* Header 右侧布局 */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Tab 按钮 */
+.tab-buttons {
+  display: flex;
+  gap: 4px;
+  background: #f0f0f0;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.tab-buttons button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-active {
+  background: white;
+  color: #4a90d9;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tab-inactive {
+  background: transparent;
+  color: #888;
+}
+
+.tab-inactive:hover {
+  color: #333;
+}
+
+.toggle-ie-btn {
+  padding: 8px 16px;
+  background: #4a90d9;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.toggle-ie-btn:hover {
+  background: #3a7bc8;
+}

@@ -31,6 +31,7 @@
 import { useState, useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import ImportExport from './components/ImportExport/ImportExport'
+import LearnMode from './components/LearnMode/LearnMode'  // ✅ 新增
 import { isValidEnglish, isValidChinese } from './utils/validation'
 import './App.css'
 
@@ -43,6 +44,9 @@ function App() {
   const [editChinese, setEditChinese] = useState('')
   const [showImportExport, setShowImportExport] = useState(false)
   const [lastAlertTime, setLastAlertTime] = useState(0)
+  
+  // ✅ 新增：Tab 切换状态
+  const [activeTab, setActiveTab] = useState<'word' | 'learn'>('word')
 
   useEffect(() => {
     loadWords()
@@ -185,12 +189,31 @@ function App() {
     <div className="app">
       <div className="app-header">
         <h1>📚 Just Word</h1>
-        <button 
-          className="toggle-ie-btn"
-          onClick={() => setShowImportExport(!showImportExport)}
-        >
-          {showImportExport ? '✕ 关闭' : '📦 管理词库'}
-        </button>
+        
+        {/* ✅ 新增：Tab 切换按钮 */}
+        <div className="header-right">
+          <div className="tab-buttons">
+            <button 
+              className={activeTab === 'word' ? 'tab-active' : 'tab-inactive'}
+              onClick={() => setActiveTab('word')}
+            >
+              📝 单词本
+            </button>
+            <button 
+              className={activeTab === 'learn' ? 'tab-active' : 'tab-inactive'}
+              onClick={() => setActiveTab('learn')}
+            >
+              🧠 学习模式
+            </button>
+          </div>
+          
+          <button 
+            className="toggle-ie-btn"
+            onClick={() => setShowImportExport(!showImportExport)}
+          >
+            {showImportExport ? '✕ 关闭' : '📦 管理词库'}
+          </button>
+        </div>
       </div>
 
       {/* 导入导出面板 */}
@@ -198,70 +221,78 @@ function App() {
         <ImportExport onImportComplete={handleImportComplete} />
       )}
 
-      {/* ✅ 添加表单 - onSubmit 绑定 handleSubmit */}
-      <form onSubmit={handleSubmit} className="add-form">
-        <input
-          type="text"
-          placeholder="英文单词 (仅字母)"
-          value={english}
-          onChange={handleEnglishChange}
-        />
-        <input
-          type="text"
-          placeholder="中文释义"
-          value={chinese}
-          onChange={handleChineseChange}
-        />
-        <button type="submit">添加</button>
-      </form>
+      {/* ✅ 根据 Tab 显示不同内容 */}
+      {activeTab === 'word' ? (
+        <>
+          {/* 添加表单 */}
+          <form onSubmit={handleSubmit} className="add-form">
+            <input
+              type="text"
+              placeholder="英文单词 (仅字母)"
+              value={english}
+              onChange={handleEnglishChange}
+            />
+            <input
+              type="text"
+              placeholder="中文释义"
+              value={chinese}
+              onChange={handleChineseChange}
+            />
+            <button type="submit">添加</button>
+          </form>
 
-      {/* 单词列表 */}
-      {loading ? (
-        <p>加载中...</p>
-      ) : words.length === 0 ? (
-        <p className="empty">还没有单词，添加一个吧！</p>
+          {/* 单词列表 */}
+          {loading ? (
+            <p>加载中...</p>
+          ) : words.length === 0 ? (
+            <p className="empty">还没有单词，添加一个吧！</p>
+          ) : (
+            <ul className="word-list">
+              {words.map((word) => (
+                <li key={word.id}>
+                  {editingId === word.id ? (
+                    <div className="edit-mode">
+                      <input
+                        type="text"
+                        value={editEnglish}
+                        onChange={handleEditEnglishChange}
+                        placeholder="英文"
+                      />
+                      <input
+                        type="text"
+                        value={editChinese}
+                        onChange={handleEditChineseChange}
+                        placeholder="中文"
+                      />
+                      <button onClick={() => handleSaveEdit(word.id)}>保存</button>
+                      <button onClick={handleCancelEdit}>取消</button>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <strong>{word.english}</strong>
+                        <span> - </span>
+                        <span>{word.chinese}</span>
+                      </div>
+                      <div className="word-actions">
+                        <button onClick={() => handleStartEdit(word)}>编辑</button>
+                        <button onClick={() => handleDeleteWord(word.id)}>删除</button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          
+          <div className="stats">
+            共 {words.length} 个单词
+          </div>
+        </>
       ) : (
-        <ul className="word-list">
-          {words.map((word) => (
-            <li key={word.id}>
-              {editingId === word.id ? (
-                <div className="edit-mode">
-                  <input
-                    type="text"
-                    value={editEnglish}
-                    onChange={handleEditEnglishChange}
-                    placeholder="英文"
-                  />
-                  <input
-                    type="text"
-                    value={editChinese}
-                    onChange={handleEditChineseChange}
-                    placeholder="中文"
-                  />
-                  <button onClick={() => handleSaveEdit(word.id)}>保存</button>
-                  <button onClick={handleCancelEdit}>取消</button>
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <strong>{word.english}</strong>
-                    <span> - </span>
-                    <span>{word.chinese}</span>
-                  </div>
-                  <div className="word-actions">
-                    <button onClick={() => handleStartEdit(word)}>编辑</button>
-                    <button onClick={() => handleDeleteWord(word.id)}>删除</button>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+        /* ✅ 学习模式 */
+        <LearnMode />
       )}
-      
-      <div className="stats">
-        共 {words.length} 个单词
-      </div>
     </div>
   )
 }
