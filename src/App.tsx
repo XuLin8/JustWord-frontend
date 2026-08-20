@@ -11,29 +11,18 @@
  *   - 应用启动时自动加载已保存数据
  *   - 全局加载状态显示
  *   - 防抖 Alert（500ms 内不重复弹窗）
- * 依赖关系：
- *   - react（useState, useEffect）
- *   - useWordStore（状态管理）
- *   - ImportExport 组件（导入导出面板）
- *   - 验证工具函数（isValidEnglish, isValidChinese）
- *   - App.css（样式文件）
- * 导出内容：
- *   - App：默认导出根组件
- * 交互流程：
- *   1. 加载时自动读取 IndexedDB 数据
- *   2. 用户通过表单添加单词（实时过滤非法字符）
- *   3. 点击编辑进入行内编辑模式
- *   4. 点击删除确认后删除
- *   5. 点击"管理词库"切换导入导出面板
  * ============================================
  */
 
 import { useState, useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import ImportExport from './components/ImportExport/ImportExport'
-import LearnMode from './components/LearnMode/LearnMode'  // ✅ 新增
+import LearnMode from './components/LearnMode/LearnMode'
 import { isValidEnglish, isValidChinese } from './utils/validation'
 import './App.css'
+import { useAuth } from './context/AuthContext'
+import Login from './components/Auth/Login'
+import Register from './components/Auth/Register'
 
 function App() {
   const { words, loading, addWord, deleteWord, updateWord, loadWords } = useWordStore()
@@ -45,8 +34,12 @@ function App() {
   const [showImportExport, setShowImportExport] = useState(false)
   const [lastAlertTime, setLastAlertTime] = useState(0)
   
-  // ✅ 新增：Tab 切换状态
+  // Tab 切换状态
   const [activeTab, setActiveTab] = useState<'word' | 'learn'>('word')
+  
+  const [showLogin, setShowLogin] = useState(false)
+  const [showRegister, setShowRegister] = useState(false)
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     loadWords()
@@ -60,14 +53,13 @@ function App() {
     }
   }
 
-  // ✅ 添加单词 - 表单提交处理
+  // 添加单词 - 表单提交处理
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const trimmedEnglish = english.trim()
     const trimmedChinese = chinese.trim()
 
-    // 验证
     if (!trimmedEnglish) {
       showAlert('⚠️ 请输入英文单词')
       return
@@ -122,7 +114,7 @@ function App() {
     setEditChinese('')
   }
 
-  // ✅ 保存编辑
+  // 保存编辑
   const handleSaveEdit = async (id: string) => {
     const trimmedEnglish = editEnglish.trim()
     const trimmedChinese = editChinese.trim()
@@ -168,7 +160,7 @@ function App() {
     setEditChinese(e.target.value)
   }
 
-  // ✅ 删除单词
+  // 删除单词
   const handleDeleteWord = async (id: string) => {
     if (window.confirm('🗑️ 确定要删除这个单词吗？')) {
       const result = await deleteWord(id)
@@ -190,8 +182,38 @@ function App() {
       <div className="app-header">
         <h1>📚 Just Word</h1>
         
-        {/* ✅ 新增：Tab 切换按钮 */}
         <div className="header-right">
+          {/* 用户信息 */}
+          {user ? (
+            <div className="user-info">
+              <span>{user.username}</span>
+              <button onClick={logout}>退出</button>
+            </div>
+          ) : (
+            <button onClick={() => setShowLogin(true)}>登录</button>
+          )}
+          
+          {/* 模态框 */}
+          {showLogin && (
+            <Login 
+              onClose={() => setShowLogin(false)} 
+              onSwitchToRegister={() => {
+                setShowLogin(false)
+                setShowRegister(true)
+              }}
+            />
+          )}
+          {showRegister && (
+            <Register 
+              onClose={() => setShowRegister(false)} 
+              onSwitchToLogin={() => {
+                setShowRegister(false)
+                setShowLogin(true)
+              }}
+            />
+          )}
+          
+          {/* Tab 切换按钮 */}
           <div className="tab-buttons">
             <button 
               className={activeTab === 'word' ? 'tab-active' : 'tab-inactive'}
@@ -221,19 +243,23 @@ function App() {
         <ImportExport onImportComplete={handleImportComplete} />
       )}
 
-      {/* ✅ 根据 Tab 显示不同内容 */}
+      {/* 根据 Tab 显示不同内容 */}
       {activeTab === 'word' ? (
         <>
           {/* 添加表单 */}
           <form onSubmit={handleSubmit} className="add-form">
             <input
               type="text"
+              id="add-english"           // ✅ 添加 id
+              name="english"             // ✅ 添加 name
               placeholder="英文单词 (仅字母)"
               value={english}
               onChange={handleEnglishChange}
             />
             <input
               type="text"
+              id="add-chinese"           // ✅ 添加 id
+              name="chinese"             // ✅ 添加 name
               placeholder="中文释义"
               value={chinese}
               onChange={handleChineseChange}
@@ -290,7 +316,7 @@ function App() {
           </div>
         </>
       ) : (
-        /* ✅ 学习模式 */
+        /* 学习模式 */
         <LearnMode />
       )}
     </div>

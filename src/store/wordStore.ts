@@ -21,6 +21,17 @@ import { create } from 'zustand'
 import type { Word, OperationResult, ImportResult, WordMetadata  } from '../types'
 import { API } from '../config/api'
 
+// ✅ 辅助函数：获取 token
+const getToken = () => localStorage.getItem('justword_token')
+
+// ✅ 辅助函数：创建带认证的请求头
+const getHeaders = () => {
+  const token = getToken()
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+  }
+}
 interface WordStore {
   words: Word[]
   loading: boolean
@@ -44,7 +55,9 @@ export const useWordStore = create<WordStore>((set, get) => ({
   loadWords: async () => {
     set({ loading: true })
     try {
-      const response = await fetch(API.words)
+      const response = await fetch(API.words, {
+        headers: getHeaders(), // ✅ 添加 token
+      })
       if (!response.ok) throw new Error('加载失败')
       const data = await response.json()
       // 后端返回的是数组，需要转换成 Word 类型
@@ -86,7 +99,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     try {
       const response = await fetch(API.words, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(), // ✅ 添加 token
         body: JSON.stringify({
           english: trimmedEnglish,
           chinese: trimmedChinese,
@@ -127,6 +140,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     try {
       const response = await fetch(`${API.words}/${id}`, {
         method: 'DELETE',
+        headers: getHeaders(), // ✅ 添加 token
       })
 
       if (!response.ok) {
@@ -163,7 +177,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       }
       const response = await fetch(`${API.words}/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(), // ✅ 添加 token
         body: JSON.stringify({
           updateData
         }),
@@ -256,6 +270,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     try {
       const response = await fetch(API.words, {
         method: 'DELETE',
+        headers: getHeaders(), // ✅ 添加 token
       })
 
       if (!response.ok) {

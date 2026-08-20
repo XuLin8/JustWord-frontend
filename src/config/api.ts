@@ -12,6 +12,8 @@ export const API = {
   auth: {
     login: `${API_BASE_URL}/api/auth/login`,
     register: `${API_BASE_URL}/api/auth/register`,
+    me: `${API_BASE_URL}/api/auth/me`,
+    logout: `${API_BASE_URL}/api/auth/logout`,
   },
   ai: {
     judge: `${API_BASE_URL}/api/ai/judge`,
