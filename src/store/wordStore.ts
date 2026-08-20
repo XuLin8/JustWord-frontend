@@ -18,7 +18,7 @@
  */
 
 import { create } from 'zustand'
-import type { Word, OperationResult, ImportResult } from '../types'
+import type { Word, OperationResult, ImportResult, WordMetadata  } from '../types'
 import { API } from '../config/api'
 
 interface WordStore {
@@ -53,6 +53,8 @@ export const useWordStore = create<WordStore>((set, get) => ({
         english: item.english,
         chinese: item.chinese,
         createdAt: new Date(item.created_at).getTime(),
+        updatedAt: item.updated_at ? new Date(item.updated_at).getTime() : undefined,
+        metadata: item.metadata || {}
       }))
       set({ words })
     } catch (error) {
@@ -73,7 +75,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
   },
 
   // ========== 添加单词到后端 ==========
-  addWord: async (english: string, chinese: string) => {
+  addWord: async (english: string, chinese: string, metadata?: WordMetadata) => {
     const trimmedEnglish = english.trim()
     const trimmedChinese = chinese.trim()
 
@@ -88,6 +90,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
         body: JSON.stringify({
           english: trimmedEnglish,
           chinese: trimmedChinese,
+          metadata: metadata || {}
         }),
       })
 
@@ -104,6 +107,8 @@ export const useWordStore = create<WordStore>((set, get) => ({
         english: newWord.english,
         chinese: newWord.chinese,
         createdAt: new Date(newWord.created_at).getTime(),
+        updatedAt: newWord.updated_at ? new Date(newWord.updated_at).getTime() : undefined,
+        meta_data: newWord.metadata || {}
       }
       
       set((state) => ({
@@ -140,7 +145,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
   },
 
   // ========== 更新单词 ==========
-  updateWord: async (id: string, english: string, chinese: string) => {
+  updateWord: async (id: string, english: string, chinese: string, meta_data?: WordMetadata) => {
     const trimmedEnglish = english.trim()
     const trimmedChinese = chinese.trim()
 
@@ -149,12 +154,18 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     try {
+      const updateData: any = {
+        english: trimmedEnglish,
+        chinese: trimmedChinese,
+      }
+      if (meta_data !== undefined) {
+        updateData.metadata = meta_data
+      }
       const response = await fetch(`${API.words}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          english: trimmedEnglish,
-          chinese: trimmedChinese,
+          updateData
         }),
       })
 
@@ -172,6 +183,8 @@ export const useWordStore = create<WordStore>((set, get) => ({
                 ...word,
                 english: updatedWord.english,
                 chinese: updatedWord.chinese,
+                updatedAt: updatedWord.updated_at ? new Date(updatedWord.updated_at).getTime() : undefined,
+                metadata: updatedWord.metadata || {}
               }
             : word
         ),
@@ -201,7 +214,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
         const response = await fetch(API.words, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ english, chinese }),
+          body: JSON.stringify({ english, chinese , meta_data: item.meta_data || {}}),
         })
 
         if (response.ok) {
@@ -211,6 +224,8 @@ export const useWordStore = create<WordStore>((set, get) => ({
             english: newWord.english,
             chinese: newWord.chinese,
             createdAt: new Date(newWord.created_at).getTime(),
+            updatedAt: newWord.updated_at ? new Date(newWord.updated_at).getTime() : undefined,
+            meta_data: newWord.metadata || {}
           }
           set((state) => ({
             words: [word, ...state.words],

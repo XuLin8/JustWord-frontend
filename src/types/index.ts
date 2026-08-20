@@ -20,6 +20,55 @@ export interface Word {
   english: string
   chinese: string
   createdAt: number
+  updatedAt?: number
+  meta_data?: WordMetadata
+}
+// ✅ 单词元数据（可扩展）
+export interface WordMetadata {
+  // 音标
+  phonetic?: {
+    uk?: string
+    us?: string
+  }
+  // 词性
+  wordType?: string
+  // 复数形式
+  plural?: string
+  // 例句
+  example?: {
+    en: string
+    zh: string
+  }
+  // 难度等级 1-5
+  difficulty?: number
+  // 标签
+  tags?: string[]
+  // 近义词
+  synonyms?: string[]
+  // 反义词
+  antonyms?: string[]
+  // 动词变位
+  conjugation?: {
+    present: string
+    past: string
+    pastParticiple: string
+  }
+  // ✅ 词组配置（拼写缺省支持）
+  phraseConfig?: {
+    type: 'single' | 'phrase'
+    wordCount: number
+    gapCount?: number
+    gapPositions?: number[]
+    displayFormat?: string
+    gaps?: Array<{
+      position: number
+      length: number
+      placeholder: string
+    }>
+    fullSentence?: string
+  }
+  // 其他扩展字段
+  [key: string]: any
 }
 
 // 操作结果类型

@@ -2,7 +2,7 @@
 
 // 根据环境自动切换
 export const API_BASE_URL = import.meta.env.DEV
-  ? 'http://192.168.31.221:3000'  // 开发环境：直接访问树莓派后端
+  ? 'http://localhost:3000'//'http://192.168.31.221:3000'  // 开发环境：直接访问树莓派后端
   : '/api'  // 生产环境：通过 Nginx 代理
 
 // API 端点
