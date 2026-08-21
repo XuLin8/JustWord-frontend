@@ -44,6 +44,7 @@ interface WordStore {
   isWordExist: (english: string, excludeId?: string) => boolean
   importWords: (words: Omit<Word, 'id' | 'createdAt'>[]) => Promise<ImportResult>
   clearAllWords: () => Promise<OperationResult>
+  clearWords: () => void
 }
 
 export const useWordStore = create<WordStore>((set, get) => ({
@@ -283,5 +284,10 @@ export const useWordStore = create<WordStore>((set, get) => ({
       console.error('清空失败:', error)
       return { success: false, message: '网络错误，请重试' }
     }
+  },
+  
+  // ✅ 清空单词列表
+  clearWords: () => {
+    set({ words: [] })  
   },
 }))

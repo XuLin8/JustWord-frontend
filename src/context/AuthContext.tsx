@@ -1,6 +1,7 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react'
 import { API } from '../config/api'
+import { useWordStore } from '../store/wordStore'
 
 interface User {
   id: string
@@ -25,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-
+  const { loadWords, clearWords } = useWordStore()
   // 加载 Token
   useEffect(() => {
     const storedToken = localStorage.getItem('justword_token')
@@ -36,6 +37,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false)
   }, [])
+
+  // ✅ 核心：token 变化时自动刷新/清空单词列表
+  useEffect(() => {
+    if (token && user) {
+        // 有 token 且有用户 → 加载单词
+        loadWords()
+    } else {
+        // 无 token → 清空单词
+        clearWords()
+    }
+  }, [token, user, loadWords, clearWords])  // ← 依赖 token 和 user
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
