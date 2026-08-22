@@ -40,6 +40,19 @@ function App() {
   const [showLogin, setShowLogin] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
   const { user, logout } = useAuth()
+  
+  useEffect(() => {
+    // 监听 401 事件，自动退出
+    const handleUnauthorized = () => {
+      logout()
+      alert('登录已过期，请重新登录')
+    }
+    
+    window.addEventListener('unauthorized', handleUnauthorized)
+    return () => {
+      window.removeEventListener('unauthorized', handleUnauthorized)
+    }
+  }, [logout])
 
   useEffect(() => {
     loadWords()

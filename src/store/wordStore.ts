@@ -72,6 +72,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       }))
       set({ words })
     } catch (error) {
+      // 错误已在 api 层处理
       console.error('加载数据失败:', error)
     } finally {
       set({ loading: false })
