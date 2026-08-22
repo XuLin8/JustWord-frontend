@@ -1,41 +1,20 @@
-/**
- * ============================================
- * 文件用途：词库导入/导出 UI 组件
- * 主要功能：
- *   - 导出词库为 JSON 格式文件
- *   - 导出词库为 CSV 格式文件（含 BOM 头，兼容 Excel）
- *   - 导入 JSON 格式词库文件
- *   - 导入 CSV 格式词库文件（自动检测 GBK/UTF-8 编码）
- *   - 清空所有单词（二次确认防误删）
- *   - 显示当前单词总数
- *   - 导入/导出状态反馈
- * 依赖关系：
- *   - react（useRef, useState）
- *   - useWordStore（单词状态管理）
- *   - exportToJSON / exportToCSV（导出工具函数）
- * 导出内容：
- *   - ImportExport：默认导出组件
- * 特殊处理：
- *   - CSV 使用 ArrayBuffer + GBK 解码，解决中文乱码问题
- *   - JSON 自动验证数据结构是否合法
- *   - 清空需要两步确认（先点击"清空词库"，再点"再次确认清空"）
- * ============================================
- */
+// src/components/organisms/ImportExportPanel/index.tsx
+import React, { useRef, useState } from 'react'
+import { useWordStore } from '../../../store/wordStore'
+import { exportToJSON, exportToCSV } from '../../../utils/helpers'
+import { Button } from '../../atoms/Button'
+import './ImportExportPanel.css'
 
-import { useRef, useState } from 'react'
-import { useWordStore } from '../../store/wordStore'
-import { exportToJSON, exportToCSV } from '../../utils/helpers'
-import './ImportExport.css'
-
-interface ImportExportProps {
+interface ImportExportPanelProps {
   onImportComplete?: () => void
 }
 
-export default function ImportExport({ onImportComplete }: ImportExportProps) {
+export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
+  onImportComplete,
+}) => {
   const { words, importWords, clearAllWords } = useWordStore()
   const [isImporting, setIsImporting] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
-  const [showClearConfirm, setShowClearConfirm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 导出 JSON
@@ -137,27 +116,17 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
 
     reader.onload = async (e) => {
       try {
-        // ✅ 改动1：读取为 ArrayBuffer（而不是直接读成字符串）
         const buffer = e.target?.result as ArrayBuffer
-        
-        // ✅ 改动2：尝试用 GBK 解码（中文 Windows 默认编码）
         let content = ''
         try {
-          // 先用 GBK 解码
           content = new TextDecoder('GBK').decode(buffer)
-          console.log('✅ 使用 GBK 编码解码')
         } catch {
-          // 如果 GBK 失败，降级到 UTF-8
           content = new TextDecoder('UTF-8').decode(buffer)
-          console.log('✅ 使用 UTF-8 编码解码')
         }
 
-        // 如果还是乱码，试试这个（移除 BOM 头）
         if (content.charCodeAt(0) === 0xFEFF) {
           content = content.slice(1)
         }
-
-        console.log('📄 解码后的内容前100字符:', content.substring(0, 100))
 
         const lines = content.split('\n').filter(line => line.trim())
 
@@ -166,45 +135,45 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
           return
         }
 
-        // ✅支持含空格的单词
-        const parseCSVLine = (line: string): string[] => {
+        const parseCSVLine = (line: string) => {
           const result: string[] = []
           let current = ''
           let inQuotes = false
-          
-          for (let i = 0; i < line.length; i++) {
+          let i = 0
+
+          while (i < line.length) {
             const char = line[i]
-            
             if (char === '"') {
               if (inQuotes && line[i + 1] === '"') {
                 current += '"'
-                i++
+                i += 2
               } else {
                 inQuotes = !inQuotes
+                i++
               }
             } else if (char === ',' && !inQuotes) {
               result.push(current.trim())
               current = ''
+              i++
             } else {
               current += char
+              i++
             }
           }
-          
+
           if (current || result.length > 0) {
             result.push(current.trim())
           }
-          
           return result
         }
 
         const headers = parseCSVLine(lines[0])
-        console.log('📋 原始标题行:', lines[0])
-        console.log('📋 解析后的 headers:', headers)
-        console.log('📋 headers 长度:', headers.length)
-        const englishIndex = headers.findIndex(h => h.includes('英文') || h.toLowerCase().includes('english'))
-        const chineseIndex = headers.findIndex(h => h.includes('中文') || h.toLowerCase().includes('chinese') || h.includes('释义'))
-        
-        console.log('englishIndex:', englishIndex, 'chineseIndex:', chineseIndex) 
+        const englishIndex = headers.findIndex(h => 
+          h.includes('英文') || h.toLowerCase().includes('english')
+        )
+        const chineseIndex = headers.findIndex(h => 
+          h.includes('中文') || h.toLowerCase().includes('chinese') || h.includes('释义')
+        )
 
         if (englishIndex === -1 || chineseIndex === -1) {
           alert('❌ CSV 格式无效：请确保包含 "英文" 和 "中文" 列')
@@ -249,54 +218,38 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
       setIsImporting(false)
     }
 
-    // ✅ 改动3：改为 readAsArrayBuffer
     reader.readAsArrayBuffer(file)
   }
 
-  // 清空所有单词
   const handleClearAll = async () => {
-    if (!showClearConfirm) {
-      setShowClearConfirm(true)
-      return
-    }
-
     if (window.confirm(`⚠️ 确定要删除全部 ${words.length} 个单词吗？此操作不可撤销！`)) {
       const result = await clearAllWords()
       alert(result.success ? '✅ 已清空所有单词' : `❌ ${result.message}`)
-      setShowClearConfirm(false)
-    } else {
-      setShowClearConfirm(false)
     }
   }
 
   return (
-    <div className="import-export">
+    <div className="import-export-panel">
       <div className="ie-header">
         <span className="ie-title">📦 词库管理</span>
         <span className="ie-count">共 {words.length} 个单词</span>
       </div>
 
       <div className="ie-actions">
-        {/* 导出区域 */}
+        {/* 导出 */}
         <div className="ie-group">
           <span className="ie-label">导出</span>
           <div className="ie-buttons">
-            <button 
-              onClick={handleExportJSON} 
-              disabled={isExporting || words.length === 0}
-            >
+            <Button size="sm" variant="secondary" onClick={handleExportJSON} disabled={isExporting || words.length === 0}>
               📄 JSON
-            </button>
-            <button 
-              onClick={handleExportCSV} 
-              disabled={isExporting || words.length === 0}
-            >
+            </Button>
+            <Button size="sm" variant="secondary" onClick={handleExportCSV} disabled={isExporting || words.length === 0}>
               📊 CSV
-            </button>
+            </Button>
           </div>
         </div>
 
-        {/* 导入区域 */}
+        {/* 导入 */}
         <div className="ie-group">
           <span className="ie-label">导入</span>
           <div className="ie-buttons">
@@ -327,13 +280,9 @@ export default function ImportExport({ onImportComplete }: ImportExportProps) {
 
         {/* 清空 */}
         <div className="ie-group ie-danger">
-          <button 
-            onClick={handleClearAll} 
-            className="danger-btn"
-            disabled={words.length === 0}
-          >
-            🗑️ {showClearConfirm ? '再次确认清空' : '清空词库'}
-          </button>
+          <Button variant="danger" size="sm" onClick={handleClearAll} disabled={words.length === 0}>
+            🗑️ 清空词库
+          </Button>
         </div>
       </div>
 

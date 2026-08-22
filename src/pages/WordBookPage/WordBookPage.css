@@ -1,0 +1,7 @@
+/* src/pages/WordBookPage/WordBookPage.css */
+.word-book-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md, 16px);
+  padding-bottom: var(--spacing-xl, 32px);
+}

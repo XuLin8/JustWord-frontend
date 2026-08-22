@@ -1,8 +1,9 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react'
-import { API } from '../config/api'
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react'
+import { authApi } from '../api'
 import { useWordStore } from '../store/wordStore'
 
+// ============ 类型定义 ============
 interface User {
   id: string
   email: string
@@ -13,13 +14,15 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (email: string, password: string) => Promise<boolean>
-  register: (email: string, username: string, password: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>
+  register: (email: string, username: string, password: string) => Promise<{ success: boolean; message?: string }>
   logout: () => void
   isAuthenticated: boolean
   isLoading: boolean
+  refreshUser: () => Promise<void>
 }
 
+// ============ Context ============
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -27,104 +30,160 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const { loadWords, clearWords } = useWordStore()
-  // 加载 Token
+  
+  // 防止 token 变化时重复加载
+  const isInitialized = useRef(false)
+
+  // ============ 初始化：从 localStorage 恢复登录状态 ============
   useEffect(() => {
     const storedToken = localStorage.getItem('justword_token')
     const storedUser = localStorage.getItem('justword_user')
+    
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      try {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+      } catch {
+        // 用户数据损坏，清除
+        localStorage.removeItem('justword_token')
+        localStorage.removeItem('justword_user')
+      }
     }
     setIsLoading(false)
+    isInitialized.current = true
   }, [])
 
-  // ✅ 核心：token 变化时自动刷新/清空单词列表
+  // ============ 核心：token/user 变化时自动刷新/清空单词 ============
   useEffect(() => {
+    // 跳过初始化前的执行
+    if (!isInitialized.current) return
+    
     if (token && user) {
-        // 有 token 且有用户 → 加载单词
-        loadWords()
+      // 有 token 且有用户 → 加载单词
+      loadWords()
     } else {
-        // 无 token → 清空单词
-        clearWords()
+      // 无 token → 清空单词
+      clearWords()
     }
-  }, [token, user, loadWords, clearWords])  // ← 依赖 token 和 user
+  }, [token, user, loadWords, clearWords])
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  // ============ 监听全局 401 事件 ============
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      // 清除本地状态
+      setToken(null)
+      setUser(null)
+      localStorage.removeItem('justword_token')
+      localStorage.removeItem('justword_user')
+      clearWords()
+    }
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
+  }, [clearWords])
+
+  // ============ 刷新用户信息 ============
+  const refreshUser = useCallback(async () => {
     try {
-      const response = await fetch(`${API.auth.login}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.detail || '登录失败')
+      const data = await authApi.getMe()
+      const userData: User = {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        created_at: data.created_at,
       }
+      setUser(userData)
+      localStorage.setItem('justword_user', JSON.stringify(userData))
+    } catch (error) {
+      console.error('刷新用户信息失败:', error)
+      // 如果获取用户信息失败，可能是 token 无效
+      setToken(null)
+      setUser(null)
+      localStorage.removeItem('justword_token')
+      localStorage.removeItem('justword_user')
+    }
+  }, [])
+
+  // ============ 登录 ============
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const data = await authApi.login({ email, password })
       
-      const data = await response.json()
+      // 保存 token
       setToken(data.access_token)
       localStorage.setItem('justword_token', data.access_token)
       
       // 获取用户信息
-      const userResponse = await fetch(`${API.auth.me}`, {
-        headers: { 'Authorization': `Bearer ${data.access_token}` }
-      })
-      if (userResponse.ok) {
-        const userData = await userResponse.json()
-        setUser(userData)
-        localStorage.setItem('justword_user', JSON.stringify(userData))
+      try {
+        const userData = await authApi.getMe()
+        const userInfo: User = {
+          id: userData.id,
+          email: userData.email,
+          username: userData.username,
+          created_at: userData.created_at,
+        }
+        setUser(userInfo)
+        localStorage.setItem('justword_user', JSON.stringify(userInfo))
+      } catch {
+        // 如果获取用户信息失败，可能是 token 无效
+        setToken(null)
+        localStorage.removeItem('justword_token')
+        return { success: false, message: '获取用户信息失败，请重试' }
       }
       
-      return true
-    } catch (error) {
+      return { success: true }
+    } catch (error: any) {
       console.error('登录失败:', error)
-      return false
-    }
-  }, [])
-
-  const register = useCallback(async (email: string, username: string, password: string): Promise<boolean> => {
-    try {
-      const response = await fetch(`${API.auth.register}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username, password }),
-      })
-      
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.detail || '注册失败')
+      return { 
+        success: false, 
+        message: error.message || '登录失败，请检查邮箱和密码' 
       }
-      
-      return true
-    } catch (error) {
-      console.error('注册失败:', error)
-      return false
     }
   }, [])
 
+  // ============ 注册 ============
+  const register = useCallback(async (email: string, username: string, password: string) => {
+    try {
+      await authApi.register({ email, username, password })
+      return { success: true }
+    } catch (error: any) {
+      console.error('注册失败:', error)
+      return { 
+        success: false, 
+        message: error.message || '注册失败，请检查邮箱或用户名是否已被使用' 
+      }
+    }
+  }, [])
+
+  // ============ 登出 ============
   const logout = useCallback(() => {
     setToken(null)
     setUser(null)
     localStorage.removeItem('justword_token')
     localStorage.removeItem('justword_user')
-  }, [])
+    clearWords()
+  }, [clearWords])
 
+  // ============ Provider ============
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      login,
-      register,
-      logout,
-      isAuthenticated: !!token && !!user,
-      isLoading,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        refreshUser,
+        isAuthenticated: !!token && !!user,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
 }
 
+// ============ Hook ============
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {

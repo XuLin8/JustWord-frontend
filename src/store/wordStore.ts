@@ -1,48 +1,32 @@
-/**
- * ============================================
- * 文件用途：Zustand 状态管理 Store（单词数据核心）
- * 主要功能：
- *   - 单词 CRUD 操作（增、删、改、查）
- *   - 通过后端 API 与 MySQL 同步
- *   - 批量导入单词（importWords）
- *   - 清空所有单词（clearAllWords）
- *   - 加载状态管理（loading）
- *   - 搜索关键词管理（searchTerm）
- *   - 应用启动时从后端加载数据（loadWords）
- * 依赖关系：
- *   - zustand：状态管理
- *   - Word 类型定义（../types）
- * 导出内容：
- *   - useWordStore：React Hook（包含所有状态和方法）
- * ============================================
- */
-
+// src/store/wordStore.ts
 import { create } from 'zustand'
-import type { Word, OperationResult, ImportResult, WordMetadata  } from '../types'
-import { API } from '../config/api'
+import type { Word, OperationResult, ImportResult, WordMetadata } from '../types'
+import { wordsApi, type WordResponse } from '../api'
 
-// ✅ 辅助函数：获取 token
-const getToken = () => localStorage.getItem('justword_token')
-
-// ✅ 辅助函数：创建带认证的请求头
-const getHeaders = () => {
-  const token = getToken()
+// ============ 辅助函数：API 响应 → 前端 Word ============
+function toWord(response: WordResponse): Word {
   return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    id: response.id,
+    english: response.english,
+    chinese: response.chinese,
+    createdAt: new Date(response.created_at).getTime(),
+    updatedAt: response.updated_at ? new Date(response.updated_at).getTime() : undefined,
+    meta_data: response.meta_data || {},
   }
 }
+
 interface WordStore {
   words: Word[]
   loading: boolean
   searchTerm: string
-  addWord: (english: string, chinese: string) => Promise<OperationResult>
+  addWord: (english: string, chinese: string, metadata?: WordMetadata) => Promise<OperationResult>
   deleteWord: (id: string) => Promise<OperationResult>
-  updateWord: (id: string, english: string, chinese: string) => Promise<OperationResult>
+  updateWord: (id: string, english: string, chinese: string, metadata?: WordMetadata) => Promise<OperationResult>
   loadWords: () => Promise<void>
+  refreshWords: () => Promise<void>
   setSearchTerm: (term: string) => void
   isWordExist: (english: string, excludeId?: string) => boolean
-  importWords: (words: Omit<Word, 'id' | 'createdAt'>[]) => Promise<ImportResult>
+  importWords: (words: Omit<Word, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<ImportResult>
   clearAllWords: () => Promise<OperationResult>
   clearWords: () => void
 }
@@ -52,35 +36,30 @@ export const useWordStore = create<WordStore>((set, get) => ({
   loading: false,
   searchTerm: '',
 
-  // ========== 从后端加载数据 ==========
+  // ========== loadWords ==========
   loadWords: async () => {
     set({ loading: true })
     try {
-      const response = await fetch(API.words, {
-        headers: getHeaders(), // ✅ 添加 token
-      })
-      if (!response.ok) throw new Error('加载失败')
-      const data = await response.json()
-      // 后端返回的是数组，需要转换成 Word 类型
-      const words = data.map((item: any) => ({
-        id: item.id,
-        english: item.english,
-        chinese: item.chinese,
-        createdAt: new Date(item.created_at).getTime(),
-        updatedAt: item.updated_at ? new Date(item.updated_at).getTime() : undefined,
-        metadata: item.metadata || {}
-      }))
+      const data = await wordsApi.getAll()
+      const words = data.map(toWord)
       set({ words })
     } catch (error) {
-      // 错误已在 api 层处理
       console.error('加载数据失败:', error)
+      set({ words: [] })
     } finally {
       set({ loading: false })
     }
   },
 
+  // ========== refreshWords ==========
+  refreshWords: async () => {
+    await get().loadWords()
+  },
+
+  // ========== setSearchTerm ==========
   setSearchTerm: (term: string) => set({ searchTerm: term }),
 
+  // ========== isWordExist ==========
   isWordExist: (english: string, excludeId?: string) => {
     const { words } = get()
     const trimmed = english.trim().toLowerCase()
@@ -89,7 +68,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     )
   },
 
-  // ========== 添加单词到后端 ==========
+  // ========== addWord ==========
   addWord: async (english: string, chinese: string, metadata?: WordMetadata) => {
     const trimmedEnglish = english.trim()
     const trimmedChinese = chinese.trim()
@@ -99,69 +78,42 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     try {
-      const response = await fetch(API.words, {
-        method: 'POST',
-        headers: getHeaders(), // ✅ 添加 token
-        body: JSON.stringify({
-          english: trimmedEnglish,
-          chinese: trimmedChinese,
-          metadata: metadata || {}
-        }),
+      const response = await wordsApi.create({
+        english: trimmedEnglish,
+        chinese: trimmedChinese,
+        meta_data: metadata || {},
       })
+      const newWord = toWord(response)
 
-      if (!response.ok) {
-        const error = await response.json()
-        return { success: false, message: error.detail || '添加失败' }
-      }
-
-      const newWord = await response.json()
-      
-      // 更新本地状态
-      const word: Word = {
-        id: newWord.id,
-        english: newWord.english,
-        chinese: newWord.chinese,
-        createdAt: new Date(newWord.created_at).getTime(),
-        updatedAt: newWord.updated_at ? new Date(newWord.updated_at).getTime() : undefined,
-        meta_data: newWord.metadata || {}
-      }
-      
       set((state) => ({
-        words: [word, ...state.words],
+        words: [newWord, ...state.words],
       }))
 
       return { success: true }
-    } catch (error) {
+    } catch (error: any) {
       console.error('添加失败:', error)
-      return { success: false, message: '网络错误，请重试' }
+      return { success: false, message: error.message || '添加失败，请重试' }
     }
   },
 
-  // ========== 删除单词 ==========
+  // ========== deleteWord ==========
   deleteWord: async (id: string) => {
     try {
-      const response = await fetch(`${API.words}/${id}`, {
-        method: 'DELETE',
-        headers: getHeaders(), // ✅ 添加 token
-      })
-
-      if (!response.ok) {
-        return { success: false, message: '删除失败' }
-      }
+      await wordsApi.delete(id)
 
       set((state) => ({
         words: state.words.filter(w => w.id !== id),
       }))
 
       return { success: true }
-    } catch (error) {
+    } catch (error: any) {
       console.error('删除失败:', error)
-      return { success: false, message: '网络错误，请重试' }
+      return { success: false, message: error.message || '删除失败，请重试' }
     }
   },
 
-  // ========== 更新单词 ==========
-  updateWord: async (id: string, english: string, chinese: string, meta_data?: WordMetadata) => {
+  // ========== updateWord ==========
+  updateWord: async (id: string, english: string, chinese: string, metadata?: WordMetadata) => {
     const trimmedEnglish = english.trim()
     const trimmedChinese = chinese.trim()
 
@@ -170,51 +122,28 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     try {
-      const updateData: any = {
+      const response = await wordsApi.update(id, {
         english: trimmedEnglish,
         chinese: trimmedChinese,
-      }
-      if (meta_data !== undefined) {
-        updateData.metadata = meta_data
-      }
-      const response = await fetch(`${API.words}/${id}`, {
-        method: 'PUT',
-        headers: getHeaders(), // ✅ 添加 token
-        body: JSON.stringify({
-          updateData
-        }),
+        meta_data: metadata,
       })
+      const updatedWord = toWord(response)
 
-      if (!response.ok) {
-        const error = await response.json()
-        return { success: false, message: error.detail || '更新失败' }
-      }
-
-      const updatedWord = await response.json()
-      
       set((state) => ({
         words: state.words.map(word =>
-          word.id === id
-            ? {
-                ...word,
-                english: updatedWord.english,
-                chinese: updatedWord.chinese,
-                updatedAt: updatedWord.updated_at ? new Date(updatedWord.updated_at).getTime() : undefined,
-                metadata: updatedWord.metadata || {}
-              }
-            : word
+          word.id === id ? updatedWord : word
         ),
       }))
 
       return { success: true }
-    } catch (error) {
+    } catch (error: any) {
       console.error('更新失败:', error)
-      return { success: false, message: '网络错误，请重试' }
+      return { success: false, message: error.message || '更新失败，请重试' }
     }
   },
 
-  // ========== 批量导入 ==========
-  importWords: async (importData: Omit<Word, 'id' | 'createdAt'>[]) => {
+  // ========== importWords ==========
+  importWords: async (importData: Omit<Word, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     let imported = 0
     let skipped = 0
 
@@ -227,29 +156,17 @@ export const useWordStore = create<WordStore>((set, get) => ({
       }
 
       try {
-        const response = await fetch(API.words, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ english, chinese , meta_data: item.meta_data || {}}),
+        const response = await wordsApi.create({
+          english,
+          chinese,
+          meta_data: item.meta_data || {},
         })
+        const newWord = toWord(response)
 
-        if (response.ok) {
-          const newWord = await response.json()
-          const word: Word = {
-            id: newWord.id,
-            english: newWord.english,
-            chinese: newWord.chinese,
-            createdAt: new Date(newWord.created_at).getTime(),
-            updatedAt: newWord.updated_at ? new Date(newWord.updated_at).getTime() : undefined,
-            meta_data: newWord.metadata || {}
-          }
-          set((state) => ({
-            words: [word, ...state.words],
-          }))
-          imported++
-        } else {
-          skipped++
-        }
+        set((state) => ({
+          words: [newWord, ...state.words],
+        }))
+        imported++
       } catch (error) {
         skipped++
       }
@@ -267,28 +184,20 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
   },
 
-  // ========== 清空所有单词 ==========
+  // ========== clearAllWords ==========
   clearAllWords: async () => {
     try {
-      const response = await fetch(API.words, {
-        method: 'DELETE',
-        headers: getHeaders(), // ✅ 添加 token
-      })
-
-      if (!response.ok) {
-        return { success: false, message: '清空失败' }
-      }
-
+      await wordsApi.deleteAll()
       set({ words: [] })
       return { success: true }
-    } catch (error) {
+    } catch (error: any) {
       console.error('清空失败:', error)
-      return { success: false, message: '网络错误，请重试' }
+      return { success: false, message: error.message || '清空失败，请重试' }
     }
   },
-  
-  // ✅ 清空单词列表
+
+  // ========== clearWords ==========
   clearWords: () => {
-    set({ words: [] })  
+    set({ words: [] })
   },
 }))

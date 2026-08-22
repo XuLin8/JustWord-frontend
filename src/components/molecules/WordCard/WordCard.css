@@ -1,0 +1,66 @@
+/* src/components/molecules/WordCard/WordCard.css */
+.word-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
+  background: var(--color-bg-white, white);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+  transition: all var(--transition, 0.2s);
+}
+
+.word-card:hover {
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+}
+
+.word-card-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.word-english {
+  font-weight: 600;
+  font-size: var(--font-size-lg, 16px);
+}
+
+.word-chinese {
+  color: var(--color-text-secondary, #666);
+}
+
+.word-separator {
+  color: var(--color-text-light, #999);
+}
+
+.word-card-actions {
+  display: flex;
+  gap: var(--spacing-xs, 4px);
+}
+
+.word-card-edit {
+  display: flex;
+  gap: var(--spacing-sm, 8px);
+  flex: 1;
+  align-items: center;
+}
+
+.word-card-edit .input-group {
+  flex: 1;
+}
+
+.word-card-edit .input-group input {
+  padding: 6px 10px;
+  font-size: var(--font-size-md, 14px);
+}
+
+@media (max-width: 480px) {
+  .word-card {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm, 8px);
+  }
+  .word-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

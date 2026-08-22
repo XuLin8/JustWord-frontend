@@ -82,3 +82,25 @@ export interface ImportResult extends OperationResult {
   imported: number
   skipped: number
 }
+
+// src/types/index.ts
+
+// ============================================
+// 统一导出所有类型
+// ============================================
+
+// 认证相关
+export type {
+  LoginData,
+  RegisterData,
+  AuthResult,
+  User,
+  LoginResponse,
+  UserResponse,
+} from './auth.types'
+
+// 单词相关（如果有）
+// export type { Word, WordMetadata } from './word.types'
+
+// 通用类型（如果有）
+// export type { ApiResponse, PaginatedResponse } from './common.types'

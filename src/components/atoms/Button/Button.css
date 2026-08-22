@@ -1,0 +1,71 @@
+/* src/components/atoms/Button/Button.css */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm, 8px);
+  border: none;
+  border-radius: var(--radius-md, 8px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition, 0.2s);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 4px 12px;
+  font-size: var(--font-size-sm, 12px);
+  height: 32px;
+}
+.btn-md {
+  padding: 8px 20px;
+  font-size: var(--font-size-md, 14px);
+  height: 40px;
+}
+.btn-lg {
+  padding: 12px 28px;
+  font-size: var(--font-size-lg, 16px);
+  height: 48px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--color-primary, #4a90d9);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover, #3a7bc8);
+}
+
+.btn-secondary {
+  background: var(--color-secondary, #6c757d);
+  color: white;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-secondary-hover, #5a6268);
+}
+
+.btn-danger {
+  background: var(--color-danger, #e74c3c);
+  color: white;
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover, #c0392b);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary, #666);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-bg, #f8f9fa);
+}

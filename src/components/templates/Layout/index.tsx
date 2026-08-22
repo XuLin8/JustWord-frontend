@@ -1,0 +1,27 @@
+// src/components/templates/Layout/index.tsx
+import React from 'react'
+import { AppHeader } from './AppHeader'
+import { AppFooter } from './AppFooter'
+import './Layout.css'
+
+interface LayoutProps {
+  children: React.ReactNode
+  headerProps: {
+    activeTab: 'word' | 'learn'
+    onTabChange: (tab: 'word' | 'learn') => void
+    showImportExport: boolean
+    onToggleImportExport: () => void
+    onShowLogin: () => void
+    onShowRegister: () => void
+  }
+}
+
+export const Layout: React.FC<LayoutProps> = ({ children, headerProps }) => {
+  return (
+    <div className="app">
+      <AppHeader {...headerProps} />
+      <main className="app-main">{children}</main>
+      <AppFooter />
+    </div>
+  )
+}

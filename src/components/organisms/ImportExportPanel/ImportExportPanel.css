@@ -1,0 +1,93 @@
+/* src/components/organisms/ImportExportPanel/ImportExportPanel.css */
+.import-export-panel {
+  background: var(--color-bg-white, white);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--spacing-lg, 24px);
+  margin-bottom: var(--spacing-lg, 24px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+  border: 1px dashed var(--color-border, #e0e0e0);
+}
+
+.ie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.ie-title {
+  font-weight: 600;
+  font-size: var(--font-size-lg, 16px);
+}
+
+.ie-count {
+  font-size: var(--font-size-sm, 12px);
+  color: var(--color-text-light, #999);
+}
+
+.ie-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg, 24px);
+}
+
+.ie-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.ie-label {
+  font-size: var(--font-size-sm, 12px);
+  color: var(--color-text-secondary, #666);
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.ie-buttons {
+  display: flex;
+  gap: var(--spacing-xs, 4px);
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  height: 32px;
+  font-size: var(--font-size-sm, 12px);
+  font-weight: 500;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-secondary, #6c757d);
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition, 0.2s);
+}
+
+.file-label:hover {
+  background: var(--color-secondary-hover, #5a6268);
+}
+
+.ie-danger {
+  margin-left: auto;
+}
+
+.ie-status {
+  margin-top: var(--spacing-sm, 8px);
+  font-size: var(--font-size-sm, 12px);
+  color: var(--color-text-secondary, #666);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .ie-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm, 8px);
+  }
+  .ie-group {
+    flex-wrap: wrap;
+  }
+  .ie-danger {
+    margin-left: 0;
+  }
+}

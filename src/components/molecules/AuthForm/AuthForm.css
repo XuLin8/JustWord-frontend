@@ -1,0 +1,57 @@
+/* src/components/molecules/AuthForm/AuthForm.css */
+.auth-form {
+  width: 100%;
+}
+
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: var(--spacing-lg, 24px);
+  color: var(--color-text, #333);
+  font-size: var(--font-size-xl, 20px);
+  font-weight: 600;
+}
+
+.auth-form .input-group {
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.auth-form .auth-error {
+  color: var(--color-danger, #e74c3c);
+  font-size: var(--font-size-sm, 12px);
+  text-align: center;
+  margin: var(--spacing-sm, 8px) 0;
+}
+
+.auth-form .auth-success {
+  color: var(--color-success, #27ae60);
+  font-size: var(--font-size-sm, 12px);
+  text-align: center;
+  margin: var(--spacing-sm, 8px) 0;
+}
+
+.auth-form .auth-switch {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-md, 16px);
+  background: none;
+  border: none;
+  color: var(--color-primary, #4a90d9);
+  cursor: pointer;
+  font-size: var(--font-size-md, 14px);
+  text-align: center;
+  transition: color var(--transition, 0.2s);
+}
+
+.auth-form .auth-switch:hover {
+  color: var(--color-primary-hover, #3a7bc8);
+  text-decoration: underline;
+}
+
+.auth-form .btn-full {
+  margin-top: var(--spacing-sm, 8px);
+}
+
+.auth-form .btn-full:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
