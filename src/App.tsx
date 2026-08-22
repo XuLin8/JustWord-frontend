@@ -14,15 +14,25 @@
  * ============================================
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { useWordStore } from './store/wordStore'
-import ImportExport from './components/ImportExport/ImportExport'
-import LearnMode from './components/LearnMode/LearnMode'
 import { isValidEnglish, isValidChinese } from './utils/validation'
 import './App.css'
 import { useAuth } from './context/AuthContext'
 import Login from './components/Auth/Login'
 import Register from './components/Auth/Register'
+
+// ✅ 懒加载组件
+const ImportExport = lazy(() => import('./components/ImportExport/ImportExport'))
+const LearnMode = lazy(() => import('./components/LearnMode/LearnMode'))
+
+// ✅ 加载中组件
+const PageLoader = () => (
+  <div className="page-loader">
+    <div className="spinner"></div>
+    <p>加载中...</p>
+  </div>
+)
 
 function App() {
   const { words, loading, addWord, deleteWord, updateWord, loadWords } = useWordStore()
@@ -39,10 +49,17 @@ function App() {
   
   const [showLogin, setShowLogin] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
-  const { user, logout } = useAuth()
-  
+  const { user, logout ,isAuthenticated } = useAuth()
+
+    // ✅ 合并 useEffect
   useEffect(() => {
-    // 监听 401 事件，自动退出
+    if (isAuthenticated) {
+      loadWords()
+    }
+  }, [isAuthenticated, loadWords])
+
+  // ✅ 监听 401 事件
+  useEffect(() => {
     const handleUnauthorized = () => {
       logout()
       alert('登录已过期，请重新登录')
@@ -53,10 +70,6 @@ function App() {
       window.removeEventListener('unauthorized', handleUnauthorized)
     }
   }, [logout])
-
-  useEffect(() => {
-    loadWords()
-  }, [loadWords])
 
   const showAlert = (message: string) => {
     const now = Date.now()
@@ -250,11 +263,18 @@ function App() {
           </button>
         </div>
       </div>
-
-      {/* 导入导出面板 */}
-      {showImportExport && (
-        <ImportExport onImportComplete={handleImportComplete} />
+      
+      {/* ✅ 懒加载组件用 Suspense 包裹 */}
+      <Suspense fallback={<PageLoader />}>
+        {/* 导入导出面板 */}
+        {showImportExport && (
+        <ImportExport 
+          onImportComplete={() => {
+            handleImportComplete()  // 如果需要额外的回调
+          }} 
+        />
       )}
+      </Suspense>
 
       {/* 根据 Tab 显示不同内容 */}
       {activeTab === 'word' ? (
