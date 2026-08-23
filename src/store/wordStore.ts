@@ -29,6 +29,7 @@ interface WordStore {
   importWords: (words: Omit<Word, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<ImportResult>
   clearAllWords: () => Promise<OperationResult>
   clearWords: () => void
+  deduplicate: () => Promise<OperationResult & { removed: number }>
 }
 
 export const useWordStore = create<WordStore>((set, get) => ({
@@ -167,7 +168,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
           words: [newWord, ...state.words],
         }))
         imported++
-      } catch (error) {
+      } catch (_error) {
         skipped++
       }
     }
@@ -199,5 +200,60 @@ export const useWordStore = create<WordStore>((set, get) => ({
   // ========== clearWords ==========
   clearWords: () => {
     set({ words: [] })
+  },
+
+  // ========== deduplicate ==========
+  deduplicate: async () => {
+    const { words } = get()
+    const groups = new Map<string, Word[]>()
+    for (const w of words) {
+      const k = w.english.trim().toLowerCase()
+      const list = groups.get(k) ?? []
+      list.push(w)
+      groups.set(k, list)
+    }
+
+    const toRemove: Word[] = []
+    for (const list of groups.values()) {
+      if (list.length <= 1) continue
+      // 保留 createdAt 最新（或最大 id）的一条，其余删
+      const sorted = [...list].sort((a, b) => {
+        const byTime = (b.createdAt ?? 0) - (a.createdAt ?? 0)
+        if (byTime !== 0) return byTime
+        return b.id.localeCompare(a.id)
+      })
+      toRemove.push(...sorted.slice(1))
+    }
+
+    if (toRemove.length === 0) {
+      return { success: true, message: '当前无重复单词', removed: 0 }
+    }
+
+    let removed = 0
+    let failed = 0
+    for (const w of toRemove) {
+      try {
+        await wordsApi.delete(w.id)
+        removed++
+      } catch {
+        failed++
+      }
+    }
+    if (removed > 0) {
+      set((state) => ({ words: state.words.filter((w) => !toRemove.find((r) => r.id === w.id)) }))
+    }
+
+    if (failed > 0) {
+      return {
+        success: removed > 0,
+        message: `去重完成：删除 ${removed} 个重复项，失败 ${failed} 个`,
+        removed,
+      }
+    }
+    return {
+      success: true,
+      message: `去重完成：共删除 ${removed} 个重复项（保留最新一条）`,
+      removed,
+    }
   },
 }))
