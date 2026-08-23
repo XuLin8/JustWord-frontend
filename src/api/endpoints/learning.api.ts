@@ -1,29 +1,25 @@
 // src/api/endpoints/learning.api.ts
 import { http } from '../client'
+import { API_PATH } from '../paths'
 
-// ============ 类型定义 ============
-export interface LearningRecord {
+export interface LearningRecordResponse {
   id: number
   word_id: string
+  user_id: string
   mode: 'en2zh' | 'zh2en'
   user_answer: string
   correct_answer: string
-  result: 'correct' | 'partial' | 'wrong' | 'close'
+  result: 'correct' | 'partial' | 'wrong' | 'close' | 'typo'
   score: number
   feedback?: string
   created_at: string
 }
 
-export interface LearningStats {
-  total_attempts: number
-  correct_count: number
-  correct_rate: number
-  word_stats: Array<{
-    word_id: string
-    total: number
-    correct: number
-    rate: number
-  }>
+export interface PaginatedRecords {
+  items: LearningRecordResponse[]
+  total: number
+  limit: number
+  offset: number
 }
 
 export interface CreateLearningRecordRequest {
@@ -31,30 +27,76 @@ export interface CreateLearningRecordRequest {
   mode: 'en2zh' | 'zh2en'
   user_answer: string
   correct_answer: string
-  result: 'correct' | 'partial' | 'wrong' | 'close'
+  result: 'correct' | 'partial' | 'wrong' | 'close' | 'typo'
   score: number
   feedback?: string
 }
 
-// ============ API 方法 ============
-export const learningApi = {
-  // 获取学习记录
-  getRecords: (params?: { word_id?: string; mode?: string; limit?: number }) =>
-    http.get<LearningRecord[]>('/api/learning/records', {
-      // GET 参数通过 URL 传递
-    }),
-
-  // 创建学习记录
-  createRecord: (data: CreateLearningRecordRequest) =>
-    http.post<LearningRecord>('/api/learning/records', data),
-
-  // 获取学习统计
-  getStats: (word_id?: string) =>
-    http.get<LearningStats>('/api/learning/stats', {
-      // 通过 URL 参数传递 word_id
-    }),
-
-  // 清空学习记录
-  clearRecords: () =>
-    http.delete<{ message: string }>('/api/learning/records'),
+export interface WordStatItem {
+  word_id: string
+  total: number
+  correct: number
+  rate: number
 }
+
+export interface LearningStatsResponse {
+  total_attempts: number
+  correct_count: number
+  correct_rate: number
+  word_stats: WordStatItem[]
+}
+
+export interface WrongWordSummaryResponse {
+  open_count: number
+  today_wrong_count: number
+  weak_due_count: number
+}
+
+export interface ReviewSummaryResponse {
+  due_count: number
+  new_count: number
+  review_count: number
+  learned_count: number
+}
+
+export const learningApi = {
+  createRecord: (data: CreateLearningRecordRequest) =>
+    http.post<LearningRecordResponse>(API_PATH.learning.records, data),
+
+  getRecords: (params?: {
+    limit?: number
+    offset?: number
+    word_id?: string
+    mode?: 'en2zh' | 'zh2en'
+  }) => {
+    const qs = new URLSearchParams()
+    if (params?.limit != null) qs.set('limit', String(params.limit))
+    if (params?.offset != null) qs.set('offset', String(params.offset))
+    if (params?.word_id) qs.set('word_id', params.word_id)
+    if (params?.mode) qs.set('mode', params.mode)
+    const s = qs.toString()
+    return http.get<PaginatedRecords>(
+      s ? `${API_PATH.learning.records}?${s}` : API_PATH.learning.records,
+    )
+  },
+
+  clearRecords: () =>
+    http.delete<{ message: string }>(API_PATH.learning.records),
+
+  getStats: (word_id?: string) => {
+    const url = word_id
+      ? `${API_PATH.learning.stats}?word_id=${encodeURIComponent(word_id)}`
+      : API_PATH.learning.stats
+    return http.get<LearningStatsResponse>(url)
+  },
+
+  getWrongSummary: () =>
+    http.get<WrongWordSummaryResponse>(API_PATH.wrongWords.summary),
+
+  getReviewSummary: () =>
+    http.get<ReviewSummaryResponse>(API_PATH.review.summary),
+}
+
+// 兼容旧命名导出
+export type LearningRecord = LearningRecordResponse
+export type LearningStats = LearningStatsResponse
