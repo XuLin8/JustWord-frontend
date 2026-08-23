@@ -3,23 +3,26 @@ import React from 'react'
 import { useAuth } from '../../../context/AuthContext'
 import { Button } from '../../atoms/Button'
 
+export type AppTab = 'home' | 'word' | 'learn'
+
 interface AppHeaderProps {
-  activeTab: 'word' | 'learn'
-  onTabChange: (tab: 'word' | 'learn') => void
+  activeTab: AppTab
+  onTabChange: (tab: AppTab) => void
   showImportExport: boolean
   onToggleImportExport: () => void
   onShowLogin: () => void
   onShowRegister: () => void
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({
-  activeTab,
-  onTabChange,
-  showImportExport,
-  onToggleImportExport,
-  onShowLogin,
-  onShowRegister,
-}) => {
+export const AppHeader: React.FC<AppHeaderProps> = (props) => {
+  const {
+    activeTab,
+    onTabChange,
+    showImportExport,
+    onToggleImportExport,
+    onShowLogin,
+  } = props
+  void props.onShowRegister
   const { user, logout } = useAuth()
 
   return (
@@ -41,6 +44,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         )}
 
         <div className="tab-buttons">
+          <button
+            className={activeTab === 'home' ? 'tab-active' : 'tab-inactive'}
+            onClick={() => onTabChange('home')}
+          >
+            🏠 首页
+          </button>
           <button
             className={activeTab === 'word' ? 'tab-active' : 'tab-inactive'}
             onClick={() => onTabChange('word')}
