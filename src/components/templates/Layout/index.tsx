@@ -2,6 +2,7 @@
 import React from 'react'
 import { AppHeader } from './AppHeader'
 import { AppFooter } from './AppFooter'
+//import { ParticleBackground } from '../../atoms/ParticleBackground'  
 import './Layout.css'
 
 interface LayoutProps {
@@ -19,6 +20,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, headerProps }) => {
   return (
     <div className="app">
+      {/* <ParticleBackground /> */}
       <AppHeader {...headerProps} />
       <main className="app-main">{children}</main>
       <AppFooter />
