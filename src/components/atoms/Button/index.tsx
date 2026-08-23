@@ -24,10 +24,11 @@ export const Button: React.FC<ButtonProps> = ({
   const baseClass = 'btn'
   const variantClass = `btn-${variant}`
   const sizeClass = `btn-${size}`
-  
+  const widthClass = fullWidth ? 'btn-full' : ''
+
   return (
     <button
-      className={`${baseClass} ${variantClass} ${sizeClass} ${className}`}
+      className={`${baseClass} ${variantClass} ${sizeClass} ${widthClass} ${className}`}
       disabled={disabled || loading}
       {...props}
     >

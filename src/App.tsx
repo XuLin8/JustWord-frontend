@@ -7,6 +7,8 @@ import { WordBookPage } from './pages/WordBookPage'
 import { LearnPage } from './pages/LearnPage'
 import { AuthModal } from './components/organisms/AuthModal'
 import { ImportExportPanel } from './components/organisms/ImportExportPanel'
+import { ToastContainer } from './components/organisms/ToastContainer'
+import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { setupAuthListener } from './api'
 import './App.css'
 
@@ -35,42 +37,43 @@ function App() {
   }
 
   return (
-    <Layout
-      headerProps={{
-        activeTab,
-        onTabChange: setActiveTab,
-        showImportExport,
-        onToggleImportExport: () => setShowImportExport(!showImportExport),
-        onShowLogin: () => setShowLogin(true),
-        onShowRegister: () => setShowRegister(true),
-      }}
-    >
-      <AuthModal
-        isLoginOpen={showLogin}
-        isRegisterOpen={showRegister}
-        onCloseLogin={() => setShowLogin(false)}
-        onCloseRegister={() => setShowRegister(false)}
-        onSwitchToRegister={() => {
-          setShowLogin(false)
-          setShowRegister(true)
+    <>
+      <Layout
+        headerProps={{
+          activeTab,
+          onTabChange: setActiveTab,
+          showImportExport,
+          onToggleImportExport: () => setShowImportExport(!showImportExport),
+          onShowLogin: () => setShowLogin(true),
+          onShowRegister: () => setShowRegister(true),
         }}
-        onSwitchToLogin={() => {
-          setShowRegister(false)
-          setShowLogin(true)
-        }}
-      />
+      >
+        <AuthModal
+          isLoginOpen={showLogin}
+          isRegisterOpen={showRegister}
+          onCloseLogin={() => setShowLogin(false)}
+          onCloseRegister={() => setShowRegister(false)}
+          onSwitchToRegister={() => {
+            setShowLogin(false)
+            setShowRegister(true)
+          }}
+          onSwitchToLogin={() => {
+            setShowRegister(false)
+            setShowLogin(true)
+          }}
+        />
 
-      {/* ✅ 导入导出面板由 App 控制 */}
-      {showImportExport && activeTab === 'word' && (
-        <ImportExportPanel onImportComplete={handleImportComplete} />
-      )}
+        {/* 导入导出面板由 App 控制 */}
+        {showImportExport && activeTab === 'word' && (
+          <ImportExportPanel onImportComplete={handleImportComplete} />
+        )}
 
-      {activeTab === 'word' ? (
-        <WordBookPage />  // ✅ 不再传 props
-      ) : (
-        <LearnPage />
-      )}
-    </Layout>
+        {activeTab === 'word' ? <WordBookPage /> : <LearnPage />}
+      </Layout>
+
+      <ToastContainer />
+      <ConfirmDialog />
+    </>
   )
 }
 

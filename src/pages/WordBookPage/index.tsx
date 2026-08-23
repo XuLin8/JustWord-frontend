@@ -1,22 +1,31 @@
 // src/pages/WordBookPage/index.tsx
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
 import { WordList } from '../../components/organisms/WordList'
+import { Input } from '../../components/atoms/Input'
 import './WordBookPage.css'
 
 export const WordBookPage: React.FC = () => {
-  const { words, loading, addWord, deleteWord, updateWord } = useWordStore()
+  const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord } = useWordStore()
 
-  // ✅ 适配器：将 addWord 包装成 WordForm 需要的类型
+  const filteredWords = useMemo(() => {
+    if (!searchTerm.trim()) return words
+    const query = searchTerm.trim().toLowerCase()
+    return words.filter(
+      (w) =>
+        w.english.toLowerCase().includes(query) ||
+        w.chinese.toLowerCase().includes(query)
+    )
+  }, [words, searchTerm])
+
   const handleAddWord = async (english: string, chinese: string): Promise<void> => {
     const result = await addWord(english, chinese)
     if (!result.success) {
-      // 把错误抛出去，让 WordForm 的 catch 或错误状态处理
       throw new Error(result.message || '添加失败')
     }
   }
-  // ✅ 适配 WordList：deleteWord → Promise<void>
+
   const handleDeleteWord = async (id: string): Promise<void> => {
     const result = await deleteWord(id)
     if (!result.success) {
@@ -24,18 +33,34 @@ export const WordBookPage: React.FC = () => {
     }
   }
 
-  // ✅ 适配 WordList：updateWord → Promise<void>
   const handleUpdateWord = async (id: string, english: string, chinese: string): Promise<void> => {
     const result = await updateWord(id, english, chinese)
     if (!result.success) {
       throw new Error(result.message || '更新失败')
     }
   }
+
   return (
     <div className="word-book-page">
       <WordForm onSubmit={handleAddWord} />
+
+      <div className="word-book-toolbar">
+        <Input
+          placeholder="🔍 搜索英文或中文..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          fullWidth
+          aria-label="搜索单词"
+        />
+        <div className="word-book-stats" aria-live="polite">
+          {searchTerm
+            ? `找到 ${filteredWords.length} / ${words.length} 个单词`
+            : `共 ${words.length} 个单词`}
+        </div>
+      </div>
+
       <WordList
-        words={words}
+        words={filteredWords}
         loading={loading}
         onDelete={handleDeleteWord}
         onUpdate={handleUpdateWord}

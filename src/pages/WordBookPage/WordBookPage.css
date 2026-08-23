@@ -5,3 +5,15 @@
   gap: var(--spacing-md, 16px);
   padding-bottom: var(--spacing-xl, 32px);
 }
+
+.word-book-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 4px);
+}
+
+.word-book-stats {
+  font-size: var(--font-size-sm, 12px);
+  color: var(--color-text-secondary, #666);
+  align-self: flex-end;
+}

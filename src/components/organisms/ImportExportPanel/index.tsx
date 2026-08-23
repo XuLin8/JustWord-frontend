@@ -1,6 +1,7 @@
 // src/components/organisms/ImportExportPanel/index.tsx
 import React, { useRef, useState } from 'react'
 import { useWordStore } from '../../../store/wordStore'
+import { useUIStore } from '../../../store/uiStore'
 import { exportToJSON, exportToCSV } from '../../../utils/helpers'
 import { Button } from '../../atoms/Button'
 import './ImportExportPanel.css'
@@ -13,23 +14,25 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   onImportComplete,
 }) => {
   const { words, importWords, clearAllWords } = useWordStore()
+  const { showToast, openConfirmDialog } = useUIStore()
   const [isImporting, setIsImporting] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const jsonInputRef = useRef<HTMLInputElement>(null)
+  const csvInputRef = useRef<HTMLInputElement>(null)
 
   // 导出 JSON
   const handleExportJSON = () => {
     if (words.length === 0) {
-      alert('⚠️ 词库为空，没有可导出的数据')
+      showToast('词库为空，没有可导出的数据', 'warning')
       return
     }
     setIsExporting(true)
     try {
       exportToJSON(words)
-      alert(`✅ 成功导出 ${words.length} 个单词`)
+      showToast(`成功导出 ${words.length} 个单词`, 'success')
     } catch (error) {
       console.error('导出失败:', error)
-      alert('❌ 导出失败，请重试')
+      showToast('导出失败，请重试', 'error')
     } finally {
       setIsExporting(false)
     }
@@ -38,16 +41,16 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   // 导出 CSV
   const handleExportCSV = () => {
     if (words.length === 0) {
-      alert('⚠️ 词库为空，没有可导出的数据')
+      showToast('词库为空，没有可导出的数据', 'warning')
       return
     }
     setIsExporting(true)
     try {
       exportToCSV(words)
-      alert(`✅ 成功导出 ${words.length} 个单词`)
+      showToast(`成功导出 ${words.length} 个单词`, 'success')
     } catch (error) {
       console.error('导出失败:', error)
-      alert('❌ 导出失败，请重试')
+      showToast('导出失败，请重试', 'error')
     } finally {
       setIsExporting(false)
     }
@@ -67,7 +70,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         const importedData = JSON.parse(content)
 
         if (!Array.isArray(importedData)) {
-          alert('❌ 无效的 JSON 格式：数据必须是数组')
+          showToast('无效的 JSON 格式：数据必须是数组', 'error')
           return
         }
 
@@ -77,29 +80,30 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         )
 
         if (validWords.length === 0) {
-          alert('❌ 没有找到有效的单词数据（需要 english 和 chinese 字段）')
+          showToast('没有找到有效的单词数据（需要 english 和 chinese 字段）', 'error')
           return
         }
 
         const result = await importWords(validWords)
-        alert(result.message)
-        
-        if (result.success && onImportComplete) {
-          onImportComplete()
+        if (result.success) {
+          showToast(result.message, 'success')
+          if (onImportComplete) onImportComplete()
+        } else {
+          showToast(result.message, 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
-        alert('❌ 导入失败：请检查 JSON 格式是否正确')
+        showToast('导入失败：请检查 JSON 格式是否正确', 'error')
       } finally {
         setIsImporting(false)
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
+        if (jsonInputRef.current) {
+          jsonInputRef.current.value = ''
         }
       }
     }
 
     reader.onerror = () => {
-      alert('❌ 读取文件失败')
+      showToast('读取文件失败', 'error')
       setIsImporting(false)
     }
 
@@ -131,7 +135,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         const lines = content.split('\n').filter(line => line.trim())
 
         if (lines.length < 2) {
-          alert('❌ CSV 文件格式无效：至少需要标题行和一行数据')
+          showToast('CSV 文件格式无效：至少需要标题行和一行数据', 'error')
           return
         }
 
@@ -168,15 +172,15 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         }
 
         const headers = parseCSVLine(lines[0])
-        const englishIndex = headers.findIndex(h => 
+        const englishIndex = headers.findIndex(h =>
           h.includes('英文') || h.toLowerCase().includes('english')
         )
-        const chineseIndex = headers.findIndex(h => 
+        const chineseIndex = headers.findIndex(h =>
           h.includes('中文') || h.toLowerCase().includes('chinese') || h.includes('释义')
         )
 
         if (englishIndex === -1 || chineseIndex === -1) {
-          alert('❌ CSV 格式无效：请确保包含 "英文" 和 "中文" 列')
+          showToast('CSV 格式无效：请确保包含 "英文" 和 "中文" 列', 'error')
           return
         }
 
@@ -192,40 +196,52 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         }
 
         if (wordsToImport.length === 0) {
-          alert('❌ 没有找到有效的单词数据')
+          showToast('没有找到有效的单词数据', 'error')
           return
         }
 
         const result = await importWords(wordsToImport)
-        alert(result.message)
-        
-        if (result.success && onImportComplete) {
-          onImportComplete()
+        if (result.success) {
+          showToast(result.message, 'success')
+          if (onImportComplete) onImportComplete()
+        } else {
+          showToast(result.message, 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
-        alert('❌ 导入失败：请检查 CSV 格式是否正确')
+        showToast('导入失败：请检查 CSV 格式是否正确', 'error')
       } finally {
         setIsImporting(false)
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
+        if (csvInputRef.current) {
+          csvInputRef.current.value = ''
         }
       }
     }
 
     reader.onerror = () => {
-      alert('❌ 读取文件失败')
+      showToast('读取文件失败', 'error')
       setIsImporting(false)
     }
 
     reader.readAsArrayBuffer(file)
   }
 
-  const handleClearAll = async () => {
-    if (window.confirm(`⚠️ 确定要删除全部 ${words.length} 个单词吗？此操作不可撤销！`)) {
-      const result = await clearAllWords()
-      alert(result.success ? '✅ 已清空所有单词' : `❌ ${result.message}`)
-    }
+  const handleClearAll = () => {
+    openConfirmDialog({
+      title: '清空词库',
+      description: `确定要删除全部 ${words.length} 个单词吗？此操作不可撤销！`,
+      confirmText: '全部删除',
+      cancelText: '取消',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        const result = await clearAllWords()
+        if (result.success) {
+          showToast('已清空所有单词', 'success')
+        } else {
+          showToast(result.message, 'error')
+        }
+      },
+    })
   }
 
   return (
@@ -257,7 +273,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
               📄 JSON
               <input
                 type="file"
-                ref={fileInputRef}
+                ref={jsonInputRef}
                 accept=".json"
                 onChange={handleImportJSON}
                 disabled={isImporting}
@@ -268,7 +284,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
               📊 CSV
               <input
                 type="file"
-                ref={fileInputRef}
+                ref={csvInputRef}
                 accept=".csv"
                 onChange={handleImportCSV}
                 disabled={isImporting}

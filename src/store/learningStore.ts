@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import localforage from 'localforage'
-import type { LearningRecord, LearningStats } from '../types/learning'
+import type { LearningRecord, LearningStats } from '../types/learning.types'
 
 const learningStorage = localforage.createInstance({
   name: 'JustWord',

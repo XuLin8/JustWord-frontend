@@ -1,18 +1,20 @@
 // components/LearnMode/LearnMode.tsx
 
 import { useState } from 'react'
-import { useWordStore } from '../../store/wordStore'
-import { useLearning } from '../../hooks/useLearning'
-import { LearnMode as LearnModeEnum } from '../../types/learning'  // ← 改这里
+import { useWordStore } from '../../../store/wordStore'
+import { useLearning } from '../../../hooks/useLearning'
+import { LearnMode as LearnModeEnum } from '../../../types/learning.types'
+import { useUIStore } from '../../../store/uiStore'
 import EnglishToChinese from './EnglishToChinese'
 import ChineseToEnglish from './ChineseToEnglish'
 import ResultReview from './ResultReview'
 import './LearnMode.css'
 
-export default function LearnMode() {  // ← 组件名不变
+export default function LearnMode() {
   const { words } = useWordStore()
-  const [selectedMode, setSelectedMode] = useState<LearnModeEnum | null>(null)  // ← 改这里
-  
+  const { showToast } = useUIStore()
+  const [selectedMode, setSelectedMode] = useState<LearnModeEnum | null>(null)
+
   const {
     session,
     currentWord,
@@ -23,9 +25,9 @@ export default function LearnMode() {  // ← 组件名不变
     startLearning
   } = useLearning(words)
 
-  const handleStart = (mode: LearnModeEnum) => {  // ← 改这里
+  const handleStart = (mode: LearnModeEnum) => {
     if (words.length < 5) {
-      alert('词库至少需要 5 个单词才能开始学习！')
+      showToast('词库至少需要 5 个单词才能开始学习！', 'warning')
       return
     }
     startLearning(mode)

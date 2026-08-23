@@ -1,6 +1,6 @@
 // components/LearnMode/ResultReview.tsx
-import { AnswerResult } from '../../types/learning'
-import type { LearningSession } from '../../types/learning'
+import { AnswerResult } from '../../../types/learning.types'
+import type { LearningSession } from '../../../types/learning.types'
 interface Props {
   session: LearningSession
   onRestart: () => void

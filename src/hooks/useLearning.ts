@@ -1,8 +1,8 @@
 // hooks/useLearning.ts
 
 import { useState, useCallback, useMemo } from 'react'
-import type { Word, Question, LearningSession, SimilarWord } from '../types/learning'
-import { LearnMode, AnswerResult } from '../types/learning'  
+import type { Word, Question, LearningSession, SimilarWord } from '../types/learning.types'
+import { LearnMode, AnswerResult } from '../types/learning.types'  
 
 // 近义词数据库（可配置）
 export const SIMILAR_WORDS_DB: Record<string, SimilarWord[]> = {

@@ -1,4 +1,4 @@
-// types/learning.ts
+// src/types/learning.types.ts
 
 export interface Word {
   id: string
@@ -11,10 +11,10 @@ export interface Word {
 export const LearnMode = {
   ENGLISH_TO_CHINESE: 'en2zh', // 英译汉
   CHINESE_TO_ENGLISH: 'zh2en', // 汉译英
-  REVIEW: 'review' // 回顾
+  REVIEW: 'review', // 回顾
 } as const
 
-//类型注解
+// 类型注解
 export type LearnMode = typeof LearnMode[keyof typeof LearnMode]
 // 类型: "en2zh" | "zh2en" | "review"
 
@@ -24,10 +24,10 @@ export const AnswerResult = {
   PARTIAL: 'partial', // 部分正确
   WRONG: 'wrong', // 错误
   CLOSE: 'close', // 近义词
-  TYPO: 'typo' // 拼写错误
+  TYPO: 'typo', // 拼写错误
 } as const
 
-//类型（编译时存在）
+// 类型（编译时存在）
 export type AnswerResult = typeof AnswerResult[keyof typeof AnswerResult]
 
 // 单道题

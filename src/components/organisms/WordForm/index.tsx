@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Input } from '../../atoms/Input'
 import { Button } from '../../atoms/Button'
 import { isValidEnglish, isValidChinese } from '../../../utils/validation'
+import { useUIStore } from '../../../store/uiStore'
 import './WordForm.css'
 
 interface WordFormProps {
@@ -14,6 +15,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
   const [chinese, setChinese] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const { showToast } = useUIStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,10 +42,16 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
     }
 
     setIsSubmitting(true)
-    await onSubmit(trimmedEnglish, trimmedChinese)
-    setEnglish('')
-    setChinese('')
-    setIsSubmitting(false)
+    try {
+      await onSubmit(trimmedEnglish, trimmedChinese)
+      showToast('单词添加成功', 'success')
+      setEnglish('')
+      setChinese('')
+    } catch (err: any) {
+      showToast(err.message || '添加失败', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

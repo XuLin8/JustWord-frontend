@@ -1,8 +1,9 @@
 // components/LearnMode/ChineseToEnglish.tsx
 
 import { useState, useRef, useEffect } from 'react'
-import type { Word, SimilarWord } from '../../types/learning'
-import { AnswerResult } from '../../types/learning'
+import type { Word, SimilarWord } from '../../../types/learning.types'
+import { AnswerResult } from '../../../types/learning.types'
+import { useUIStore } from '../../../store/uiStore'
 
 interface Props {
   word: Word
@@ -18,6 +19,7 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
   const [similarWords, setSimilarWords] = useState<SimilarWord[]>([])
   const [showHint, setShowHint] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { showToast } = useUIStore()
 
   useEffect(() => {
     if (inputRef.current) {
@@ -27,7 +29,7 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
 
   const handleSubmit = () => {
     if (!answer.trim()) {
-      alert('请输入英文拼写！')
+      showToast('请输入英文拼写！', 'warning')
       return
     }
 

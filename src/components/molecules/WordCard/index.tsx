@@ -4,6 +4,7 @@ import { Button } from '../../atoms/Button'
 import { Input } from '../../atoms/Input'
 import type { Word } from '../../../types'
 import { isValidEnglish, isValidChinese } from '../../../utils/validation'
+import { useUIStore } from '../../../store/uiStore'
 import './WordCard.css'
 
 interface WordCardProps {
@@ -17,6 +18,8 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
   const [editEnglish, setEditEnglish] = useState(word.english)
   const [editChinese, setEditChinese] = useState(word.chinese)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { showToast, openConfirmDialog } = useUIStore()
 
   const handleStartEdit = () => {
     setIsEditing(true)
@@ -35,32 +38,50 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
     const trimmedChinese = editChinese.trim()
 
     if (!trimmedEnglish) {
-      alert('⚠️ 英文单词不能为空')
+      showToast('英文单词不能为空', 'warning')
       return
     }
     if (!trimmedChinese) {
-      alert('⚠️ 中文释义不能为空')
+      showToast('中文释义不能为空', 'warning')
       return
     }
     if (!isValidEnglish(trimmedEnglish)) {
-      alert('⚠️ 英文只能包含字母、空格、连字符和撇号')
+      showToast('英文只能包含字母、空格、连字符和撇号', 'warning')
       return
     }
     if (!isValidChinese(trimmedChinese)) {
-      alert('⚠️ 请输入中文释义')
+      showToast('请输入中文释义', 'warning')
       return
     }
 
     setIsSubmitting(true)
-    await onUpdate(word.id, trimmedEnglish, trimmedChinese)
-    setIsEditing(false)
-    setIsSubmitting(false)
+    try {
+      await onUpdate(word.id, trimmedEnglish, trimmedChinese)
+      showToast('单词更新成功', 'success')
+      setIsEditing(false)
+    } catch (err: any) {
+      showToast(err.message || '更新失败', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleDelete = async () => {
-    if (window.confirm('🗑️ 确定要删除这个单词吗？')) {
-      await onDelete(word.id)
-    }
+  const handleDelete = () => {
+    openConfirmDialog({
+      title: '删除单词',
+      description: `确定要删除单词「${word.english}」吗？此操作不可撤销。`,
+      confirmText: '删除',
+      cancelText: '取消',
+      confirmVariant: 'danger',
+      onConfirm: async () => {
+        try {
+          await onDelete(word.id)
+          showToast('单词删除成功', 'success')
+        } catch (err: any) {
+          showToast(err.message || '删除失败', 'error')
+        }
+      },
+    })
   }
 
   if (isEditing) {
