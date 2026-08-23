@@ -86,10 +86,10 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
 
         const result = await importWords(validWords)
         if (result.success) {
-          showToast(result.message, 'success')
+          showToast(result.message ?? '导入成功', 'success')
           if (onImportComplete) onImportComplete()
         } else {
-          showToast(result.message, 'warning')
+          showToast(result.message ?? '导入失败', 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
@@ -202,10 +202,10 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
 
         const result = await importWords(wordsToImport)
         if (result.success) {
-          showToast(result.message, 'success')
+          showToast(result.message ?? '导入成功', 'success')
           if (onImportComplete) onImportComplete()
         } else {
-          showToast(result.message, 'warning')
+          showToast(result.message ?? '导入失败', 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
@@ -238,7 +238,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         if (result.success) {
           showToast('已清空所有单词', 'success')
         } else {
-          showToast(result.message, 'error')
+          showToast(result.message ?? '清空失败', 'error')
         }
       },
     })
