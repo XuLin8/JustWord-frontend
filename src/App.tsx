@@ -13,11 +13,15 @@ import { ToastContainer } from './components/organisms/ToastContainer'
 import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { setupAuthListener } from './api'
 import { useAppShell } from './hooks/useAppShell'
+import { useTheme } from './hooks/useTheme'
+import { ThemeSwitcher } from './components/atoms/ThemeSwitcher'
+import { LanguageSwitcher } from './components/atoms/LanguageSwitcher'
 import type { AppTab } from './components/templates/Layout/AppHeader'
 import './App.css'
 
 function App() {
   const shell = useAppShell()
+  useTheme()
 
   const { words, loadWords } = useWordStore()
   const { clearDashboard } = useStatsStore()
@@ -58,6 +62,12 @@ function App() {
           user: user ? { username: user.username } : null,
           onShowLogin: shell.openLogin,
           onLogout: logout,
+          headerActions: (
+            <>
+              <LanguageSwitcher />
+              <ThemeSwitcher />
+            </>
+          ),
         }}
         wordCount={words.length}
       >

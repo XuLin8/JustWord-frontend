@@ -20,6 +20,8 @@ export interface ConfirmDialogOptions {
   onCancel?: () => void
 }
 
+export type ThemeMode = 'light' | 'dark' | 'system'
+
 interface UIStore {
   // ===== Toast =====
   toasts: ToastItem[]
@@ -30,9 +32,27 @@ interface UIStore {
   confirmDialog: ConfirmDialogOptions | null
   openConfirmDialog: (options: Omit<ConfirmDialogOptions, 'isOpen'>) => void
   closeConfirmDialog: () => void
+
+  // ===== Theme =====
+  theme: ThemeMode
+  setTheme: (mode: ThemeMode) => void
+  /** 实际生效的主题（system 解析后的落定值）。由 useTheme hook 维护。 */
+  resolvedTheme: 'light' | 'dark'
+  setResolvedTheme: (resolved: 'light' | 'dark') => void
 }
 
 const genId = () => Math.random().toString(36).slice(2, 10)
+
+const THEME_STORAGE_KEY = 'justword.theme'
+
+/** 读取持久化主题，无则默认 system（跟随系统）。 */
+function getInitialTheme(): ThemeMode {
+  const saved = localStorage.getItem(THEME_STORAGE_KEY)
+  if (saved === 'light' || saved === 'dark' || saved === 'system') {
+    return saved
+  }
+  return 'system'
+}
 
 export const useUIStore = create<UIStore>((set, get) => ({
   // ===== Toast =====
@@ -76,5 +96,18 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const dialog = get().confirmDialog
     if (dialog?.onCancel) dialog.onCancel()
     set({ confirmDialog: null })
+  },
+
+  // ===== Theme =====
+  theme: getInitialTheme(),
+  resolvedTheme: 'light', // 初值由 useTheme 挂载后校正
+
+  setTheme: (mode) => {
+    localStorage.setItem(THEME_STORAGE_KEY, mode)
+    set({ theme: mode })
+  },
+
+  setResolvedTheme: (resolved) => {
+    if (get().resolvedTheme !== resolved) set({ resolvedTheme: resolved })
   },
 }))

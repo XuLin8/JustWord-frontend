@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "Just Word"
+  },
+  "common": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "manageBook": "Manage books",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "saving": "Saving…"
+  },
+  "nav": {
+    "home": "Home",
+    "wordbook": "Wordbook",
+    "learn": "Learn"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language"
+  }
+}

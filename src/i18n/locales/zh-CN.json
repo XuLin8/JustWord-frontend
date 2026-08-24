@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "Just Word"
+  },
+  "common": {
+    "login": "登录",
+    "logout": "退出登录",
+    "manageBook": "管理词库",
+    "close": "关闭",
+    "confirm": "确认",
+    "cancel": "取消",
+    "saving": "保存中…"
+  },
+  "nav": {
+    "home": "首页",
+    "wordbook": "单词本",
+    "learn": "学习"
+  },
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "language": {
+    "label": "语言"
+  }
+}

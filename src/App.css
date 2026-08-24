@@ -31,7 +31,7 @@
 
 /* 卡片底壳 —— 毛玻璃 + 软阴影 + 大圆角 */
 .surface {
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--card-glass-3);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--br-xl);
   box-shadow: var(--shadow-card-rest);

@@ -16,6 +16,7 @@ interface LayoutProps {
     user: UserBrief | null
     onShowLogin: () => void
     onLogout: () => void
+    headerActions?: React.ReactNode
   }
 }
 

@@ -12,6 +12,9 @@
     -moz-osx-font-smoothing: grayscale;
     text-size-adjust: 100%;
   }
+  :root.dark {
+    color-scheme: dark;
+  }
 }
 
 html, body, #root {
