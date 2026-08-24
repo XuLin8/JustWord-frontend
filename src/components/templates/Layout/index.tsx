@@ -1,29 +1,31 @@
 // src/components/templates/Layout/index.tsx
 import React from 'react'
-import { AppHeader, type AppTab } from './AppHeader'
+import { AppHeader, type AppTab, type UserBrief } from './AppHeader'
 import { AppFooter } from './AppFooter'
 //import { ParticleBackground } from '../../atoms/ParticleBackground'  
 import './Layout.css'
 
 interface LayoutProps {
   children: React.ReactNode
+  wordCount: number
   headerProps: {
     activeTab: AppTab
     onTabChange: (tab: AppTab) => void
     showImportExport: boolean
     onToggleImportExport: () => void
+    user: UserBrief | null
     onShowLogin: () => void
-    onShowRegister: () => void
+    onLogout: () => void
   }
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, headerProps }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, wordCount, headerProps }) => {
   return (
     <div className="app">
       {/* <ParticleBackground /> */}
       <AppHeader {...headerProps} />
       <main className="app-main">{children}</main>
-      <AppFooter />
+      <AppFooter wordCount={wordCount} />
     </div>
   )
 }

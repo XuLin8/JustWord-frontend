@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import { useStatsStore } from './store/statsStore'
 import { useAuth } from './context/AuthContext'
@@ -12,18 +12,16 @@ import { ImportExportPanel } from './components/organisms/ImportExportPanel'
 import { ToastContainer } from './components/organisms/ToastContainer'
 import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { setupAuthListener } from './api'
+import { useAppShell } from './hooks/useAppShell'
 import type { AppTab } from './components/templates/Layout/AppHeader'
 import './App.css'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<AppTab>('home')
-  const [showImportExport, setShowImportExport] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
-  const [showRegister, setShowRegister] = useState(false)
+  const shell = useAppShell()
 
-  const { loadWords } = useWordStore()
+  const { words, loadWords } = useWordStore()
   const { clearDashboard } = useStatsStore()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
 
   useEffect(() => {
     const cleanup = setupAuthListener()
@@ -40,47 +38,50 @@ function App() {
 
   const handleImportComplete = () => {
     loadWords()
+    shell.closeImportExport()
+  }
+
+  // 切换 Tab 时若离开单词本，自动关闭导入导出面板
+  const handleTabChange = (tab: AppTab) => {
+    shell.setTab(tab)
+    if (tab !== 'word') shell.closeImportExport()
   }
 
   return (
     <>
       <Layout
         headerProps={{
-          activeTab,
-          onTabChange: setActiveTab,
-          showImportExport,
-          onToggleImportExport: () => setShowImportExport(!showImportExport),
-          onShowLogin: () => setShowLogin(true),
-          onShowRegister: () => setShowRegister(true),
+          activeTab: shell.activeTab,
+          onTabChange: handleTabChange,
+          showImportExport: shell.showImportExport,
+          onToggleImportExport: shell.toggleImportExport,
+          user: user ? { username: user.username } : null,
+          onShowLogin: shell.openLogin,
+          onLogout: logout,
         }}
+        wordCount={words.length}
       >
         <AuthModal
-          isLoginOpen={showLogin}
-          isRegisterOpen={showRegister}
-          onCloseLogin={() => setShowLogin(false)}
-          onCloseRegister={() => setShowRegister(false)}
-          onSwitchToRegister={() => {
-            setShowLogin(false)
-            setShowRegister(true)
-          }}
-          onSwitchToLogin={() => {
-            setShowRegister(false)
-            setShowLogin(true)
-          }}
+          isLoginOpen={shell.showLogin}
+          isRegisterOpen={shell.showRegister}
+          onCloseLogin={shell.closeLogin}
+          onCloseRegister={shell.closeRegister}
+          onSwitchToRegister={shell.switchToRegister}
+          onSwitchToLogin={shell.switchToLogin}
         />
 
         {/* 导入导出面板只在单词本 Tab 可见 */}
-        {showImportExport && activeTab === 'word' && (
+        {shell.showImportExport && shell.activeTab === 'word' && (
           <ImportExportPanel onImportComplete={handleImportComplete} />
         )}
 
-        {activeTab === 'home' && (
+        {shell.activeTab === 'home' && (
           <div key="home" className="tab-panel"><DashboardPage /></div>
         )}
-        {activeTab === 'word' && (
+        {shell.activeTab === 'word' && (
           <div key="word" className="tab-panel"><WordBookPage /></div>
         )}
-        {activeTab === 'learn' && (
+        {shell.activeTab === 'learn' && (
           <div key="learn" className="tab-panel"><LearnPage /></div>
         )}
       </Layout>

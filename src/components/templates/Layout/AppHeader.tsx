@@ -1,6 +1,5 @@
 // src/components/templates/Layout/AppHeader.tsx
 import React from 'react'
-import { useAuth } from '../../../context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -8,13 +7,18 @@ import { Archive, ChevronDown } from 'lucide-react'
 
 export type AppTab = 'home' | 'word' | 'learn'
 
+export interface UserBrief {
+  username: string
+}
+
 interface AppHeaderProps {
   activeTab: AppTab
   onTabChange: (tab: AppTab) => void
   showImportExport: boolean
   onToggleImportExport: () => void
+  user: UserBrief | null
   onShowLogin: () => void
-  onShowRegister: () => void
+  onLogout: () => void
 }
 
 const TABS: Array<{ id: AppTab; label: string }> = [
@@ -23,11 +27,15 @@ const TABS: Array<{ id: AppTab; label: string }> = [
   { id: 'learn', label: '学习' },
 ]
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onShowRegister, ...props }) => {
-  const { activeTab, onTabChange, showImportExport, onToggleImportExport, onShowLogin } = props
-  void onShowRegister // 保留 API 通道，未来未登录时直接展示注册入口
-  const { user, logout } = useAuth()
-
+export const AppHeader: React.FC<AppHeaderProps> = ({
+  activeTab,
+  onTabChange,
+  showImportExport,
+  onToggleImportExport,
+  user,
+  onShowLogin,
+  onLogout,
+}) => {
   const usernameInitial = user?.username?.trim().slice(0, 1).toUpperCase() ?? 'U'
 
   return (
@@ -62,7 +70,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onShowRegister, ...props }
                 管理词库
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onSelect={() => logout()}>
+              <DropdownMenuItem variant="destructive" onSelect={onLogout}>
                 退出登录
               </DropdownMenuItem>
             </DropdownMenuContent>
