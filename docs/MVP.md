@@ -550,7 +550,7 @@
   - **响应式 ≥420px**：桌面与移动端布局正确，无横向溢出。
   - **性能代码分割**：四页面按需懒加载 + vendor 独立 chunk，解除 >500 kB 告警。
   - **DoD 总检**：`tsc -b` / `vite build` 零错误 + 生产构建浏览器回归。
-- 范围外：云养猫（§5.8，P1）、PWA 图标 AI 化，留待后续阶段。
+- 范围外：云养猫（§5.8，P1），留待后续阶段。
 
 ### 13.2 模块划分与提交计划（分模块本地提交，不推送）
 
@@ -561,6 +561,8 @@
 | M4-C 响应式 ≥420px | 审计所有网格（auto-fit/auto-fill minmax）、flex-wrap、clamp；补 `LearnMode` 模式卡片 560px 单列断点；622px 视口实测四 Tab 无横向溢出 | ✅ |
 | M4-D 性能代码分割 | 四页面 `React.lazy` + `Suspense`（Spinner fallback）+ `manualChunks`（vendor-react / state / i18n / ui / lucide）；**修复生产 `BASE_URL` 双 `/api` 拼接 bug**（`config/index.ts`） | ✅ |
 | M4-E DoD 总检 + 文档 | 本章节；§5.6 / §5.7 勾选；生产构建登录 + 四 Tab 懒加载浏览器回归 | ✅ |
+| M4-F PWA 安装引导 | `PWAInstallPrompt` 组件（beforeinstallprompt 捕获 + iOS「添加到主屏幕」指引 + 关闭记忆）；双分支挂载 | ✅ |
+| M4-G PWA 图标 AI 化 | AI 生成品牌主图标（紫渐变 + 玻璃书本/J 字标），`scripts/derive-icons-from-ai.ps1` 裁剪中心 80% 去水印并派生 4 枚图标（192/512 圆角、maskable 安全区、apple-touch 180） | ✅ |
 
 ### 13.3 验收标准映射（§5.6 性能 + §5.7 通用）
 
@@ -592,10 +594,12 @@
 | M4-D 性能代码分割 | ✅ 完成 | 首屏 `index.js` 42 kB（gzip 12.6 kB）；四页面 chunk 按需加载（登录后学习页仅加载 `LearningHomePage`；词库 / 统计 / 我的 切换时才加载对应 chunk）；生产登录 `/api/auth/login` 200 |
 | M4-E DoD 总检 + 文档 | ✅ 完成 | §5.6 / §5.7 全部勾选；本文档 13.5 章节 |
 | M4-F PWA 安装引导 | ✅ 完成 | `PWAInstallPrompt` 组件（beforeinstallprompt 捕获 + iOS「添加到主屏幕」指引 + 关闭记忆）；双分支挂载；`vite preview` 手动派发事件验证弹窗出现 → 稍后关闭 → 刷新不再打扰 |
+| M4-G PWA 图标 AI 化 | ✅ 完成 | AI 主图标（紫渐变 + 玻璃书本/J 字标，1920²）；派生脚本裁剪中心 80% 去除 AI 水印；4 图标 HTTP 200；maskable 安全区 / 圆角透明 / 无水印浏览器实测通过 |
 
 **说明与遗留**
 - 生产构建验证环境：`vite preview` 于 4180 端口（全新 origin）以新账号 `m4_20260825@example.com` 登录，学习首页仅加载 `LearningHomePage-*.js`，切 Tab 按需加载 `WordBookPage / DashboardPage / ProfilePage` chunk，均无阻断性报错。
 - M4-D 顺带修复生产 `BASE_URL` 重复拼接 bug（`/api/api/...` → `/api/...`），属生产可用性修复，非 M0–M3 回归。
 - M4-F 安装引导：桌面 Chrome / Edge 经 `beforeinstallprompt` 触发自绘安装卡片，点击「安装」拉起系统安装弹窗；iOS 无此事件，改显示「添加到主屏幕」指引；关闭后 `localStorage` 记忆，刷新不再打扰。
-- P1 增强（云养猫 §5.8、PWA 图标 AI 化）留待后续阶段。
+- M4-G 图标 AI 化：主图存于 `scripts/ai-assets/justword-master-icon.jpg`（AI 生成源资产）；重新派生运行 `scripts/derive-icons-from-ai.ps1`（裁剪中心 80% 去除 AI 水印后生成 4 图标）。
+- P1 增强（云养猫 §5.8）留待后续阶段。
 - 未推送，本地提交。
