@@ -64,6 +64,12 @@
     "checkinSuccess": "Checked in, keep it up!",
     "restart": "Do it again"
   },
+  "pwa": {
+    "updateAvailable": "New version available, refresh to apply",
+    "reload": "Refresh",
+    "dismiss": "Later",
+    "offlineReady": "Offline mode ready, learn without network"
+  },
   "modes": {
     "back": "Back",
     "exit": "Exit",

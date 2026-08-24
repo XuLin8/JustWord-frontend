@@ -64,6 +64,12 @@
     "checkinSuccess": "打卡成功，继续保持！",
     "restart": "再来一轮"
   },
+  "pwa": {
+    "updateAvailable": "发现新版本，刷新后生效",
+    "reload": "立即刷新",
+    "dismiss": "稍后",
+    "offlineReady": "离线模式已就绪，可离线学习"
+  },
   "modes": {
     "back": "返回",
     "exit": "退出",

@@ -15,6 +15,7 @@ import { ImportExportPanel } from './components/organisms/ImportExportPanel'
 import { ToastContainer } from './components/organisms/ToastContainer'
 import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { Spinner } from './components/atoms/Spinner'
+import { PWAUpdateToast } from './components/organisms/PWAUpdateToast'
 import { setupAuthListener } from './api'
 import { useAppShell } from './hooks/useAppShell'
 import { useTheme } from './hooks/useTheme'
@@ -150,6 +151,7 @@ function App() {
 
       <ToastContainer />
       <ConfirmDialog />
+      <PWAUpdateToast />
     </>
   )
 }

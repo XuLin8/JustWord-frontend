@@ -1,0 +1,57 @@
+/* src/components/organisms/PWAUpdateToast/PWAUpdateToast.css
+   M3-C PWA 更新提示：新版本刷新 + 离线就绪 */
+
+.pwa-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(96px, env(safe-area-inset-bottom) + 84px);
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 12px 18px;
+  max-width: min(92vw, 460px);
+  border-radius: var(--br-xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  animation: pwa-toast-in var(--dur-fast) var(--ease-spring-soft);
+}
+.pwa-toast-text {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+.pwa-toast-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+.pwa-toast-btn {
+  padding: 7px 14px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--apple-blue);
+  background: var(--apple-blue-p);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-pill);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), opacity var(--dur-fast);
+}
+.pwa-toast-btn:hover { transform: scale(1.03); }
+.pwa-toast-btn:active { transform: scale(0.96); }
+.pwa-toast-btn.primary {
+  color: #fff;
+  background: var(--apple-blue);
+  border-color: transparent;
+}
+
+@keyframes pwa-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
