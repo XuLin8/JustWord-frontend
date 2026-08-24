@@ -18,7 +18,7 @@
   grid-template-columns: 1.4fr 1fr;
   gap: var(--spacing-xl);
   padding: var(--spacing-2xl) var(--spacing-2xl);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--br-2xl);
 
   background:
     radial-gradient(1100px 360px at 110% -30%, rgba(94, 92, 230, 0.22), transparent 55%),
@@ -95,7 +95,7 @@
   position: relative;
   min-width: 150px;
   padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
 
   background: linear-gradient(135deg,
               rgba(255, 149, 0, 0.18) 0%,
@@ -172,7 +172,7 @@
   position: relative;
   overflow: hidden;
 
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
   padding: var(--spacing-lg);
   background: rgba(255, 255, 255, 0.82);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
@@ -278,7 +278,7 @@
   overflow: hidden;
   isolation: isolate;
 
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
   padding: var(--spacing-lg) var(--spacing-xl);
   background: rgba(255, 255, 255, 0.78);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
@@ -493,7 +493,7 @@
   gap: var(--spacing-md);
   align-items: center;
   padding: var(--spacing-md);
-  border-radius: var(--radius-md);
+  border-radius: var(--br-md);
   margin-bottom: var(--spacing-sm);
   background: var(--color-fill-tertiary);
   border: 0.5px solid transparent;
@@ -547,7 +547,7 @@
     linear-gradient(to right, rgba(60,60,67,0.10) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(60,60,67,0.08) 1px, transparent 1px);
   background-size: calc(100% / 6) 33.33%;
-  border-radius: var(--radius-md);
+  border-radius: var(--br-md);
   mask-image: linear-gradient(180deg, #000 65%, transparent);
 }
 .tc-bars {
@@ -604,7 +604,7 @@
 .ach-card {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   padding: var(--spacing-md);
   background: var(--color-fill-tertiary);
   border: 0.5px solid rgba(0, 0, 0, 0.04);

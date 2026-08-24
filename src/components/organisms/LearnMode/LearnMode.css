@@ -29,7 +29,7 @@
 
   background: rgba(255, 255, 255, 0.82);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--br-2xl);
   padding: var(--spacing-2xl) var(--spacing-xl);
   cursor: pointer;
   box-shadow: var(--shadow-card-rest);
@@ -76,7 +76,7 @@
   margin-bottom: 16px;
   display: inline-flex;
   width: 84px; height: 84px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
   align-items: center; justify-content: center;
   background: linear-gradient(135deg, var(--apple-blue-p), var(--apple-indigo-p));
   box-shadow: 0 6px 16px -8px rgba(0, 122, 255, 0.5);
@@ -162,7 +162,7 @@
   isolation: isolate;
 
   background: rgba(255, 255, 255, 0.84);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--br-2xl);
   padding: var(--spacing-2xl);
   box-shadow: var(--shadow-card-hover);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
@@ -199,7 +199,7 @@
 .hint {
   background: var(--apple-blue-p);
   padding: 12px 16px;
-  border-radius: var(--radius-md);
+  border-radius: var(--br-md);
   color: var(--apple-blue);
   font-size: 14px;
   margin-top: 8px;
@@ -215,7 +215,7 @@
   padding: 14px 16px;
   font-size: 20px;
   border: 0.5px solid rgba(0, 0, 0, 0.12);
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   transition: border-color 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-spring);
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.9);
@@ -241,7 +241,7 @@
   padding: 10px 20px;
   background: var(--color-fill-tertiary);
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   cursor: pointer;
   color: var(--color-label-secondary);
   font-weight: var(--font-weight-medium);
@@ -288,7 +288,7 @@
 /* ========== 结果框 ========== */
 .result-box {
   padding: var(--spacing-xl);
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   margin-top: 16px;
 }
 
@@ -420,7 +420,7 @@
   align-items: center;
   padding: var(--spacing-xl);
   background: linear-gradient(135deg, rgba(255, 204, 0, 0.14), rgba(255, 149, 0, 0.10));
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   width: 100%;
   border: 0.5px solid rgba(255, 204, 0, 0.25);
   color: var(--color-label-secondary);
@@ -445,7 +445,7 @@
   grid-template-columns: 1.4fr 1fr;
   gap: var(--spacing-lg);
   padding: var(--spacing-2xl);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--br-2xl);
 
   background:
     radial-gradient(1100px 260px at 100% -20%, rgba(0, 122, 255, 0.16), transparent 60%),
@@ -512,7 +512,7 @@
   position: relative;
   overflow: hidden;
   padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   background: rgba(255, 255, 255, 0.82);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   backdrop-filter: saturate(180%) blur(16px);
@@ -612,7 +612,7 @@
 
   background: rgba(255, 255, 255, 0.82);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-card-rest);
   backdrop-filter: saturate(180%) blur(18px);
@@ -767,7 +767,7 @@
 @media (max-width: 560px) { .mastery-summary { grid-template-columns: repeat(2, 1fr); } }
 .mastery-chip {
   display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 6px;
-  padding: 10px; border-radius: var(--radius-lg);
+  padding: 10px; border-radius: var(--br-lg);
   border: 0.5px solid;
   backdrop-filter: saturate(160%) blur(10px);
   transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-spring);
@@ -806,7 +806,7 @@
   padding: 9px 4px;
   border-bottom: 0.5px dashed var(--color-separator);
   font-size: 12px;
-  border-radius: var(--radius-md);
+  border-radius: var(--br-md);
   margin: 0 -4px;
   padding-left: 10px; padding-right: 10px;
   transition: background-color var(--dur-fast);
@@ -862,7 +862,7 @@
   background: rgba(255, 255, 255, 0.82);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   border-left: 4px solid var(--color-primary);
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   gap: 0;
   box-shadow: var(--shadow-card-rest);
   transition:
