@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useUIStore } from '../../../store/uiStore'
 import { Button } from '../../atoms/Button'
 import {
@@ -13,10 +13,6 @@ import {
 export const ConfirmDialog: React.FC = () => {
   const { confirmDialog, closeConfirmDialog } = useUIStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
-    if (!confirmDialog?.isOpen) setIsSubmitting(false)
-  }, [confirmDialog?.isOpen])
 
   const handleConfirm = async () => {
     setIsSubmitting(true)
