@@ -4,35 +4,35 @@ import { useState, useCallback, useMemo } from 'react'
 import type { Word, Question, LearningSession, SimilarWord } from '../types/learning.types'
 import { LearnMode, AnswerResult } from '../types/learning.types'  
 
-// 近义词数据库（可配置）
+// 近义词数据库（可配置）—— meaning/usage/difference 存 i18n 键，渲染时经 t() 解析
 export const SIMILAR_WORDS_DB: Record<string, SimilarWord[]> = {
   'run': [
-    { 
-      word: 'jog', 
-      meaning: '慢跑', 
-      usage: '休闲/锻炼用',
-      difference: 'run 速度更快，jog 是慢跑/轻松跑'
+    {
+      word: 'jog',
+      meaning: 'learn.similar.run.jog.meaning',
+      usage: 'learn.similar.run.jog.usage',
+      difference: 'learn.similar.run.jog.difference',
     },
-    { 
-      word: 'sprint', 
-      meaning: '冲刺', 
-      usage: '短距离全力跑',
-      difference: 'run 是通用词，sprint 是短距离冲刺'
-    }
+    {
+      word: 'sprint',
+      meaning: 'learn.similar.run.sprint.meaning',
+      usage: 'learn.similar.run.sprint.usage',
+      difference: 'learn.similar.run.sprint.difference',
+    },
   ],
   'big': [
     {
       word: 'large',
-      meaning: '大的',
-      usage: '形容尺寸/数量',
-      difference: 'big 更口语化，large 更正式'
+      meaning: 'learn.similar.big.large.meaning',
+      usage: 'learn.similar.big.large.usage',
+      difference: 'learn.similar.big.large.difference',
     },
     {
       word: 'huge',
-      meaning: '巨大的',
-      usage: '强调非常大',
-      difference: 'big 是普通大，huge 是巨大'
-    }
+      meaning: 'learn.similar.big.huge.meaning',
+      usage: 'learn.similar.big.huge.usage',
+      difference: 'learn.similar.big.huge.difference',
+    },
   ],
   // ... 可扩展
 }

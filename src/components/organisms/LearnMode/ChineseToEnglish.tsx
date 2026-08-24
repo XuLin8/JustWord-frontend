@@ -141,13 +141,13 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
                   </div>
                   <div className="sw-meaning">
                     <span>{t('learn.similarMeaning', { word: word.english, meaning: word.chinese })}</span>
-                    <span>{t('learn.similarMeaning', { word: sw.word, meaning: sw.meaning })}</span>
+                    <span>{t('learn.similarMeaning', { word: sw.word, meaning: t(sw.meaning) })}</span>
                   </div>
                   <div className="sw-usage">
-                    <span>{t('learn.similarUsage', { usage: sw.usage })}</span>
+                    <span>{t('learn.similarUsage', { usage: t(sw.usage) })}</span>
                   </div>
                   <div className="sw-difference">
-                    {t('learn.similarDifference', { difference: sw.difference })}
+                    {t('learn.similarDifference', { difference: t(sw.difference) })}
                   </div>
                 </div>
               ))}
