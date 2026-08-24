@@ -1,14 +1,31 @@
 // src/components/atoms/Button/index.tsx
-import React, { useRef } from 'react'
-import { Spinner } from '../Spinner'
-import './Button.css'
+import React from 'react'
+import { Button as ShadcnButton, buttonVariants } from '@/components/ui/button'
+import type { VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'variant'> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
   fullWidth?: boolean
   children: React.ReactNode
+}
+
+type ShadcnVariant = NonNullable<VariantProps<typeof buttonVariants>['variant']>
+type ShadcnSize = NonNullable<VariantProps<typeof buttonVariants>['size']>
+
+const VARIANT_MAP: Record<NonNullable<ButtonProps['variant']>, ShadcnVariant> = {
+  primary: 'default',
+  secondary: 'secondary',
+  danger: 'destructive',
+  ghost: 'ghost',
+}
+
+const SIZE_MAP: Record<NonNullable<ButtonProps['size']>, ShadcnSize> = {
+  sm: 'sm',
+  md: 'default',
+  lg: 'lg',
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -19,41 +36,17 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   className = '',
   disabled,
-  onPointerDown,
-  style,
   ...props
 }) => {
-  const hostRef = useRef<HTMLButtonElement | null>(null)
-
-  const baseClass = 'btn shine'
-  const variantClass = `btn-${variant}`
-  const sizeClass = `btn-${size}`
-  const widthClass = fullWidth ? 'btn-full' : ''
-
-  const handlePointerDown: React.PointerEventHandler<HTMLButtonElement> = (e) => {
-    const el = hostRef.current ?? (e.currentTarget as HTMLButtonElement)
-    const rect = el.getBoundingClientRect()
-    const rx = Math.round((e.clientX - rect.left) * (200 / rect.width))
-    const ry = Math.round((e.clientY - rect.top)  * (200 / rect.height))
-    el.style.setProperty('--rx', String(rx))
-    el.style.setProperty('--ry', String(ry))
-    el.classList.remove('is-rippling')
-    // force reflow to restart animation
-    void el.offsetWidth
-    el.classList.add('is-rippling')
-    onPointerDown?.(e)
-  }
-
   return (
-    <button
-      ref={hostRef}
-      className={`${baseClass} ${variantClass} ${sizeClass} ${widthClass} ${className}`.trim()}
+    <ShadcnButton
+      variant={VARIANT_MAP[variant]}
+      size={SIZE_MAP[size]}
       disabled={disabled || loading}
-      onPointerDown={handlePointerDown}
-      style={style}
+      className={cn(fullWidth && 'w-full', className)}
       {...props}
     >
-      {loading ? <Spinner size="sm" /> : children}
-    </button>
+      {loading ? <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : children}
+    </ShadcnButton>
   )
 }

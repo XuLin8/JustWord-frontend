@@ -1,7 +1,10 @@
 // src/components/templates/Layout/AppHeader.tsx
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React from 'react'
 import { useAuth } from '../../../context/AuthContext'
-import { Button } from '../../atoms/Button'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Archive, ChevronDown } from 'lucide-react'
 
 export type AppTab = 'home' | 'word' | 'learn'
 
@@ -20,41 +23,10 @@ const TABS: Array<{ id: AppTab; label: string }> = [
   { id: 'learn', label: '学习' },
 ]
 
-export const AppHeader: React.FC<AppHeaderProps> = (props) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({ onShowRegister, ...props }) => {
   const { activeTab, onTabChange, showImportExport, onToggleImportExport, onShowLogin } = props
-  void props.onShowRegister
+  void onShowRegister // 保留 API 通道，未来未登录时直接展示注册入口
   const { user, logout } = useAuth()
-
-  const tabsRef = useRef<HTMLDivElement | null>(null)
-  const buttonRefs = useRef<Record<AppTab, HTMLButtonElement | null>>({
-    home: null, word: null, learn: null,
-  })
-
-  const [indicator, setIndicator] = useState({ left: 0, width: 0 })
-
-  const syncIndicator = () => {
-    const btn = buttonRefs.current[activeTab]
-    const tabs = tabsRef.current
-    if (!btn || !tabs) return
-    const b = btn.getBoundingClientRect()
-    const t = tabs.getBoundingClientRect()
-    setIndicator({ left: b.left - t.left - 3, width: b.width })
-  }
-
-  useLayoutEffect(() => {
-    syncIndicator()
-  }, [activeTab])
-
-  useEffect(() => {
-    if (typeof ResizeObserver === 'undefined') return
-    const ro = new ResizeObserver(() => syncIndicator())
-    if (tabsRef.current) ro.observe(tabsRef.current)
-    window.addEventListener('resize', syncIndicator)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', syncIndicator)
-    }
-  }, [])
 
   const usernameInitial = user?.username?.trim().slice(0, 1).toUpperCase() ?? 'U'
 
@@ -62,47 +34,52 @@ export const AppHeader: React.FC<AppHeaderProps> = (props) => {
     <header className="app-header">
       <h1>Just Word</h1>
 
+      {/* 主导航：shadcn Tabs（受控） */}
+      <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as AppTab)}>
+        <TabsList>
+          {TABS.map((t) => (
+            <TabsTrigger key={t.id} value={t.id}>
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
       <div className="header-right">
         {user ? (
-          <div className="user-info">
-            <span className="user-avatar" aria-hidden>{usernameInitial}</span>
-            <span>{user.username}</span>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              退出
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2">
+                <span className="user-avatar" aria-hidden>{usernameInitial}</span>
+                {user.username}
+                <ChevronDown className="size-3.5 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>已登录：{user.username}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={onToggleImportExport}>
+                管理词库
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onSelect={() => logout()}>
+                退出登录
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
-          <Button variant="secondary" size="sm" onClick={onShowLogin}>
+          <Button variant="outline" size="sm" onClick={onShowLogin}>
             登录
           </Button>
         )}
 
-        <div className="tab-buttons" ref={tabsRef}>
-          <span
-            className="tab-indicator"
-            style={{
-              width: `${indicator.width}px`,
-              transform: `translateX(${indicator.left}px)`,
-            }}
-            aria-hidden
-          />
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              ref={(el) => { buttonRefs.current[t.id] = el }}
-              className={activeTab === t.id ? 'tab-active' : 'tab-inactive'}
-              onClick={() => onTabChange(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
         <Button
-          variant={showImportExport ? 'primary' : 'secondary'}
+          variant={showImportExport ? 'secondary' : 'outline'}
           size="sm"
+          className="gap-1.5"
           onClick={onToggleImportExport}
         >
+          <Archive className="size-3.5" />
           {showImportExport ? '关闭' : '管理词库'}
         </Button>
       </div>

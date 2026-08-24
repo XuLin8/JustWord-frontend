@@ -1,21 +1,20 @@
-/* src/components/templates/Layout/Layout.css — Apple Navbar + Capsule Tabs */
+/* src/components/templates/Layout/Layout.css — App shell（shadcn 化） */
 
-/* ============== Header 毛玻璃 ============== */
 .app-header {
   position: sticky;
   top: 0;
   z-index: var(--z-header);
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   padding: var(--spacing-sm) var(--spacing-xl);
   margin: 0 calc(-1 * var(--spacing-xl));
   margin-bottom: var(--spacing-sm);
 
   border-bottom: 0.5px solid var(--color-separator);
-  background-color: rgba(247, 247, 250, 0.72);
+  background-color: color-mix(in oklab, var(--background) 72%, transparent);
   backdrop-filter: saturate(180%) blur(26px);
   -webkit-backdrop-filter: saturate(180%) blur(26px);
 
@@ -27,14 +26,8 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-purple) 60%,
-              var(--apple-pink) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   padding: 4px 2px;
+  color: var(--foreground);
 }
 
 .header-right {
@@ -44,17 +37,8 @@
   flex-wrap: wrap;
 }
 
-/* ============== User Info ============== */
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-sm);
-  color: var(--color-label-secondary);
-}
-.user-info .user-avatar {
-  width: 28px; height: 28px;
+.user-avatar {
+  width: 26px; height: 26px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--apple-blue), var(--apple-purple));
   color: #fff;
@@ -63,71 +47,6 @@
   box-shadow: 0 1px 3px rgba(0, 122, 255, 0.25);
 }
 
-/* ============== Capsule Tab Bar + Sliding Indicator ============== */
-.tab-buttons {
-  position: relative;
-  isolation: isolate;
-
-  display: inline-flex;
-  gap: 2px;
-
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  background: rgba(120, 120, 128, 0.12); /* systemFill equivalent */
-  border: 0.5px solid rgba(0, 0, 0, 0.04);
-
-  box-shadow:
-    inset 0 0 0 0.5px rgba(255,255,255,0.6),
-    0 1px 2px rgba(0,0,0,0.04);
-}
-
-/* 滑动指示器 — iOS 质感白胶囊 */
-.tab-indicator {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  height: calc(100% - 6px);
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.08),
-    0 6px 16px -6px rgba(0, 0, 0, 0.18),
-    inset 0 0 0 0.5px rgba(0,0,0,0.04);
-  transition:
-    transform var(--dur-slow) var(--ease-spring),
-    width     var(--dur-slow) var(--ease-spring);
-  z-index: 0;
-  will-change: transform, width;
-}
-
-.tab-buttons button {
-  position: relative;
-  z-index: 1;
-
-  padding: 6px 16px;
-  border: none;
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  background: transparent;
-  color: var(--color-label-secondary);
-  letter-spacing: var(--tracking-tight);
-  transition: color var(--dur-fast) var(--ease-spring);
-  white-space: nowrap;
-  user-select: none;
-}
-.tab-buttons button:hover {
-  color: var(--color-label);
-}
-.tab-buttons .tab-active {
-  color: var(--color-label) !important;
-}
-.tab-buttons .tab-inactive {
-  background: transparent;
-}
-
-/* ============== Footer ============== */
 .app-footer {
   margin-top: var(--spacing-2xl);
   padding: var(--spacing-lg) 0;
