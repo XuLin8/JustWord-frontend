@@ -232,9 +232,9 @@
 - [ ] 离线可学习，联网后自动同步（本地优先冲突策略）
 
 ### 5.6 PWA
-- [ ] 桌面 / 手机可安装，具备独立图标与应用名
-- [ ] 核心页面离线可访问（Service Worker 缓存策略）
-- [ ] 加载性能达标（首屏可交互时间合理，构建体积可接受）
+- [x] 桌面 / 手机可安装，具备独立图标与应用名（manifest + 4 枚图标，已验证 manifest 注入与图标 200）
+- [x] 核心页面离线可访问（Service Worker 缓存策略：precache + navigateFallback，已验证 SW 自动注册激活 / 页面受控 / workbox-precache 就绪）
+- [ ] 加载性能达标（首屏可交互时间合理，构建体积可接受）：`index.js` 574 kB（gzip 179 kB）、CSS 126 kB（gzip 22 kB），可接受但 >500 kB 触发告警，代码分割留待 M4
 
 ### 5.7 通用（非功能）
 - [ ] 明 / 暗主题双态全部通过
@@ -479,3 +479,59 @@
 - 表格背诵复习队列：当前经 `learningPlanStore` 混入最近学习记录；「复习 0 词」为新账号无记录的正常表现，机制已就绪。
 - §5.2 / §5.4 其余勾选项（同步 / PWA / 通用 / 云养猫）留待 M3 / M4 / M5。
 - 词书数据源为 mock 种子（CET4 / CET6 / KAOYAN），后端 `/api/textbooks` 契约已定、实现留待后续。
+
+---
+
+## 12. M3 实现规划（PWA 化）
+
+> 规划 / 验收日期：2026-08-25。
+
+### 12.1 目标与范围
+
+- 交付形态：**Web + PWA 可安装**（§1.4 / §4.1 P0）。
+- 技术选型：`vite-plugin-pwa`（Workbox `generateSW`），构建期生成 `manifest.webmanifest` + `sw.js`。
+- 离线策略：`precache` 构建产物 + `navigateFallback` 回退 `index.html`；`/api/*` 走 `NetworkFirst`（兜底最近响应）；图片走 `CacheFirst`。
+- 更新策略：`registerType: 'prompt'` + 更新提示 Toast（发现新版本 → 用户点击刷新），规避「旧缓存功能不一致」风险（§9）。
+- 范围外：PWA 图标 AI 化 / 动态安装按钮（beforeinstallprompt 引导）留待 M4 / M5。
+
+### 12.2 模块划分与提交计划（分模块本地提交，不推送）
+
+| 模块 | 内容 | 状态 |
+|---|---|---|
+| M3-A 可安装基础 | 安装 `vite-plugin-pwa`；manifest（名称 / 图标 / theme_color / display standalone）；4 枚应用图标（`scripts/generate-icons.ps1` 生成品牌紫渐变 + J 字标）；`index.html` 注入 apple / theme meta | ✅ |
+| M3-B 离线缓存 | Workbox `precache` + `navigateFallback` + `/api` `NetworkFirst` + 图片 `CacheFirst`；`tsconfig` 增加 `vite-plugin-pwa/client` 类型 | ✅ |
+| M3-C 更新提示 | `PWAUpdateToast` 组件（新版本刷新 + 离线就绪提示）+ `pwa` i18n 双语，挂载于 App 双分支 | ✅ |
+| M3-D 文档 | 本文档 §5.6 勾选 + 本章节（12.5 进度） | ✅ |
+
+### 12.3 验收标准映射（§5.6）
+
+| 验收项 | 实现 | 验证 |
+|---|---|---|
+| 可安装（图标 + 应用名） | manifest + 4 图标 | 已验证：manifest 注入、图标全部 200 |
+| 核心页离线可访问 | precache + navigateFallback | 已验证：SW 自动注册激活、刷新后页面受控、`workbox-precache-v2` 缓存存在 |
+| 加载性能 | 构建体积 | gzip 179 kB（JS）+ 22 kB（CSS），可接受；>500 kB 告警留待 M4 代码分割 |
+
+### 12.4 风险与开放问题（M3 视角）
+
+| 风险 / 问题 | 影响 | 应对 |
+|---|---|---|
+| 构建体积告警 | 首屏下载偏大 | M4 用 `import()` 代码分割 + 分 chunk |
+| 自动化验证时序 | 首轮探针过早查询 SW 显示未注册 | 手动注册复测确认，非代码缺陷 |
+| iOS 离线行为差异 | 苹果对 SW 缓存限制更严 | `CacheFirst` 控制条目 + 过期；发布后真机复测 |
+
+### 12.5 实现进度（M3 分模块验收）
+
+> `tsc -b` 与 `vite build` 零错误；`vite preview` 生产构建浏览器验证通过。
+
+| 模块 | 状态 | 验证结果 |
+|---|---|---|
+| M3-A 可安装基础 | ✅ 完成 | manifest / 4 图标 / meta 注入齐全；图标 200 |
+| M3-B 离线缓存 | ✅ 完成 | SW 自动注册 `activated`，刷新后 `controller` 受控，`workbox-precache-v2` 缓存就绪 |
+| M3-C 更新提示 | ✅ 完成 | 组件 + i18n 就位（事件触发型，正常加载不可见） |
+| M3-D 文档 | ✅ 完成 | 本文档 §5.6 + 本进度章节 |
+
+**说明与遗留**
+- PWA 仅在**生产构建**（`vite build` + `vite preview` / 部署）下生效；开发模式 `devOptions.enabled=false` 不注入 SW。
+- 验证命令：`vite build` → `vite preview`（浏览器检查 `manifest.webmanifest`、`sw.js`、`caches`）。
+- §5.6 性能项：体积可接受，代码分割记入 M4；PWA 其余（安装引导 / 图标 AI 化）留待 M4 / M5。
+- 未推送，本地提交。
