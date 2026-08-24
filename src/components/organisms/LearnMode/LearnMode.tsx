@@ -11,7 +11,11 @@ import ChineseToEnglish from './ChineseToEnglish'
 import ResultReview from './ResultReview'
 import './LearnMode.css'
 
-export default function LearnMode() {
+interface LearnModeProps {
+  onExit?: () => void
+}
+
+export default function LearnMode({ onExit }: LearnModeProps) {
   const { t } = useTranslation()
   const { words } = useWordStore()
   const { showToast } = useUIStore()
@@ -39,6 +43,11 @@ export default function LearnMode() {
   if (!selectedMode) {
     return (
       <div className="learn-mode-select">
+        {onExit && (
+          <button className="learn-exit-btn" onClick={onExit}>
+            ← {t('modes.backHome')}
+          </button>
+        )}
         <h2>{t('learn.selectTitle')}</h2>
         <div className="learn-mode-cards">
           <div className="learn-card" onClick={() => handleStart(LearnModeEnum.ENGLISH_TO_CHINESE)}>
@@ -70,6 +79,7 @@ export default function LearnMode() {
           }
         }}
         hasRound2={selectedMode === LearnModeEnum.ENGLISH_TO_CHINESE}  // ← 改这里
+        onExit={onExit}
       />
     )
   }

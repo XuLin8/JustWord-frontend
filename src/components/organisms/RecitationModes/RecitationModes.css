@@ -1,0 +1,312 @@
+/* src/components/organisms/RecitationModes/RecitationModes.css
+   M2-F 背诵规则：规则选择器（RulePicker）+ 听词默写 / 看词选意 / 表格背诵法
+   复用 RecitationStage 的 rec-stage / rec-done / rec-actions 等基础样式 */
+
+/* ============ 规则选择器 ============ */
+.rm-picker {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  min-height: calc(100vh - 180px);
+}
+.rm-picker-head { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.rm-back-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--br-pill);
+  transition: background-color var(--dur-fast);
+}
+.rm-back-btn:hover { background: var(--color-fill-secondary); color: var(--color-text); }
+.rm-picker-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+}
+.rm-picker-sub { font-size: var(--font-size-md); color: var(--color-label-secondary); }
+
+.rm-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  flex: 1;
+}
+.rm-picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl);
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), box-shadow var(--dur-fast), border-color var(--dur-fast);
+}
+.rm-picker-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--apple-blue) 45%, transparent);
+  box-shadow: var(--shadow-popover);
+}
+.rm-picker-card:active { transform: scale(0.97); }
+.rm-picker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--br-xl);
+  color: var(--apple-blue);
+  background: var(--apple-blue-p);
+}
+.rm-picker-card-title { font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text); }
+.rm-picker-card-desc { font-size: var(--font-size-sm); color: var(--color-label-secondary); line-height: 1.5; }
+
+/* ============ 通用模式头 ============ */
+.rm-mode-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  padding: 3px 10px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-secondary);
+  border: 0.5px solid var(--color-separator);
+  color: var(--apple-indigo);
+}
+.rm-phase-badge {
+  font-size: var(--font-size-xs);
+  padding: 3px 10px;
+  border-radius: var(--br-pill);
+  background: var(--apple-purple-p);
+  color: var(--apple-purple);
+}
+
+/* ============ 听词默写 ============ */
+.rm-listen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-2xl);
+  text-align: center;
+}
+.rm-listen-hidden {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+  min-height: 1.2em;
+}
+.rm-listen-play {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl);
+  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  color: var(--apple-blue);
+  background: var(--apple-blue-p);
+  border: 0.5px solid var(--color-separator);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), box-shadow var(--dur-fast);
+}
+.rm-listen-play span { font-size: var(--font-size-xs); font-weight: 600; }
+.rm-listen-play:hover { transform: scale(1.06); box-shadow: 0 0 0 6px var(--apple-blue-p); }
+.rm-listen-play:active { transform: scale(0.94); }
+
+.rm-input {
+  width: min(420px, 100%);
+  padding: 14px 20px;
+  font-size: var(--font-size-lg);
+  font-family: var(--font-family-apple);
+  text-align: center;
+  color: var(--color-text);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-xl);
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.rm-input:focus {
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 4px var(--apple-blue-p);
+}
+.rm-input:disabled { opacity: 0.7; }
+
+.rm-result {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--br-pill);
+}
+.rm-result.is-correct { color: var(--apple-green); background: var(--apple-green-p); }
+.rm-result.is-wrong { color: var(--apple-red); background: var(--apple-red-p); }
+.rm-result-answer { font-family: var(--font-family-apple); font-weight: 700; }
+
+/* ============ 看词选意 ============ */
+.rm-choice {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-2xl);
+  text-align: center;
+}
+.rm-choice-word {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.rm-choice-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--apple-blue);
+  background: var(--apple-blue-p);
+  border: 0.5px solid var(--color-separator);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft);
+}
+.rm-choice-play:hover { transform: scale(1.08); }
+
+.rm-choice-opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  width: min(680px, 100%);
+}
+.rm-choice-opt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: 16px 20px;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-xl);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), border-color var(--dur-fast), box-shadow var(--dur-fast), opacity var(--dur-fast);
+}
+.rm-choice-opt:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 4px var(--apple-blue-p);
+}
+.rm-choice-opt:disabled { cursor: default; }
+.rm-choice-opt.is-correct { border-color: var(--apple-green); color: var(--apple-green); background: var(--apple-green-p); }
+.rm-choice-opt.is-wrong { border-color: var(--apple-red); color: var(--apple-red); background: var(--apple-red-p); }
+.rm-choice-opt.is-dim { opacity: 0.5; }
+.rm-choice-hint { font-size: var(--font-size-sm); color: var(--color-label-tertiary); }
+
+/* ============ 表格背诵法 ============ */
+.rm-table-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+  text-align: center;
+}
+.rm-table-scroll {
+  flex: 1;
+  overflow: auto;
+  border-radius: var(--br-xl);
+  border: 0.5px solid var(--color-separator);
+  background: var(--card-glass-2);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+}
+.rm-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+.rm-table th,
+.rm-table td {
+  padding: 10px 14px;
+  border-bottom: 0.5px solid var(--color-separator);
+  text-align: left;
+  vertical-align: middle;
+}
+.rm-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-fill-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-label-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  z-index: 1;
+}
+.rm-table tbody tr:last-child td { border-bottom: none; }
+.rm-th-index, .rm-td-index { width: 48px; text-align: center !important; color: var(--color-label-tertiary); }
+.rm-th-status, .rm-td-status { width: 56px; text-align: center !important; }
+.rm-td-label {
+  font-family: var(--font-family-apple);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text);
+}
+.rm-cell {
+  width: 100%;
+  min-width: 180px;
+  padding: 8px 12px;
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-md);
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.rm-cell:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 3px var(--apple-blue-p); }
+.rm-cell:disabled { opacity: 0.75; }
+.rm-status-pending { color: var(--color-label-tertiary); }
+.rm-status-correct { color: var(--apple-green); }
+.rm-status-wrong { color: var(--apple-red); }
+
+/* ============ 错词复习 ============ */
+.rm-wrong-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.rm-wrong-title { font-size: var(--font-size-sm); color: var(--color-label-secondary); }
+.rm-wrong-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-xs); }
+.rm-wrong-tag {
+  font-family: var(--font-family-apple);
+  font-size: var(--font-size-sm);
+  padding: 3px 10px;
+  border-radius: var(--br-pill);
+  color: var(--apple-red);
+  background: var(--apple-red-p);
+  border: 0.5px solid color-mix(in oklab, var(--apple-red) 40%, transparent);
+}

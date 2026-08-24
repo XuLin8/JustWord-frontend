@@ -11,6 +11,7 @@ interface Props {
   onRestart: () => void
   onContinue?: () => void
   hasRound2?: boolean
+  onExit?: () => void
 }
 
 const RESULT_META: Record<AnswerResult, { color: string; bg: string }> = {
@@ -28,7 +29,7 @@ const MASTERY = [
   { thresh: 0,    tone: 'D', color: '#e74c3c', bg: '#fdecea' },
 ]
 
-export default function ResultReview({ session, onRestart, onContinue, hasRound2 }: Props) {
+export default function ResultReview({ session, onRestart, onContinue, hasRound2, onExit }: Props) {
   const { t } = useTranslation()
   const { wordList, questions, score, mode } = session
 
@@ -328,6 +329,11 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
         <button className="restart-btn" onClick={onRestart}>
           {t('learn.restart')}
         </button>
+        {onExit && (
+          <button className="restart-btn" onClick={onExit}>
+            {t('modes.backHome')}
+          </button>
+        )}
       </div>
     </div>
   )

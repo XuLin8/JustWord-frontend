@@ -8,6 +8,22 @@
   text-align: center;
 }
 
+.learn-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--br-pill);
+  margin-bottom: var(--spacing-md);
+  transition: background-color var(--dur-fast), color var(--dur-fast);
+}
+.learn-exit-btn:hover { background: var(--color-fill-secondary); color: var(--color-text); }
+
 .learn-mode-select h2 {
   font-size: var(--font-size-3xl);
   margin-bottom: 30px;

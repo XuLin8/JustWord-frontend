@@ -7,6 +7,11 @@ import { BookOpen, CalendarDays, Minus, Play, Plus, Search, Sparkles } from 'luc
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { RecitationStage } from '@/components/organisms/RecitationStage'
+import { RulePicker, type RecitationRule } from '@/components/organisms/RecitationModes/RulePicker'
+import { ListeningMode } from '@/components/organisms/RecitationModes/ListeningMode'
+import { ChoiceMode } from '@/components/organisms/RecitationModes/ChoiceMode'
+import { TableMode } from '@/components/organisms/RecitationModes/TableMode'
+import LearnMode from '@/components/organisms/LearnMode/LearnMode'
 import { useLearningPlanStore } from '@/store/learningPlanStore'
 import { useTextbookStore } from '@/store/textbookStore'
 import { useDictionary, type DictionaryEntry } from '@/hooks/useDictionary'
@@ -16,11 +21,12 @@ interface LearningHomePageProps {
   onGoWordbook?: () => void
 }
 
-type View = 'home' | 'stage'
+type View = 'home' | 'rules' | 'mode'
 
 export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook }) => {
   const { t } = useTranslation()
   const [view, setView] = useState<View>('home')
+  const [rule, setRule] = useState<RecitationRule | null>(null)
   const [query, setQuery] = useState('')
   const [detail, setDetail] = useState<DictionaryEntry | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -163,7 +169,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
                   {t('learningHome.targetUnit')}
                 </div>
 
-                <button className="lh-start-btn" onClick={() => setView('stage')} disabled={!hasPlan}>
+                <button className="lh-start-btn" onClick={() => setView('rules')} disabled={!hasPlan}>
                   <Play size={18} />
                   {t('learningHome.start')}
                 </button>
@@ -171,9 +177,28 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
             )}
           </div>
         </>
+      ) : view === 'rules' ? (
+        /* ============ 背诵规则自选（M2-F） ============ */
+        <RulePicker
+          onSelect={(r) => {
+            setRule(r)
+            setView('mode')
+          }}
+          onBack={() => setView('home')}
+        />
       ) : (
-        /* ============ 背诵主区（M2-E：认识/不认识判定 → 详情 → 打卡） ============ */
-        <RecitationStage words={todayWords} onExit={() => setView('home')} />
+        /* ============ 背诵主区（M2-E 判定流程 + M2-F 各模式） ============ */
+        rule === 'listen' ? (
+          <ListeningMode words={todayWords} onExit={() => { setRule(null); setView('home') }} />
+        ) : rule === 'choice' ? (
+          <ChoiceMode words={todayWords} onExit={() => { setRule(null); setView('home') }} />
+        ) : rule === 'table' ? (
+          <TableMode words={todayWords} onExit={() => { setRule(null); setView('home') }} />
+        ) : rule === 'round2' ? (
+          <LearnMode onExit={() => { setRule(null); setView('home') }} />
+        ) : (
+          <RecitationStage words={todayWords} onExit={() => setView('home')} />
+        )
       )}
 
       {/* ============ 字典详情弹窗 ============ */}
