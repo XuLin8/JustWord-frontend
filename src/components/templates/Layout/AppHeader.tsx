@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Archive, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export type AppTab = 'home' | 'word' | 'learn'
+export type AppTab = 'home' | 'word' | 'stats' | 'profile'
 
 export interface UserBrief {
   username: string
@@ -25,9 +25,10 @@ interface AppHeaderProps {
 }
 
 const TABS: Array<{ id: AppTab; labelKey: string }> = [
-  { id: 'home',  labelKey: 'nav.home' },
-  { id: 'word',  labelKey: 'nav.wordbook' },
-  { id: 'learn', labelKey: 'nav.learn' },
+  { id: 'home',    labelKey: 'nav.home' },
+  { id: 'word',    labelKey: 'nav.wordbook' },
+  { id: 'stats',   labelKey: 'nav.stats' },
+  { id: 'profile', labelKey: 'nav.profile' },
 ]
 
 export const AppHeader: React.FC<AppHeaderProps> = ({

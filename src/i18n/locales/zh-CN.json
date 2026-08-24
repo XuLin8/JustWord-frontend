@@ -12,9 +12,21 @@
     "saving": "保存中…"
   },
   "nav": {
-    "home": "首页",
-    "wordbook": "单词本",
-    "learn": "学习"
+    "home": "学习",
+    "wordbook": "词库",
+    "stats": "统计",
+    "profile": "我的"
+  },
+  "profile": {
+    "account": "账号",
+    "dataAndSync": "数据与同步",
+    "comingSoon": "功能建设中，敬请期待",
+    "subscribedWordbooks": "已订阅词书"
+  },
+  "learningHome": {
+    "placeholder": "核心学习首页建设中…",
+    "subscribeHint": "前往「词库」订阅词书后即可开始学习",
+    "goWordbook": "去选词书"
   },
   "theme": {
     "light": "浅色",

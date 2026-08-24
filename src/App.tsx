@@ -7,7 +7,8 @@ import { useAuth } from './context/AuthContext'
 import { Layout } from './components/templates/Layout'
 import { DashboardPage } from './pages/DashboardPage'
 import { WordBookPage } from './pages/WordBookPage'
-import { LearnPage } from './pages/LearnPage'
+import { LearningHomePage } from './pages/LearningHomePage'
+import { ProfilePage } from './pages/ProfilePage'
 import { LoginGate } from './pages/LoginGate'
 import { AuthModal } from './components/organisms/AuthModal'
 import { ImportExportPanel } from './components/organisms/ImportExportPanel'
@@ -132,13 +133,18 @@ function App() {
         )}
 
         {shell.activeTab === 'home' && (
-          <div key="home" className="tab-panel"><DashboardPage /></div>
+          <div key="home" className="tab-panel">
+            <LearningHomePage onGoWordbook={() => shell.setTab('word')} />
+          </div>
         )}
         {shell.activeTab === 'word' && (
           <div key="word" className="tab-panel"><WordBookPage /></div>
         )}
-        {shell.activeTab === 'learn' && (
-          <div key="learn" className="tab-panel"><LearnPage /></div>
+        {shell.activeTab === 'stats' && (
+          <div key="stats" className="tab-panel"><DashboardPage /></div>
+        )}
+        {shell.activeTab === 'profile' && (
+          <div key="profile" className="tab-panel"><ProfilePage /></div>
         )}
       </Layout>
 

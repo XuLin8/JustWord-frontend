@@ -12,9 +12,21 @@
     "saving": "Saving…"
   },
   "nav": {
-    "home": "Home",
+    "home": "Learn",
     "wordbook": "Wordbook",
-    "learn": "Learn"
+    "stats": "Stats",
+    "profile": "Me"
+  },
+  "profile": {
+    "account": "Account",
+    "dataAndSync": "Data & Sync",
+    "comingSoon": "Coming soon",
+    "subscribedWordbooks": "Subscribed wordbooks"
+  },
+  "learningHome": {
+    "placeholder": "Learning home under construction…",
+    "subscribeHint": "Subscribe a wordbook in the Wordbook tab to start learning",
+    "goWordbook": "Pick a wordbook"
   },
   "theme": {
     "light": "Light",
