@@ -172,7 +172,7 @@
 .wb-dist-stack {
   display: flex;
   height: 20px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   overflow: hidden;
   background: var(--color-fill-secondary);
   box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05);
@@ -205,7 +205,7 @@
 .wb-legend-dot {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 8px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   background: var(--color-fill-tertiary);
   transition: background-color var(--dur-fast);
 }
@@ -257,7 +257,7 @@
   letter-spacing: -0.005em;
   padding: 4px 12px;
   background: var(--color-fill-tertiary);
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
 }
 
 .wb-filter-row, .wb-pos-row {
@@ -277,7 +277,7 @@
   position: relative;
   overflow: hidden;
   padding: 7px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   border: 0.5px solid transparent;
   background: var(--color-fill-tertiary);
   color: var(--color-label-secondary);
@@ -331,7 +331,7 @@
   position: relative;
   overflow: hidden;
   padding: 5px 10px 5px 12px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   background: linear-gradient(135deg,
               var(--apple-purple-p) 0%,
               var(--apple-indigo-p) 100%);
@@ -355,7 +355,7 @@
   font-weight: var(--font-weight-bold);
   background: #fff;
   padding: 1px 8px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   color: var(--apple-purple);
   font-variant-numeric: tabular-nums;
   font-size: 11px;

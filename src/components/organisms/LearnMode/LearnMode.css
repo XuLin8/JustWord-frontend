@@ -103,7 +103,7 @@
   display: inline-block;
   background: var(--color-fill-tertiary);
   padding: 4px 14px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   font-size: var(--font-size-sm);
   color: var(--color-label-secondary);
   font-weight: var(--font-weight-semibold);
@@ -135,7 +135,7 @@
   flex: 1;
   height: 8px;
   background: var(--color-fill-secondary);
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   overflow: hidden;
   box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05);
 }
@@ -143,7 +143,7 @@
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--apple-blue), var(--apple-indigo));
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   transition: width 0.5s var(--ease-spring);
 }
 
@@ -260,7 +260,7 @@
   background: linear-gradient(135deg, var(--apple-blue), var(--apple-indigo));
   color: white;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   font-size: var(--font-size-lg);
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
@@ -319,7 +319,7 @@
   background: linear-gradient(135deg, var(--apple-blue), var(--apple-indigo));
   color: white;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   font-size: var(--font-size-lg);
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
@@ -380,7 +380,7 @@
   background: linear-gradient(135deg, var(--apple-green), #30B0C7);
   color: white;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   font-size: var(--font-size-lg);
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
@@ -400,7 +400,7 @@
   padding: 12px 32px;
   background: var(--color-fill-tertiary);
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   font-size: var(--font-size-lg);
   cursor: pointer;
   color: var(--color-label);
@@ -475,7 +475,7 @@
 .result-mode-chip {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 12px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   background: var(--apple-blue-p);
   color: var(--apple-blue);
   font-size: var(--font-size-sm);
@@ -591,7 +591,7 @@
 
 .mastery-hero-badge {
   padding: 7px 16px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   border: 0.5px solid;
   font-size: var(--font-size-md);
   display: inline-flex; align-items: center; gap: 6px;
@@ -657,7 +657,7 @@
 .result-stack {
   display: flex;
   height: 20px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--br-pill);
   background: var(--color-fill-secondary);
   box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05);
   overflow: hidden;
@@ -886,7 +886,7 @@
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }
 .result-tag {
-  padding: 2px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600;
+  padding: 2px 10px; border-radius: var(--br-pill); font-size: 11px; font-weight: 600;
   border: 0.5px solid transparent;
 }
 .result-mini-mastery {
