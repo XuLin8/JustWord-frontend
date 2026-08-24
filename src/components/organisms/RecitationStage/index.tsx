@@ -334,7 +334,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
       )}
 
       <p className="rec-kbd-hint">
-        <kbd>↑</kbd> {t('recitation.unknown')} · <kbd>↓</kbd> {t('recitation.known')} · <kbd>空格</kbd> {t('recitation.play')}
+        <kbd>↑</kbd> {t('recitation.unknown')} · <kbd>↓</kbd> {t('recitation.known')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
         <span className="rec-kbd-divider">·</span>
         <Clock size={12} />
         {t('recitation.dragHint')}

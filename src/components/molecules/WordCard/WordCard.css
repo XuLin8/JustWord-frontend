@@ -13,7 +13,7 @@
   padding: var(--spacing-lg) var(--spacing-xl);
   background: var(--card-glass-1);
   border-radius: var(--br-xl);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border);
   backdrop-filter: saturate(180%) blur(18px);
   -webkit-backdrop-filter: saturate(180%) blur(18px);
   box-shadow: var(--shadow-card-rest);

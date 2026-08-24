@@ -141,7 +141,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
                 </div>
 
                 <div className="lh-task-source">
-                  {t('learningHome.sourceLabel')}：
+                  {t('learningHome.sourceLabel')}
                   <b>{enrolledBooks.map((b) => b.name).join('、')}</b>
                 </div>
 

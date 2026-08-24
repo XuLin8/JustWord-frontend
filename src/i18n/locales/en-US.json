@@ -34,7 +34,7 @@
     "metricNew": "New",
     "metricReview": "Review",
     "targetUnit": "words",
-    "sourceLabel": "Source",
+    "sourceLabel": "Source: ",
     "targetConfig": "Daily target:",
     "start": "Start learning",
     "back": "Back",
@@ -62,7 +62,8 @@
     "checkin": "Check in",
     "checked": "Checked in today",
     "checkinSuccess": "Checked in, keep it up!",
-    "restart": "Do it again"
+    "restart": "Do it again",
+    "space": "Space"
   },
   "pwa": {
     "updateAvailable": "New version available, refresh to apply",

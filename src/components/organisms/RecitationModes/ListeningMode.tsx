@@ -170,7 +170,7 @@ export const ListeningMode: React.FC<ListeningModeProps> = ({ words, onExit }) =
       </div>
 
       <p className="rec-kbd-hint">
-        <kbd>Enter</kbd> {t('modes.enterHint')} · <kbd>空格</kbd> {t('recitation.play')}
+        <kbd>Enter</kbd> {t('modes.enterHint')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
       </p>
     </div>
   )

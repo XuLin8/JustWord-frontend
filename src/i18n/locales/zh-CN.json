@@ -34,7 +34,7 @@
     "metricNew": "新词",
     "metricReview": "复习",
     "targetUnit": "词",
-    "sourceLabel": "选词来源",
+    "sourceLabel": "选词来源：",
     "targetConfig": "当日目标：",
     "start": "开始学习",
     "back": "返回",
@@ -62,7 +62,8 @@
     "checkin": "打卡",
     "checked": "今日已打卡",
     "checkinSuccess": "打卡成功，继续保持！",
-    "restart": "再来一轮"
+    "restart": "再来一轮",
+    "space": "空格"
   },
   "pwa": {
     "updateAvailable": "发现新版本，刷新后生效",

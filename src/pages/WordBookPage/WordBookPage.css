@@ -26,7 +26,7 @@
     radial-gradient(700px 240px at 0% 110%,  rgba(52, 199, 89, 0.10), transparent 60%),
     linear-gradient(180deg, var(--card-glass-1) 0%, color-mix(in oklab, var(--color-bg) 60%, var(--card) 40%) 100%);
 
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border);
   box-shadow: var(--shadow-card-hover);
 
   animation: fade-in-up 560ms var(--ease-spring) both;
@@ -54,7 +54,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--br-xl);
   background: var(--card-glass-1);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border);
   backdrop-filter: saturate(180%) blur(18px);
   -webkit-backdrop-filter: saturate(180%) blur(18px);
   box-shadow: var(--shadow-card-rest);
@@ -193,7 +193,7 @@
   border-radius: var(--br-pill);
   overflow: hidden;
   background: var(--color-fill-secondary);
-  box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.05);
+  box-shadow: inset 0 0 0 0.5px var(--border);
 }
 .wb-dist-seg {
   position: relative;
@@ -242,7 +242,7 @@
   padding: var(--spacing-xl);
   border-radius: var(--br-xl);
   background: var(--card-glass-3);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border);
   backdrop-filter: saturate(180%) blur(18px);
   -webkit-backdrop-filter: saturate(180%) blur(18px);
   box-shadow: var(--shadow-card-rest);
