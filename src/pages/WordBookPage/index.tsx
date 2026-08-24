@@ -1,5 +1,6 @@
 // src/pages/WordBookPage/index.tsx
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
 import { WordList } from '../../components/organisms/WordList'
@@ -10,6 +11,7 @@ import './WordBookPage.css'
 type DifficultyFilter = 0 | 1 | 2 | 3 | 4 | 5
 
 export const WordBookPage: React.FC = () => {
+  const { t } = useTranslation()
   const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate } =
     useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
@@ -65,32 +67,36 @@ export const WordBookPage: React.FC = () => {
 
   const handleAddWord = async (english: string, chinese: string): Promise<void> => {
     const result = await addWord(english, chinese)
-    if (!result.success) throw new Error(result.message || '添加失败')
+    if (!result.success) throw new Error(result.message || t('word.addFailed'))
   }
 
   const handleDeleteWord = async (id: string): Promise<void> => {
     const result = await deleteWord(id)
-    if (!result.success) throw new Error(result.message || '删除失败')
+    if (!result.success) throw new Error(result.message || t('word.deleteFailed'))
   }
 
   const handleUpdateWord = async (id: string, english: string, chinese: string): Promise<void> => {
     const result = await updateWord(id, english, chinese)
-    if (!result.success) throw new Error(result.message || '更新失败')
+    if (!result.success) throw new Error(result.message || t('word.updateFailed'))
   }
 
   const handleDeduplicate = () => {
     if (overview.duplicateCount === 0) {
-      showToast('当前无重复单词', 'info')
+      showToast(t('wordbook.noDuplicate'), 'info')
       return
     }
     openConfirmDialog({
-      title: '一键去重',
-      description: `检测到 ${overview.duplicateCount} 个重复项（共 ${overview.total} 个单词，重复率 ${(overview.duplicateRate * 100).toFixed(1)}%）。保留最后创建的一条，其他删除。是否继续？`,
-      confirmText: '去重',
+      title: t('wordbook.dedupTitle'),
+      description: t('wordbook.dedupDesc', {
+        count: overview.duplicateCount,
+        total: overview.total,
+        rate: (overview.duplicateRate * 100).toFixed(1),
+      }),
+      confirmText: t('wordbook.dedupConfirm'),
       confirmVariant: 'primary',
       onConfirm: async () => {
         const r = await deduplicate()
-        showToast(r.message ?? '去重完成', r.success ? 'success' : 'error')
+        showToast(r.message ?? t('wordbook.dedupDone'), r.success ? 'success' : 'error')
       },
     })
   }
@@ -101,23 +107,23 @@ export const WordBookPage: React.FC = () => {
       <section className="wb-overview">
         <div className="wb-overview-left">
           <div className="wb-metric">
-            <span className="wb-metric-label">单词总数</span>
+            <span className="wb-metric-label">{t('wordbook.totalLabel')}</span>
             <b className="wb-metric-value">{overview.total}</b>
           </div>
           <div className="wb-metric">
-            <span className="wb-metric-label">不重复</span>
+            <span className="wb-metric-label">{t('wordbook.uniqueLabel')}</span>
             <b className="wb-metric-value">{overview.uniqueCount}</b>
           </div>
           <div className={`wb-metric ${overview.duplicateCount > 0 ? 'wb-metric-warn' : ''}`}>
-            <span className="wb-metric-label">重复项</span>
+            <span className="wb-metric-label">{t('wordbook.duplicateLabel')}</span>
             <b className="wb-metric-value">{overview.duplicateCount}</b>
           </div>
           <div className="wb-metric">
-            <span className="wb-metric-label">词性种类</span>
+            <span className="wb-metric-label">{t('wordbook.posLabel')}</span>
             <b className="wb-metric-value">{overview.posCount}</b>
           </div>
           <button className="wb-dedup-btn" onClick={handleDeduplicate} disabled={overview.duplicateCount === 0}>
-            🧹 一键去重 · {overview.duplicateCount === 0 ? '已干净' : `节省 ${overview.duplicateCount} 条`}
+            🧹 {t('wordbook.dedupTitle')} · {overview.duplicateCount === 0 ? t('wordbook.dedupClean') : t('wordbook.dedupSave', { count: overview.duplicateCount })}
           </button>
         </div>
         <div className="wb-overview-right">
@@ -125,36 +131,36 @@ export const WordBookPage: React.FC = () => {
             <span
               className="wb-dist-seg wb-d-0"
               style={{ width: `${(overview.diffBuckets[0] / Math.max(1, overview.total)) * 100}%` }}
-              title={`未标难度：${overview.diffBuckets[0]}`}
+              title={t('wordbook.diffTitle0', { count: overview.diffBuckets[0] })}
             />
             <span
               className="wb-dist-seg wb-d-1"
               style={{ width: `${(overview.diffBuckets[1] / Math.max(1, overview.total)) * 100}%` }}
-              title={`★ 入门：${overview.diffBuckets[1]}`}
+              title={t('wordbook.diffTitle1', { count: overview.diffBuckets[1] })}
             />
             <span
               className="wb-dist-seg wb-d-2"
               style={{ width: `${(overview.diffBuckets[2] / Math.max(1, overview.total)) * 100}%` }}
-              title={`★★ 简单：${overview.diffBuckets[2]}`}
+              title={t('wordbook.diffTitle2', { count: overview.diffBuckets[2] })}
             />
             <span
               className="wb-dist-seg wb-d-3"
               style={{ width: `${(overview.diffBuckets[3] / Math.max(1, overview.total)) * 100}%` }}
-              title={`★★★ 中等：${overview.diffBuckets[3]}`}
+              title={t('wordbook.diffTitle3', { count: overview.diffBuckets[3] })}
             />
             <span
               className="wb-dist-seg wb-d-4"
               style={{ width: `${(overview.diffBuckets[4] / Math.max(1, overview.total)) * 100}%` }}
-              title={`★★★★ 较难：${overview.diffBuckets[4]}`}
+              title={t('wordbook.diffTitle4', { count: overview.diffBuckets[4] })}
             />
             <span
               className="wb-dist-seg wb-d-5"
               style={{ width: `${(overview.diffBuckets[5] / Math.max(1, overview.total)) * 100}%` }}
-              title={`★★★★★ 高难：${overview.diffBuckets[5]}`}
+              title={t('wordbook.diffTitle5', { count: overview.diffBuckets[5] })}
             />
           </div>
           <div className="wb-dist-legend">
-            <LegendDot color="#cbd5e1" label={`未 ${overview.diffBuckets[0]}`} />
+            <LegendDot color="#cbd5e1" label={t('wordbook.legendUnmarked', { count: overview.diffBuckets[0] })} />
             <LegendDot color="#22c55e" label={`★ ${overview.diffBuckets[1]}`} />
             <LegendDot color="#38bdf8" label={`★★ ${overview.diffBuckets[2]}`} />
             <LegendDot color="#4a90d9" label={`★★★ ${overview.diffBuckets[3]}`} />
@@ -169,21 +175,21 @@ export const WordBookPage: React.FC = () => {
       <div className="word-book-toolbar">
         <div className="wb-toolbar-top">
           <Input
-            placeholder="🔍 搜索英文或中文..."
+            placeholder={t('wordbook.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             fullWidth
-            aria-label="搜索单词"
+            aria-label={t('wordbook.searchAria')}
           />
           <div className="word-book-stats" aria-live="polite">
             {searchTerm
-              ? `找到 ${filteredWords.length} / ${words.length} 个单词`
-              : `共 ${words.length} 个单词${difficulty ? ` · 筛选难度 ${difficulty}` : ''}`}
+              ? t('wordbook.searchResult', { found: filteredWords.length, total: words.length })
+              : t('word.footerCount', { count: words.length }) + (difficulty ? t('wordbook.filteredByDifficulty', { difficulty }) : '')}
           </div>
         </div>
 
         <div className="wb-filter-row">
-          <span className="wb-filter-label">难度筛选：</span>
+          <span className="wb-filter-label">{t('wordbook.difficultyFilter')}</span>
           {([0, 1, 2, 3, 4, 5] as DifficultyFilter[]).map((lv) => (
             <button
               key={lv}
@@ -191,14 +197,14 @@ export const WordBookPage: React.FC = () => {
               onClick={() => setDifficulty(lv)}
               type="button"
             >
-              {lv === 0 ? '全部' : `${'★'.repeat(lv)}`}
+              {lv === 0 ? t('wordbook.all') : `${'★'.repeat(lv)}`}
             </button>
           ))}
         </div>
 
         {posDistribution.length > 0 && (
           <div className="wb-pos-row">
-            <span className="wb-filter-label">词性分布：</span>
+            <span className="wb-filter-label">{t('wordbook.posDistribution')}</span>
             {posDistribution.map(([pos, c]) => (
               <span key={pos} className="wb-pos-pill">
                 {pos}
