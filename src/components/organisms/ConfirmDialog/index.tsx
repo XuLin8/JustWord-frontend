@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { useUIStore } from '../../../store/uiStore'
 import { Button } from '../../atoms/Button'
-import './ConfirmDialog.css'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export const ConfirmDialog: React.FC = () => {
   const { confirmDialog, closeConfirmDialog } = useUIStore()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleEsc = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && confirmDialog?.isOpen && !isSubmitting) {
-      closeConfirmDialog()
-    }
-  }
-
   useEffect(() => {
-    if (confirmDialog?.isOpen) {
-      window.addEventListener('keydown', handleEsc)
-    }
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [confirmDialog?.isOpen, isSubmitting])
-
-  if (!confirmDialog?.isOpen) return null
+    if (!confirmDialog?.isOpen) setIsSubmitting(false)
+  }, [confirmDialog?.isOpen])
 
   const handleConfirm = async () => {
     setIsSubmitting(true)
     try {
-      await confirmDialog.onConfirm()
+      await confirmDialog?.onConfirm()
     } finally {
       setIsSubmitting(false)
       // 操作完成后自动关闭（若调用方未手动关闭）
@@ -42,42 +38,33 @@ export const ConfirmDialog: React.FC = () => {
   }
 
   return (
-    <div
-      className="confirm-overlay"
-      onClick={handleCancel}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-    >
-      <div
-        className="confirm-content"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 id="confirm-title" className="confirm-title">
-          {confirmDialog.title}
-        </h3>
-
-        {confirmDialog.description && (
-          <p className="confirm-description">{confirmDialog.description}</p>
-        )}
-
-        <div className="confirm-actions">
+    <Dialog open={confirmDialog?.isOpen} onOpenChange={(open) => {
+      if (!open && !isSubmitting) handleCancel()
+    }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{confirmDialog?.title}</DialogTitle>
+          {confirmDialog?.description && (
+            <DialogDescription>{confirmDialog.description}</DialogDescription>
+          )}
+        </DialogHeader>
+        <DialogFooter className="gap-2">
           <Button
             variant="ghost"
             onClick={handleCancel}
             disabled={isSubmitting}
           >
-            {confirmDialog.cancelText}
+            {confirmDialog?.cancelText}
           </Button>
           <Button
-            variant={confirmDialog.confirmVariant}
+            variant={confirmDialog?.confirmVariant === 'danger' ? 'danger' : 'primary'}
             onClick={handleConfirm}
             loading={isSubmitting}
           >
-            {confirmDialog.confirmText}
+            {confirmDialog?.confirmText}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

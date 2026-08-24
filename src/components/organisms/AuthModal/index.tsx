@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { AuthForm } from '../../molecules/AuthForm'
 import { useAuth } from '../../../context/AuthContext'
-import './AuthModal.css'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface AuthModalProps {
   isLoginOpen: boolean
@@ -29,9 +29,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true)
     try {
       const result = await login(data.email, data.password)
-      if (result.success) {
-        onCloseLogin()
-      }
+      if (result.success) onCloseLogin()
       return result
     } finally {
       setLoading(false)
@@ -42,9 +40,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true)
     try {
       const result = await register(data.email, data.username, data.password)
-      if (result.success) {
-        onSwitchToLogin()
-      }
+      if (result.success) onSwitchToLogin()
       return result
     } finally {
       setLoading(false)
@@ -53,37 +49,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <>
-      {isLoginOpen && (
-        <div className="auth-modal-overlay" onClick={onCloseLogin}>
-          <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="auth-modal-close" onClick={onCloseLogin}>
-              ✕
-            </button>
-            <AuthForm
-              mode="login"
-              onSubmit={handleLogin}
-              onSwitch={onSwitchToRegister}
-              loading={loading}
-            />
-          </div>
-        </div>
-      )}
+      <Dialog open={isLoginOpen} onOpenChange={(open) => !open && onCloseLogin()}>
+        <DialogContent className="sm:max-w-sm">
+          <AuthForm
+            mode="login"
+            onSubmit={handleLogin}
+            onSwitch={onSwitchToRegister}
+            loading={loading}
+          />
+        </DialogContent>
+      </Dialog>
 
-      {isRegisterOpen && (
-        <div className="auth-modal-overlay" onClick={onCloseRegister}>
-          <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="auth-modal-close" onClick={onCloseRegister}>
-              ✕
-            </button>
-            <AuthForm
-              mode="register"
-              onSubmit={handleRegister}
-              onSwitch={onSwitchToLogin}
-              loading={loading}
-            />
-          </div>
-        </div>
-      )}
+      <Dialog open={isRegisterOpen} onOpenChange={(open) => !open && onCloseRegister()}>
+        <DialogContent className="sm:max-w-sm">
+          <AuthForm
+            mode="register"
+            onSubmit={handleRegister}
+            onSwitch={onSwitchToLogin}
+            loading={loading}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

@@ -2,8 +2,9 @@
 import React, { useState } from 'react'
 import { Button } from '../../atoms/Button'
 import { Input } from '../../atoms/Input'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import type { LoginData, RegisterData } from '../../../types'
-import './AuthForm.css'
 
 type AuthFormProps =
   | {
@@ -68,68 +69,80 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     setIsSubmitting(false)
 
     if (result.success) {
-      if (isLogin) {
-        // 登录成功，由父组件处理
-      } else {
-        setSuccess('注册成功！请登录')
-      }
+      if (!isLogin) setSuccess('注册成功！请登录')
     } else {
       setError(result.message || (isLogin ? '登录失败' : '注册失败'))
     }
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2>{title}</h2>
+    <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit}>
+      <h2 className="text-center text-xl font-semibold">{title}</h2>
 
-      <Input
-        type="email"
-        placeholder="邮箱"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        fullWidth
-      />
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="auth-email">邮箱</Label>
+        <Input
+          id="auth-email"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
 
       {!isLogin && (
-        <Input
-          type="text"
-          placeholder="用户名"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          fullWidth
-        />
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="auth-username">用户名</Label>
+          <Input
+            id="auth-username"
+            type="text"
+            placeholder="用户名"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
       )}
 
-      <Input
-        type="password"
-        placeholder="密码"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        fullWidth
-      />
-
-      {!isLogin && (
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="auth-password">密码</Label>
         <Input
+          id="auth-password"
           type="password"
-          placeholder="确认密码"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="密码（至少 6 位）"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
-          fullWidth
         />
+      </div>
+
+      {!isLogin && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="auth-confirm">确认密码</Label>
+          <Input
+            id="auth-confirm"
+            type="password"
+            placeholder="再次输入密码"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
       )}
 
-      {error && <div className="auth-error">{error}</div>}
-      {success && <div className="auth-success">{success}</div>}
+      {error && <p className="text-center text-sm text-destructive">{error}</p>}
+      {success && <p className="text-center text-sm text-emerald-600">{success}</p>}
 
       <Button type="submit" loading={isSubmitting || loading} fullWidth>
         {isLogin ? '登录' : '注册'}
       </Button>
 
-      <button type="button" className="auth-switch" onClick={onSwitch}>
+      <button
+        type="button"
+        className={cn('mt-2 w-full cursor-pointer bg-transparent text-center text-sm text-primary hover:underline')}
+        onClick={onSwitch}
+      >
         {switchText}
       </button>
     </form>

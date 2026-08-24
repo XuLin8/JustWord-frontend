@@ -4,7 +4,6 @@ import { Input } from '../../atoms/Input'
 import { Button } from '../../atoms/Button'
 import { isValidEnglish, isValidChinese } from '../../../utils/validation'
 import { useUIStore } from '../../../store/uiStore'
-import './WordForm.css'
 
 interface WordFormProps {
   onSubmit: (english: string, chinese: string) => Promise<void>
@@ -55,8 +54,8 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
   }
 
   return (
-    <form className="word-form" onSubmit={handleSubmit}>
-      <div className="word-form-row">
+    <form className="mb-6 flex flex-col gap-2 rounded-lg border bg-card p-4 shadow-sm" onSubmit={handleSubmit}>
+      <div className="flex items-end gap-2 max-sm:flex-col max-sm:items-stretch">
         <Input
           id="add-english"
           name="english"
@@ -84,7 +83,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
           添加
         </Button>
       </div>
-      {error && <div className="word-form-error">{error}</div>}
+      {error && <div className="text-sm text-destructive">{error}</div>}
     </form>
   )
 }
