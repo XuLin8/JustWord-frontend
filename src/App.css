@@ -33,7 +33,7 @@
 .surface {
   background: rgba(255, 255, 255, 0.78);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
-  border-radius: var(--radius-xl);
+  border-radius: var(--br-xl);
   box-shadow: var(--shadow-card-rest);
   backdrop-filter: saturate(180%) blur(22px);
   -webkit-backdrop-filter: saturate(180%) blur(22px);
@@ -63,7 +63,7 @@
   text-align: center;
   color: var(--color-label-tertiary);
   font-size: var(--font-size-sm);
-  border-radius: var(--radius-lg);
+  border-radius: var(--br-lg);
   background: var(--color-fill-tertiary);
   border: 0.5px dashed var(--color-separator);
 }
