@@ -23,6 +23,28 @@
     "comingSoon": "功能建设中，敬请期待",
     "subscribedWordbooks": "已订阅词书"
   },
+  "cat": {
+    "title": "云养猫",
+    "adopt": "领养猫咪",
+    "adoptHint": "领养一只小猫，陪你一起背单词吧！背单词 / 打卡可获得金币，喂养与陪伴它。",
+    "adopted": "已领养，欢迎回家！",
+    "notAdopted": "尚未领养 · 点击领养",
+    "satiety": "饱食",
+    "mood": "心情",
+    "feed": "喂食",
+    "play": "玩耍",
+    "coinUnit": "币",
+    "asBoard": "设为首页看板",
+    "boardTip": "设为看板后，首页的猫咪会放大常驻陪伴",
+    "insufficientCoins": "金币不足，背单词 / 打卡可获得金币",
+    "fed": "吃饱啦，心满意足～",
+    "played": "玩得很开心！",
+    "petAria": "抚摸猫咪",
+    "openBoard": "打开猫咪看板",
+    "profileCoins": "{{name}} · {{coins}} 币",
+    "satietyShort": "饱食 {{n}}",
+    "moodShort": "心情 {{n}}"
+  },
   "learningHome": {
     "placeholder": "核心学习首页建设中…",
     "subscribeHint": "前往「词库」订阅词书后即可开始学习",

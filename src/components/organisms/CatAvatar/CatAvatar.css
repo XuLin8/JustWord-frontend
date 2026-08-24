@@ -1,0 +1,96 @@
+/* src/components/organisms/CatAvatar/CatAvatar.css
+   云养猫 · 猫咪头像：待机呼吸动画 + 状态光环 + 抚摸爱心反馈（明暗双态） */
+
+.cat-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline-offset: 3px;
+}
+.cat-avatar:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--primary) 55%, transparent);
+  border-radius: 50%;
+}
+
+/* 尺寸档位 */
+.cat-avatar-sm { width: 56px; height: 56px; }
+.cat-avatar-md { width: 84px; height: 84px; }
+.cat-avatar-lg { width: 128px; height: 128px; }
+.cat-avatar-xl { width: 200px; height: 200px; }
+
+/* 圆形形象 + 待机呼吸 */
+.cat-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: cat-breathe 3.6s var(--ease-spring-soft) infinite;
+  will-change: transform;
+}
+@keyframes cat-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.035) translateY(-2px); }
+}
+
+/* 状态光环（随心情着色） */
+.cat-avatar.has-ring::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, color-mix(in oklab, var(--apple-blue) 45%, transparent), transparent 68%);
+  filter: blur(10px);
+  opacity: 0.85;
+  z-index: -1;
+}
+
+/* 需要关怀状态：动作迟滞、下垂 */
+.cat-avatar.is-needy .cat-avatar-img {
+  animation-duration: 5.2s;
+  transform: translateY(4px) scale(0.985);
+}
+.cat-avatar.is-needy.has-ring::before {
+  background: radial-gradient(circle at 50% 42%, color-mix(in oklab, var(--apple-orange) 40%, transparent), transparent 68%);
+}
+
+/* 未领养占位 */
+.cat-avatar-ghost {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  color: var(--color-label-secondary);
+  background: var(--color-fill-secondary);
+  border-radius: 50%;
+  border: 0.5px solid var(--color-separator);
+}
+
+/* 抚摸爱心反馈 */
+.cat-heart {
+  position: absolute;
+  top: -8%;
+  font-size: 18px;
+  color: #ff5d8f;
+  pointer-events: none;
+  animation: cat-heart-float 0.9s var(--ease-spring-soft) forwards;
+  text-shadow: 0 1px 4px rgba(255, 93, 143, 0.4);
+}
+@keyframes cat-heart-float {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.6); }
+  25%  { opacity: 1; transform: translateY(-4px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-26px) scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-avatar-img { animation: none; }
+}

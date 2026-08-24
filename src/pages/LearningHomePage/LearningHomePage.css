@@ -215,3 +215,46 @@
   color: var(--color-label-secondary);
 }
 
+/* ============ 猫咪陪伴角落（M5 云养猫） ============ */
+.lh-cat-corner {
+  position: fixed;
+  right: var(--spacing-xl);
+  bottom: calc(56px + var(--spacing-lg));
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.lh-cat-corner.is-board .cat-avatar {
+  width: 148px;
+  height: 148px;
+}
+.lh-cat-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--apple-orange);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-pill);
+  padding: 3px 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  font-variant-numeric: tabular-nums;
+}
+.lh-cat-coins:hover {
+  background: color-mix(in oklab, var(--card-glass-2) 80%, var(--apple-orange) 12%);
+}
+
+@media (max-width: 560px) {
+  .lh-cat-corner {
+    right: var(--spacing-md);
+    bottom: calc(56px + var(--spacing-md));
+  }
+}
+

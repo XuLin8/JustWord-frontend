@@ -3,7 +3,7 @@
 // 大屏占比、渐变背景明暗双态。背诵流程（M2-E）与背诵规则（M2-F）在此页深化。
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BookOpen, CalendarDays, Minus, Play, Plus, Search, Sparkles } from 'lucide-react'
+import { BookOpen, CalendarDays, Coins, Minus, Play, Plus, Search, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { RecitationStage } from '@/components/organisms/RecitationStage'
@@ -12,8 +12,10 @@ import { ListeningMode } from '@/components/organisms/RecitationModes/ListeningM
 import { ChoiceMode } from '@/components/organisms/RecitationModes/ChoiceMode'
 import { TableMode } from '@/components/organisms/RecitationModes/TableMode'
 import LearnMode from '@/components/organisms/LearnMode/LearnMode'
+import { CatAvatar } from '@/components/organisms/CatAvatar'
 import { useLearningPlanStore } from '@/store/learningPlanStore'
 import { useTextbookStore } from '@/store/textbookStore'
+import { useCatStore } from '@/store/catStore'
 import { useDictionary, type DictionaryEntry } from '@/hooks/useDictionary'
 import './LearningHomePage.css'
 
@@ -35,12 +37,18 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
     useLearningPlanStore()
   const { enrolledIds, textbooks, loadTextbooks } = useTextbookStore()
   const { search } = useDictionary()
+  const catAdopted = useCatStore((s) => s.adopted)
+  const catCoins = useCatStore((s) => s.coins)
+  const catAsBoard = useCatStore((s) => s.asBoard)
+  const loadCat = useCatStore((s) => s.load)
+  const openBoard = useCatStore((s) => s.openBoard)
 
-  // 挂载：加载订阅词书 + 生成今日计划
+  // 挂载：加载订阅词书 + 生成今日计划 + 加载猫咪状态
   useEffect(() => {
     if (textbooks.length === 0) void loadTextbooks()
     void generatePlan()
-  }, [loadTextbooks, generatePlan, textbooks.length])
+    void loadCat()
+  }, [loadTextbooks, generatePlan, textbooks.length, loadCat])
 
   // Ctrl+K 唤起字典搜索
   useEffect(() => {
@@ -213,6 +221,17 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
             {detail.example && <p>{t('learningHome.detailExample')}：{detail.example}</p>}
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* ============ 猫咪陪伴（常驻右下角，可互动） ============ */}
+      {catAdopted && (
+        <div className={`lh-cat-corner ${catAsBoard ? 'is-board' : ''}`}>
+          <button type="button" className="lh-cat-coins" onClick={openBoard} aria-label={t('cat.openBoard')}>
+            <Coins size={14} />
+            {catCoins}
+          </button>
+          <CatAvatar size={catAsBoard ? 'lg' : 'md'} onClick={openBoard} />
+        </div>
       )}
     </section>
   )

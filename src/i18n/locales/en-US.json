@@ -23,6 +23,28 @@
     "comingSoon": "Coming soon",
     "subscribedWordbooks": "Subscribed wordbooks"
   },
+  "cat": {
+    "title": "Cloud Cat",
+    "adopt": "Adopt a Cat",
+    "adoptHint": "Adopt a kitten to study with you! Earn coins by studying / checking in, then feed and play with it.",
+    "adopted": "Adopted. Welcome home!",
+    "notAdopted": "Not adopted yet · Tap to adopt",
+    "satiety": "Satiety",
+    "mood": "Mood",
+    "feed": "Feed",
+    "play": "Play",
+    "coinUnit": "coins",
+    "asBoard": "Set as home companion",
+    "boardTip": "When set, your cat stays bigger on the home page",
+    "insufficientCoins": "Not enough coins. Study or check in to earn more",
+    "fed": "Yummy, all satisfied~",
+    "played": "What fun!",
+    "petAria": "Pet the cat",
+    "openBoard": "Open cat board",
+    "profileCoins": "{{name}} · {{coins}} coins",
+    "satietyShort": "Satiety {{n}}",
+    "moodShort": "Mood {{n}}"
+  },
   "learningHome": {
     "placeholder": "Learning home under construction…",
     "subscribeHint": "Subscribe a wordbook in the Wordbook tab to start learning",

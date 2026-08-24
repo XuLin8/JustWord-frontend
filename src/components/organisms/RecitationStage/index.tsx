@@ -20,6 +20,8 @@ import { useLearningStore } from '@/store/learningStore'
 import { useCheckinStore } from '@/store/checkinStore'
 import { useUIStore } from '@/store/uiStore'
 import { speakWord, warmupSpeech } from '@/utils/speech'
+import { playMeow, playHiss } from '@/utils/catSound'
+import { useCatStore, CAT_REWARD } from '@/store/catStore'
 import './RecitationStage.css'
 
 interface RecitationStageProps {
@@ -36,6 +38,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
   const { checkIn, todayChecked, loadCheckins } = useCheckinStore()
   const showToast = useUIStore((s) => s.showToast)
+  const earnCoins = useCatStore((s) => s.earnCoins)
 
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
@@ -63,10 +66,18 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
         chinese: word.meaning,
         known: j === 'known',
       })
+      // 云养猫联动：认识 → 甜美喵声 + 2 币；不认识 → 哈气音 + 1 币
+      if (j === 'known') {
+        playMeow()
+        void earnCoins(CAT_REWARD.KNOWN)
+      } else {
+        playHiss()
+        void earnCoins(CAT_REWARD.UNKNOWN)
+      }
       setLastJudgement(j)
       setRevealed(true)
     },
-    [word, revealed, finished, recordJudgement],
+    [word, revealed, finished, recordJudgement, earnCoins],
   )
 
   /** 播发音 */
@@ -164,7 +175,10 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
             onClick={() => {
               void (async () => {
                 const ok = await checkIn()
-                if (ok) showToast(t('recitation.checkinSuccess'), 'success')
+                if (ok) {
+                  showToast(t('recitation.checkinSuccess'), 'success')
+                  void earnCoins(CAT_REWARD.CHECKIN) // 云养猫：打卡得币
+                }
               })()
             }}
           >

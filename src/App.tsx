@@ -13,6 +13,8 @@ import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { Spinner } from './components/atoms/Spinner'
 import { PWAUpdateToast } from './components/organisms/PWAUpdateToast'
 import { PWAInstallPrompt } from './components/organisms/PWAInstallPrompt'
+import { CatBoard } from './components/organisms/CatBoard'
+import { useCatStore } from './store/catStore'
 import { setupAuthListener } from './api'
 import { useAppShell } from './hooks/useAppShell'
 import { useTheme } from './hooks/useTheme'
@@ -43,6 +45,11 @@ function App() {
   const { clearDashboard } = useStatsStore()
   const { isAuthenticated, isLoading, user, logout } = useAuth()
   const { init: initSync, reset: resetSync, syncNow } = useSyncStore()
+  const loadCat = useCatStore((s) => s.load)
+
+  useEffect(() => {
+    void loadCat() // 云养猫：全局加载猫咪状态（时间衰减 + 持久化）
+  }, [loadCat])
 
   useEffect(() => {
     const cleanup = setupAuthListener()
@@ -118,6 +125,7 @@ function App() {
         {authModal}
         <ToastContainer />
         <ConfirmDialog />
+        <CatBoard />
         <PWAInstallPrompt />
       </>
     )
@@ -171,6 +179,7 @@ function App() {
 
       <ToastContainer />
       <ConfirmDialog />
+      <CatBoard />
       <PWAUpdateToast />
       <PWAInstallPrompt />
     </>

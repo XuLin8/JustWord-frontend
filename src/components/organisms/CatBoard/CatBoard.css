@@ -1,0 +1,235 @@
+/* src/components/organisms/CatBoard/CatBoard.css
+   云养猫 · 猫咪看板：全屏玻璃浮层 + 状态条 + 互动按钮（明暗双态） */
+
+.cat-board {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  animation: cat-board-fade var(--dur-fast) var(--ease-spring-soft);
+}
+@keyframes cat-board-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cat-board-card {
+  width: min(92vw, 400px);
+  max-height: 86vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  animation: cat-board-card-in var(--dur-slow) var(--ease-spring-soft);
+}
+@keyframes cat-board-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cat-board-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cat-board-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.cat-board-close {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--color-label-secondary);
+  background: var(--color-fill-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast);
+}
+.cat-board-close:hover { background: var(--color-fill-secondary); }
+
+/* 领养态 */
+.cat-board-adopt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl) 0;
+}
+.cat-board-adopt-text {
+  text-align: center;
+  color: var(--color-label-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* 日常态 hero */
+.cat-board-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--br-xl);
+  background: var(--color-fill-secondary);
+  border: 0.5px solid var(--color-separator);
+}
+.cat-board-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+.cat-board-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.cat-board-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--apple-orange);
+  background: color-mix(in oklab, var(--apple-orange) 14%, transparent);
+  padding: 3px 10px;
+  border-radius: var(--br-pill);
+}
+
+/* 状态条 */
+.cat-board-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.cat-board-stat {
+  display: grid;
+  grid-template-columns: 96px 1fr 34px;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.cat-board-stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+}
+.cat-board-stat-val {
+  text-align: right;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+.cat-bar {
+  height: 10px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: var(--br-pill);
+  transition: width var(--dur-slow) var(--ease-spring-soft);
+}
+.cat-bar-fill.is-satiety {
+  background-image: linear-gradient(135deg, var(--apple-orange) 0%, var(--apple-yellow) 100%);
+}
+.cat-bar-fill.is-mood {
+  background-image: linear-gradient(135deg, var(--apple-pink) 0%, var(--apple-purple) 100%);
+}
+
+/* 互动按钮 */
+.cat-board-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+.cat-board-action {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.cat-board-action span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+.cat-board-action small {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+}
+
+/* 设为看板开关 */
+.cat-board-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-sm) 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.cat-board-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+.cat-board-switch-hint {
+  color: var(--color-label-tertiary);
+}
+.cat-switch {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+  transition: background-color var(--dur-fast);
+}
+.cat-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform var(--dur-fast) var(--ease-spring-soft);
+}
+.cat-switch.is-on {
+  background-image: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%);
+}
+.cat-switch.is-on .cat-switch-thumb {
+  transform: translateX(18px);
+}
+
+.cat-board-tip {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+  text-align: center;
+}
