@@ -172,6 +172,29 @@
     "all": "All",
     "posDistribution": "Part-of-speech:"
   },
+  "textbooks": {
+    "title": "Built-in wordbooks",
+    "subtitle": "Subscribe to start learning on the home page",
+    "empty": "No wordbooks available",
+    "wordsCount": "{{count}} words",
+    "browse": "Browse",
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed",
+    "subscribedSuccess": "Subscribed to \"{{name}}\". Start learning on the home page",
+    "unsubscribedSuccess": "Unsubscribed from \"{{name}}\"",
+    "browseTitle": "{{name}} · Word browser",
+    "browseSubtitle": "{{count}} words · keyword search supported",
+    "browseSearchPlaceholder": "🔍 Search word or meaning...",
+    "browseEmpty": "No matching words",
+    "browseResult": "{{total}} words · page {{page}} / {{pages}}",
+    "prev": "Prev",
+    "next": "Next",
+    "level": {
+      "CET4": "CET-4",
+      "CET6": "CET-6",
+      "KAOYAN": "Postgrad"
+    }
+  },
   "learn": {
     "minWordsWarning": "Your wordbook needs at least {{count}} words to start learning!",
     "selectTitle": "📚 Choose a learning mode",

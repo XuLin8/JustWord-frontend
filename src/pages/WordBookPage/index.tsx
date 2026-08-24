@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
 import { WordList } from '../../components/organisms/WordList'
+import { WordbookSection } from '../../components/organisms/WordbookSection'
 import { Input } from '../../components/atoms/Input'
 import { useUIStore } from '../../store/uiStore'
 import './WordBookPage.css'
@@ -103,6 +104,9 @@ export const WordBookPage: React.FC = () => {
 
   return (
     <div className="word-book-page">
+      {/* ============ 内置词书（订阅入口） ============ */}
+      <WordbookSection />
+
       {/* ============ 顶部 Overview 条带 ============ */}
       <section className="wb-overview">
         <div className="wb-overview-left">

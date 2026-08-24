@@ -172,6 +172,29 @@
     "all": "全部",
     "posDistribution": "词性分布："
   },
+  "textbooks": {
+    "title": "内置词书",
+    "subtitle": "订阅后即可在学习首页开始背诵",
+    "empty": "暂无可用词书",
+    "wordsCount": "{{count}} 词",
+    "browse": "浏览词条",
+    "subscribe": "订阅",
+    "subscribed": "已订阅",
+    "subscribedSuccess": "已订阅「{{name}}」，可在学习首页开始背诵",
+    "unsubscribedSuccess": "已取消订阅「{{name}}」",
+    "browseTitle": "{{name}} · 词条浏览",
+    "browseSubtitle": "共 {{count}} 词 · 支持关键词搜索",
+    "browseSearchPlaceholder": "🔍 搜索单词或释义...",
+    "browseEmpty": "没有匹配的词条",
+    "browseResult": "共 {{total}} 词 · 第 {{page}} / {{pages}} 页",
+    "prev": "上一页",
+    "next": "下一页",
+    "level": {
+      "CET4": "四级",
+      "CET6": "六级",
+      "KAOYAN": "考研"
+    }
+  },
   "learn": {
     "minWordsWarning": "词库至少需要 {{count}} 个单词才能开始学习！",
     "selectTitle": "📚 选择学习模式",
