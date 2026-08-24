@@ -1,0 +1,93 @@
+/* src/components/organisms/PWAInstallPrompt/PWAInstallPrompt.css
+   M4-PWA-安装引导：安装提示卡片 + 半透明遮罩 */
+
+.pwa-install {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: saturate(160%) blur(6px);
+  -webkit-backdrop-filter: saturate(160%) blur(6px);
+  animation: pwa-install-fade var(--dur-fast) var(--ease-spring-soft);
+}
+
+.pwa-install-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: min(88vw, 320px);
+  padding: 24px 22px 18px;
+  border-radius: var(--br-xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  text-align: center;
+  animation: pwa-install-card-in var(--dur-slow) var(--ease-spring-soft);
+}
+
+.pwa-install-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+.pwa-install-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pwa-install-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pwa-install-desc {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.pwa-install-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.pwa-install-btn {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--apple-blue);
+  background: var(--apple-blue-p);
+  border: 0.5px solid var(--color-separator);
+  border-radius: var(--br-pill);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), opacity var(--dur-fast);
+}
+.pwa-install-btn:hover { transform: scale(1.03); }
+.pwa-install-btn:active { transform: scale(0.96); }
+.pwa-install-btn.primary {
+  color: #fff;
+  background: var(--apple-blue);
+  border-color: transparent;
+}
+
+@keyframes pwa-install-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pwa-install-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -69,7 +69,12 @@
     "updateAvailable": "New version available, refresh to apply",
     "reload": "Refresh",
     "dismiss": "Later",
-    "offlineReady": "Offline mode ready, learn without network"
+    "offlineReady": "Offline mode ready, learn without network",
+    "installTitle": "Install Just Word",
+    "installDesc": "Install to your device for offline study and one-tap launch",
+    "install": "Install",
+    "installIos": "Tap the Share button at the bottom, then choose \"Add to Home Screen\"",
+    "gotIt": "Got it"
   },
   "modes": {
     "back": "Back",

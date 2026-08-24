@@ -550,7 +550,7 @@
   - **响应式 ≥420px**：桌面与移动端布局正确，无横向溢出。
   - **性能代码分割**：四页面按需懒加载 + vendor 独立 chunk，解除 >500 kB 告警。
   - **DoD 总检**：`tsc -b` / `vite build` 零错误 + 生产构建浏览器回归。
-- 范围外：云养猫（§5.8，P1）、安装引导按钮（beforeinstallprompt）、PWA 图标 AI 化，均留待后续阶段。
+- 范围外：云养猫（§5.8，P1）、PWA 图标 AI 化，留待后续阶段。
 
 ### 13.2 模块划分与提交计划（分模块本地提交，不推送）
 
@@ -591,9 +591,11 @@
 | M4-C 响应式 ≥420px | ✅ 完成 | 560px 卡片断点；622px 视口四 Tab 无横向溢出 |
 | M4-D 性能代码分割 | ✅ 完成 | 首屏 `index.js` 42 kB（gzip 12.6 kB）；四页面 chunk 按需加载（登录后学习页仅加载 `LearningHomePage`；词库 / 统计 / 我的 切换时才加载对应 chunk）；生产登录 `/api/auth/login` 200 |
 | M4-E DoD 总检 + 文档 | ✅ 完成 | §5.6 / §5.7 全部勾选；本文档 13.5 章节 |
+| M4-F PWA 安装引导 | ✅ 完成 | `PWAInstallPrompt` 组件（beforeinstallprompt 捕获 + iOS「添加到主屏幕」指引 + 关闭记忆）；双分支挂载；`vite preview` 手动派发事件验证弹窗出现 → 稍后关闭 → 刷新不再打扰 |
 
 **说明与遗留**
 - 生产构建验证环境：`vite preview` 于 4180 端口（全新 origin）以新账号 `m4_20260825@example.com` 登录，学习首页仅加载 `LearningHomePage-*.js`，切 Tab 按需加载 `WordBookPage / DashboardPage / ProfilePage` chunk，均无阻断性报错。
 - M4-D 顺带修复生产 `BASE_URL` 重复拼接 bug（`/api/api/...` → `/api/...`），属生产可用性修复，非 M0–M3 回归。
-- P1 增强（云养猫 §5.8、安装引导、图标 AI 化）留待后续阶段。
+- M4-F 安装引导：桌面 Chrome / Edge 经 `beforeinstallprompt` 触发自绘安装卡片，点击「安装」拉起系统安装弹窗；iOS 无此事件，改显示「添加到主屏幕」指引；关闭后 `localStorage` 记忆，刷新不再打扰。
+- P1 增强（云养猫 §5.8、PWA 图标 AI 化）留待后续阶段。
 - 未推送，本地提交。

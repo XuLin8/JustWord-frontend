@@ -12,6 +12,7 @@ import { ToastContainer } from './components/organisms/ToastContainer'
 import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { Spinner } from './components/atoms/Spinner'
 import { PWAUpdateToast } from './components/organisms/PWAUpdateToast'
+import { PWAInstallPrompt } from './components/organisms/PWAInstallPrompt'
 import { setupAuthListener } from './api'
 import { useAppShell } from './hooks/useAppShell'
 import { useTheme } from './hooks/useTheme'
@@ -117,6 +118,7 @@ function App() {
         {authModal}
         <ToastContainer />
         <ConfirmDialog />
+        <PWAInstallPrompt />
       </>
     )
   }
@@ -170,6 +172,7 @@ function App() {
       <ToastContainer />
       <ConfirmDialog />
       <PWAUpdateToast />
+      <PWAInstallPrompt />
     </>
   )
 }
