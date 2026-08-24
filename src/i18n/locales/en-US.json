@@ -306,7 +306,8 @@
     "level": {
       "CET4": "CET-4",
       "CET6": "CET-6",
-      "KAOYAN": "Postgrad"
+      "KAOYAN": "Postgrad",
+      "OTHER": "Wordbook"
     }
   },
   "learn": {

@@ -385,7 +385,7 @@
 | 1 | TTS 发音（听词默写 / 单词详情） | 无 TTS 实现；词条无音标数据 | Web Speech API 起步 + 规则判定；音标数据随词书补充 | M2 |
 | 2 | 内置词书数据源 | 无词书数据；仅自建词库 | 从公开大纲词表整理，先一本可用词书起步 | M2 前 |
 | 3 | 猫咪形象 / 动画 / 音效资产 | 无任何猫咪资产 | AI 生成形象（Seedream）+ CSS/SVG 待机动画；音效用 Web Audio 合成或短音频 | M2 |
-| 4 | textbooks / sync 后端接口 | 契约已定义（§6.3 / §6.4），`paths.ts` 未加 | 前端 mock 先行，后端后续补充 | M1 |
+| 4 | textbooks / sync 后端接口 | textbooks 已接真实 `/api/library`；sync 契约已定义（§6.4） | 词书已跑通真实后端；sync 前端 mock 先行，后端后续补充 | M1 |
 | 5 | 登录门禁 / 路由保护 | 无路由库；Tab 切换 | App 层基于 `isAuthenticated` 拦截；可选引入 react-router | M1 |
 | 6 | 学习记录双轨 | `learningStore`（localforage）与 `learningApi` 未打通 | 统一走同步引擎，`learningStore` 改为本地缓存层 | M1 |
 | 7 | 形近词 / 反义词数据 | 近义 `SIMILAR_WORDS_DB` 仅 2 组 | 规则生成或随词书补充数据 | M2 |

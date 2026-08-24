@@ -306,7 +306,8 @@
     "level": {
       "CET4": "四级",
       "CET6": "六级",
-      "KAOYAN": "考研"
+      "KAOYAN": "考研",
+      "OTHER": "词库"
     }
   },
   "learn": {

@@ -29,10 +29,11 @@ export const API_PATH = {
     word: (bookId: number, wordId: string) => `/api/wordbooks/${bookId}/words/${wordId}`,
   },
   textbooks: {
-    root: '/api/textbooks',
-    detail: (id: number) => `/api/textbooks/${id}`,
-    words: (id: number) => `/api/textbooks/${id}/words`,
-    enroll: (id: number) => `/api/textbooks/${id}/enroll`,
+    // 后端「内置词库」走 /api/library（真实四级词库已由 load_cet4.py 载入）
+    root: '/api/library/',
+    detail: (id: number) => `/api/library/${id}`,
+    words: (id: number) => `/api/library/${id}`,
+    enroll: (id: number) => `/api/library/${id}/import`,
   },
   sync: {
     words: '/api/sync/words',

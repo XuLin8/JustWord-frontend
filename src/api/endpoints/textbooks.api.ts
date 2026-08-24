@@ -1,10 +1,10 @@
 // src/api/endpoints/textbooks.api.ts
-// 内置词书接口契约（新增 · 后端实现后续补充，当前走 mock）
+// 内置词书接口（M2-B）：对接后端真实词库 /api/library
+// 后端四级完整词表由 migrations/load_cet4.py 载入，本模块负责响应字段映射与分页换算。
 import { http } from '../client'
 import { API_PATH } from '../paths'
-import { textbooksMock } from '../mock/textbooks.mock'
 
-// ============ 类型定义 ============
+// ============ 前端类型定义 ============
 export interface Textbook {
   id: number
   name: string
@@ -48,37 +48,105 @@ export interface TextbookWordsParams {
   keyword?: string
 }
 
-// ============ API 方法 ============
-export const textbooksApi = {
-  // 词书列表
-  list: () =>
-    textbooksMock.list(),
-
-  // 词条分页拉取
-  getWords: (id: number, params?: TextbookWordsParams) =>
-    textbooksMock.getWords(id, params),
-
-  // 订阅词书到个人学习计划
-  enroll: (id: number) =>
-    textbooksMock.enroll(id),
+// ============ 后端响应结构（/api/library） ============
+interface BackendLibrary {
+  id: number
+  name: string
+  description: string
+  words_count: number
 }
 
-// 兼容命名导出（后端就绪后切换为 http 实现）
-export const textbooksApiHttp = {
-  list: () =>
-    http.get<Textbook[]>(API_PATH.textbooks.root),
+interface BackendLibraryWord {
+  id: number
+  english: string
+  chinese: string
+  phonetic: string | null
+  part_of_speech: string | null
+}
 
+interface BackendLibraryWordsResponse {
+  id: number
+  name: string
+  description: string
+  total: number
+  limit: number
+  offset: number
+  words: BackendLibraryWord[]
+}
+
+interface BackendImportResult {
+  library_id: number
+  imported: number
+  skipped: number
+  skipped_english: string[]
+}
+
+// ============ 字段映射 ============
+/** 词库名 -> 级别标签（后端未单独存 level，按名称推断） */
+function deriveLevel(name: string): string {
+  if (name.includes('四级')) return 'CET4'
+  if (name.includes('六级')) return 'CET6'
+  if (name.includes('考研')) return 'KAOYAN'
+  return 'OTHER'
+}
+
+function mapLibrary(lib: BackendLibrary): Textbook {
+  return {
+    id: lib.id,
+    name: lib.name,
+    level: deriveLevel(lib.name),
+    word_count: lib.words_count,
+    description: lib.description ?? '',
+    created_at: '',
+  }
+}
+
+function mapLibraryWord(w: BackendLibraryWord, level: string): TextbookWord {
+  return {
+    id: String(w.id),
+    word: w.english,
+    phonetic: w.phonetic ?? undefined,
+    meaning: w.chinese,
+    level,
+  }
+}
+
+// ============ API 方法（真实后端） ============
+export const textbooksApi = {
+  // 词库列表（公开接口，无需登录）
+  list: () =>
+    http.get<BackendLibrary[]>(API_PATH.textbooks.root, { requiresAuth: false }).then((libs) =>
+      libs.map(mapLibrary),
+    ),
+
+  // 词条分页拉取（公开接口，q/limit/offset 分页）
   getWords: (id: number, params?: TextbookWordsParams) => {
     const qs = new URLSearchParams()
-    if (params?.page != null) qs.set('page', String(params.page))
-    if (params?.size != null) qs.set('size', String(params.size))
-    if (params?.keyword) qs.set('keyword', params.keyword)
+    if (params?.keyword?.trim()) qs.set('q', params.keyword.trim())
+    if (params?.size != null) qs.set('limit', String(params.size))
+    const offset = ((params?.page ?? 1) - 1) * (params?.size ?? 20)
+    qs.set('offset', String(offset))
     const s = qs.toString()
-    return http.get<TextbookWordsResponse>(
-      s ? `${API_PATH.textbooks.words(id)}?${s}` : API_PATH.textbooks.words(id),
-    )
+    return http
+      .get<BackendLibraryWordsResponse>(
+        s ? `${API_PATH.textbooks.words(id)}?${s}` : API_PATH.textbooks.words(id),
+        { requiresAuth: false },
+      )
+      .then((res) => ({
+        items: res.words.map((w) => mapLibraryWord(w, deriveLevel(res.name))),
+        total: res.total,
+        page: params?.page ?? 1,
+        size: params?.size ?? 20,
+      }))
   },
 
+  // 订阅词书 -> 导入到个人单词本（真实落库）
   enroll: (id: number) =>
-    http.post<EnrollResponse>(API_PATH.textbooks.enroll(id)),
+    http
+      .post<BackendImportResult>(API_PATH.textbooks.enroll(id))
+      .then((res) => ({
+        enrolled: res.imported > 0 || res.skipped > 0,
+        textbook_id: res.library_id,
+        subscribed: res.imported,
+      })),
 }
