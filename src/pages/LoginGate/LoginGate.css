@@ -1,0 +1,114 @@
+/* src/pages/LoginGate/LoginGate.css — 登录门禁页（明暗双态，语义 token） */
+.login-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl);
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 100% 0%, color-mix(in srgb, var(--ring) 8%, transparent), transparent 60%),
+    var(--background);
+}
+
+.login-gate-top {
+  position: absolute;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.login-gate-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 480px;
+  animation: fade-in-up 560ms var(--ease-spring) both;
+}
+
+.login-gate-logo {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  line-height: 1.1;
+}
+.login-gate-logo span {
+  color: var(--primary);
+}
+
+.login-gate-tagline {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.login-gate-subtitle {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+.login-gate-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  width: 100%;
+  margin-top: var(--spacing-2xl);
+}
+
+.login-gate-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  border-radius: var(--br-lg);
+  border: 0.5px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-card-rest);
+  text-align: left;
+}
+
+.login-gate-feature-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+.login-gate-feature-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.login-gate-feature-desc {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.login-gate-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
+  width: 100%;
+}
+
+.login-gate-btn {
+  flex: 1;
+}
+
+@media (max-width: 520px) {
+  .login-gate-features {
+    grid-template-columns: 1fr;
+  }
+}

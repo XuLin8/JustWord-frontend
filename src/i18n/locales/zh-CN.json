@@ -46,6 +46,18 @@
     "loginErrorHint": "登录失败，请检查邮箱和密码",
     "registerErrorHint": "注册失败，请检查邮箱或用户名是否已被使用"
   },
+  "gate": {
+    "tagline": "智能单词学习",
+    "subtitle": "内置四六级 / 考研词书，两轮巩固 + 规则化批改，多端云端同步。登录后开启你的背单词之旅。",
+    "login": "登录",
+    "register": "注册",
+    "feature1Title": "内置词书",
+    "feature1Desc": "四六级 / 考研大纲词，开箱即背",
+    "feature2Title": "科学巩固",
+    "feature2Desc": "英译汉 → 汉译英两轮学习",
+    "feature3Title": "云端同步",
+    "feature3Desc": "多端进度一致，离线可学"
+  },
   "dashboard": {
     "hello": "你好，",
     "helloSub": "今天也来背单词吧",
@@ -319,5 +331,11 @@
       "502": "服务暂时不可用",
       "503": "服务维护中"
     }
+  },
+  "sync": {
+    "syncing": "正在同步…",
+    "synced": "同步完成",
+    "failed": "同步失败，请稍后重试",
+    "offline": "当前处于离线状态，已加载本地数据"
   }
 }

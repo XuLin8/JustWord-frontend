@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const { loadWords, clearWords } = useWordStore()
+  const { clearWords } = useWordStore()
   
   // 防止 token 变化时重复加载
   const isInitialized = useRef(false)
@@ -54,19 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isInitialized.current = true
   }, [])
 
-  // ============ 核心：token/user 变化时自动刷新/清空单词 ============
+  // ============ token/user 变化：登出时清空本地单词（加载与同步由 App 层统一编排） ============
   useEffect(() => {
     // 跳过初始化前的执行
     if (!isInitialized.current) return
-    
-    if (token && user) {
-      // 有 token 且有用户 → 加载单词
-      loadWords()
-    } else {
-      // 无 token → 清空单词
+
+    // 无 token → 清空单词
+    if (!token || !user) {
       clearWords()
     }
-  }, [token, user, loadWords, clearWords])
+  }, [token, user, clearWords])
 
   // ============ 监听全局 401 事件 ============
   useEffect(() => {

@@ -41,6 +41,14 @@
 }
 
 /* ========== 加载动画（重写 spinner — Apple 细蓝圈） ========== */
+.app-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+}
 .spinner {
   display: inline-block;
   border: 2px solid var(--color-fill);

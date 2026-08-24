@@ -46,6 +46,18 @@
     "loginErrorHint": "Sign in failed, check your email and password",
     "registerErrorHint": "Sign up failed, the email or username may already be in use"
   },
+  "gate": {
+    "tagline": "Smart word learning",
+    "subtitle": "Built-in CET-4 / CET-6 / postgraduate exam wordbooks, two-round learning with rule-based review, and cloud sync across devices. Sign in to start your word-learning journey.",
+    "login": "Sign in",
+    "register": "Sign up",
+    "feature1Title": "Built-in wordbooks",
+    "feature1Desc": "CET-4 / CET-6 / exam vocabulary, ready to learn",
+    "feature2Title": "Scientific review",
+    "feature2Desc": "English → Chinese two-round learning",
+    "feature3Title": "Cloud sync",
+    "feature3Desc": "Consistent progress, learn offline"
+  },
   "dashboard": {
     "hello": "Hi,",
     "helloSub": "let's learn words today",
@@ -319,5 +331,11 @@
       "502": "Service temporarily unavailable",
       "503": "Service under maintenance"
     }
+  },
+  "sync": {
+    "syncing": "Syncing…",
+    "synced": "Synced",
+    "failed": "Sync failed, please retry later",
+    "offline": "You're offline — showing local data"
   }
 }

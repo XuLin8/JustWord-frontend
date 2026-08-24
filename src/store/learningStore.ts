@@ -2,7 +2,8 @@
 
 import { create } from 'zustand'
 import localforage from 'localforage'
-import type { LearningRecord, LearningStats } from '../types/learning.types'
+import type { LearningRecord, LearningStats, AnswerResult } from '../types/learning.types'
+import type { SyncRecordItem } from '../api/endpoints/sync.api'
 
 const learningStorage = localforage.createInstance({
   name: 'JustWord',
@@ -15,6 +16,41 @@ interface LearningStore {
   addRecord: (record: LearningRecord) => Promise<void>
   loadRecords: () => Promise<void>
   getStats: () => LearningStats
+  /** 同步引擎：返回 lastSyncAt 之后的新增/更新记录（供 push） */
+  getRecordsSince: (lastSyncAt: number | null) => SyncRecordItem[]
+  /** 同步引擎：合并服务端增量（本地优先冲突策略） */
+  mergeRemoteRecords: (remote: SyncRecordItem[]) => Promise<void>
+}
+
+// ============ 同步映射：LearningRecord ↔ SyncRecordItem ============
+function toSyncRecord(r: LearningRecord): SyncRecordItem {
+  return {
+    id: r.wordId,
+    english: r.english,
+    chinese: r.chinese,
+    en2zhResult: r.en2zhResult,
+    zh2enResult: r.zh2enResult,
+    correctCount: r.correctCount,
+    wrongCount: r.wrongCount,
+    lastLearnedAt: r.lastLearnedAt,
+    mistakes: r.mistakes ?? [],
+    updated_at: r.lastLearnedAt,
+  }
+}
+
+function fromSyncRecord(item: SyncRecordItem): LearningRecord {
+  return {
+    wordId: item.id,
+    english: item.english,
+    chinese: item.chinese,
+    en2zhResult: item.en2zhResult as AnswerResult,
+    zh2enResult: item.zh2enResult as AnswerResult,
+    correctCount: item.correctCount,
+    wrongCount: item.wrongCount,
+    lastLearnedAt: item.lastLearnedAt,
+    mistakes: item.mistakes ?? [],
+    similarWords: [],
+  }
 }
 
 export const useLearningStore = create<LearningStore>((set, get) => ({
@@ -86,6 +122,38 @@ export const useLearningStore = create<LearningStore>((set, get) => ({
       todayLearned,
       streak
     }
+  },
+
+  // ========== 同步：lastSyncAt 之后的新增/更新记录 ==========
+  getRecordsSince: (lastSyncAt) => {
+    const since = lastSyncAt ?? 0
+    return get().records
+      .filter(r => (r.lastLearnedAt ?? 0) > since)
+      .map(toSyncRecord)
+  },
+
+  // ========== 同步：合并服务端增量（本地优先冲突） ==========
+  mergeRemoteRecords: async (remote) => {
+    if (!remote || remote.length === 0) return
+
+    set((state) => {
+      const localMap = new Map(state.records.map(r => [r.wordId, r]))
+      const next = [...state.records]
+      let changed = false
+
+      for (const item of remote) {
+        if (!item.id) continue
+        // 本地已存在 → 本地优先，保留本地版本
+        if (localMap.has(item.id)) continue
+        next.push(fromSyncRecord(item))
+        changed = true
+      }
+
+      return changed ? { records: next } : state
+    })
+
+    await learningStorage.setItem('records', get().records)
+    set({ stats: get().getStats() })
   }
 }))
 
