@@ -74,9 +74,15 @@ function App() {
           <ImportExportPanel onImportComplete={handleImportComplete} />
         )}
 
-        {activeTab === 'home' && <DashboardPage />}
-        {activeTab === 'word' && <WordBookPage />}
-        {activeTab === 'learn' && <LearnPage />}
+        {activeTab === 'home' && (
+          <div key="home" className="tab-panel"><DashboardPage /></div>
+        )}
+        {activeTab === 'word' && (
+          <div key="word" className="tab-panel"><WordBookPage /></div>
+        )}
+        {activeTab === 'learn' && (
+          <div key="learn" className="tab-panel"><LearnPage /></div>
+        )}
       </Layout>
 
       <ToastContainer />
