@@ -26,7 +26,23 @@
   "learningHome": {
     "placeholder": "核心学习首页建设中…",
     "subscribeHint": "前往「词库」订阅词书后即可开始学习",
-    "goWordbook": "去选词书"
+    "goWordbook": "去选词书",
+    "searchPlaceholder": "🔍 搜索单词（Ctrl+K 唤起）...",
+    "searchEmpty": "未找到匹配单词",
+    "taskTitle": "今日任务",
+    "metricTarget": "今日目标",
+    "metricNew": "新词",
+    "metricReview": "复习",
+    "targetUnit": "词",
+    "sourceLabel": "选词来源",
+    "targetConfig": "当日目标：",
+    "start": "开始学习",
+    "back": "返回",
+    "stageTitle": "今日背诵 · 共 {{count}} 词",
+    "stageHint": "背诵流程（认识 / 不认识 → 单词详情）将在下一模块完善",
+    "stageEmpty": "今日无待学单词，先去订阅词书吧",
+    "detailPhonetic": "音标",
+    "detailExample": "例句"
   },
   "theme": {
     "light": "浅色",

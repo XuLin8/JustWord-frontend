@@ -1,0 +1,252 @@
+/* src/pages/LearningHomePage/LearningHomePage.css
+   M2-D 核心学习首页：沉浸式大屏占比 + 渐变背景明暗双态 + 顶部字典搜索 + 今日任务卡片 */
+
+.learning-home {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  min-height: calc(100vh - 72px);
+  padding: var(--spacing-xl) 0 var(--spacing-3xl);
+  background-image: var(--apple-bg-mesh);
+  background-size: cover;
+}
+
+/* ============ 顶部字典搜索条 ============ */
+.lh-search {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--br-xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+}
+.lh-search:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
+}
+.lh-search-icon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+.lh-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-sm) 0;
+}
+.lh-search-input::placeholder { color: var(--color-label-tertiary); }
+.lh-search-kbd {
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-label-secondary);
+  background: var(--color-fill-tertiary);
+  border-radius: var(--br-sm);
+  padding: 2px 7px;
+  border: 0.5px solid var(--color-separator);
+}
+
+/* 搜索结果浮层 */
+.lh-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: var(--br-lg);
+  background: var(--card-glass-1);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  padding: var(--spacing-xs);
+}
+.lh-search-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-md);
+  width: 100%;
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--br-md);
+  cursor: pointer;
+  transition: background-color var(--dur-fast);
+}
+.lh-search-item:hover { background: var(--color-fill-secondary); }
+.lh-search-item-word { font-weight: 600; color: var(--color-text); }
+.lh-search-item-mean { flex: 1; min-width: 0; font-size: var(--font-size-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============ 今日任务卡片 ============ */
+.lh-task {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+.lh-task-gleam::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--dash-hero-gleam);
+  pointer-events: none;
+}
+.lh-task-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+.lh-task-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+}
+.lh-task-date { font-size: var(--font-size-sm); color: var(--color-label-secondary); font-variant-numeric: tabular-nums; }
+
+.lh-task-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-md);
+}
+.lh-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--br-lg);
+  background: var(--color-fill-secondary);
+  border: 0.5px solid var(--color-separator);
+}
+.lh-metric-label { font-size: var(--font-size-xs); color: var(--color-label-secondary); }
+.lh-metric-value { font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.lh-metric-value small { font-size: var(--font-size-sm); font-weight: 500; color: var(--color-label-secondary); }
+
+.lh-task-source {
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+}
+.lh-task-source b { color: var(--color-text); font-weight: 600; }
+
+.lh-target-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+}
+.lh-target-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--color-fill-secondary);
+  border-radius: var(--br-pill);
+  padding: 2px;
+}
+.lh-target-stepper button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast);
+}
+.lh-target-stepper button:hover { background: var(--color-fill-tertiary); }
+.lh-target-stepper button:disabled { opacity: 0.4; cursor: not-allowed; }
+.lh-target-stepper b { min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; color: var(--color-text); }
+
+.lh-start-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 12px 32px;
+  border-radius: var(--br-pill);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: #fff;
+  background-image: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%);
+  box-shadow: var(--shadow-button-primary);
+  border: none;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-spring-soft), box-shadow var(--dur-fast), filter var(--dur-fast);
+}
+.lh-start-btn:hover { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05), 0 18px 44px -10px rgba(0,122,255,0.55); }
+.lh-start-btn:active { transform: scale(0.97); }
+.lh-start-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* 空态引导 */
+.lh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+  padding: var(--spacing-3xl) 0;
+  color: var(--color-label-secondary);
+}
+
+/* ============ 背诵主区（M2-D 起步视图，M2-E 深化） ============ */
+.lh-stage {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  padding: var(--spacing-2xl);
+}
+.lh-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+.lh-stage-queue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+.lh-chip {
+  font-size: var(--font-size-sm);
+  padding: 4px 12px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-secondary);
+  border: 0.5px solid var(--color-separator);
+  color: var(--color-label-secondary);
+}
+.lh-chip.is-new { color: var(--apple-blue); }
+.lh-chip.is-review { color: var(--apple-purple); }

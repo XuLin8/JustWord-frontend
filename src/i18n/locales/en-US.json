@@ -26,7 +26,23 @@
   "learningHome": {
     "placeholder": "Learning home under construction…",
     "subscribeHint": "Subscribe a wordbook in the Wordbook tab to start learning",
-    "goWordbook": "Pick a wordbook"
+    "goWordbook": "Pick a wordbook",
+    "searchPlaceholder": "🔍 Search a word (Ctrl+K)...",
+    "searchEmpty": "No matching words",
+    "taskTitle": "Today's tasks",
+    "metricTarget": "Daily target",
+    "metricNew": "New",
+    "metricReview": "Review",
+    "targetUnit": "words",
+    "sourceLabel": "Source",
+    "targetConfig": "Daily target:",
+    "start": "Start learning",
+    "back": "Back",
+    "stageTitle": "Today · {{count}} words",
+    "stageHint": "Recitation flow (know / don't know → word detail) lands in the next module",
+    "stageEmpty": "Nothing to learn today, subscribe a wordbook first",
+    "detailPhonetic": "Phonetic",
+    "detailExample": "Example"
   },
   "theme": {
     "light": "Light",
