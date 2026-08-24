@@ -172,7 +172,7 @@
 .glass {
   backdrop-filter: saturate(180%) blur(24px);
   -webkit-backdrop-filter: saturate(180%) blur(24px);
-  background-color: rgba(255, 255, 255, 0.72);
+  background-color: var(--card-glass-3);
   border: 0.5px solid rgba(0, 0, 0, 0.06);
 }
 .glass-dark {

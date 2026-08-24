@@ -57,6 +57,19 @@
   --ring: oklch(0.588 0.158 241.966);
   --art-bg: #F6F7FB;
   --art-foreground: #1C1C1E;
+
+  /* 卡片毛玻璃语义色：随 --card 明暗自适应，亮色下与白色玻璃一致 */
+  --card-glass-1: color-mix(in oklab, var(--card) 82%, transparent);
+  --card-glass-2: color-mix(in oklab, var(--card) 92%, transparent);
+  --card-glass-3: color-mix(in oklab, var(--card) 78%, transparent);
+
+  /* Hero 顶部高光（叠印光泽）：亮色为白高光，深色显著降低避免白雾 */
+  --dash-hero-gleam:
+    linear-gradient(135deg,
+      rgba(255,255,255,0.6) 0%,
+      rgba(255,255,255,0) 45%,
+      rgba(255,255,255,0) 65%,
+      rgba(255,255,255,0.25) 100%);
 }
 
 .dark {
@@ -66,9 +79,9 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.27 0.006 286.033);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.588 0.158 241.966);
+  --primary: oklch(0.66 0.16 250);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.353 0.006 285.885);
+  --secondary: oklch(0.42 0.02 285);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.353 0.006 285.885);
   --muted-foreground: oklch(0.709 0.01 286.286);
@@ -77,7 +90,37 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.588 0.158 241.966);
+  --ring: oklch(0.66 0.16 250);
+
+  /* Apple label/bg 原语：跟随 .dark 反转（iOS 深色 label 层级） */
+  --color-label:            #FFFFFF;
+  --color-label-secondary:  oklch(1 0 0 / 55%);
+  --color-label-tertiary:   oklch(1 0 0 / 30%);
+  --color-label-quaternary: oklch(1 0 0 / 18%);
+  --color-text:             var(--color-label);
+  --color-text-secondary:   var(--color-label-secondary);
+  --color-text-light:       var(--color-label-tertiary);
+  --color-bg:               #000000;
+  --color-bg-secondary:     oklch(0.27 0.006 286.033);
+  --color-bg-tertiary:      oklch(0.27 0.006 286.033);
+  --color-bg-white:         oklch(0.27 0.006 286.033);
+  --color-separator:        oklch(1 0 0 / 14%);
+
+  /* Hero 顶部高光：深色下显著压低，避免白雾 */
+  --dash-hero-gleam:
+    linear-gradient(135deg,
+      rgba(255,255,255,0.12) 0%,
+      rgba(255,255,255,0) 45%,
+      rgba(255,255,255,0) 65%,
+      rgba(255,255,255,0.05) 100%);
+
+  /* 背景光斑：暴露同源彩色光斑，仅替换底层线性渐变（跟随深色） */
+  --apple-bg-mesh:
+    radial-gradient(1200px 800px at 10% -10%, rgba(0, 122, 255, 0.12), transparent 60%),
+    radial-gradient(900px 700px  at 100% 0%,  rgba(175, 82, 222, 0.10), transparent 60%),
+    radial-gradient(900px 700px  at 100% 100%,rgba(52, 199, 89, 0.08),  transparent 60%),
+    radial-gradient(1000px 800px at 0% 100%, rgba(255, 149, 0, 0.08), transparent 60%),
+    linear-gradient(180deg, #141416 0%, #0B0B0F 100%);
 }
 
 @layer base {

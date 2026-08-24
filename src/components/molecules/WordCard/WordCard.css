@@ -11,7 +11,7 @@
   gap: var(--spacing-md);
 
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--card-glass-1);
   border-radius: var(--br-xl);
   border: 0.5px solid rgba(0, 0, 0, 0.05);
   backdrop-filter: saturate(180%) blur(18px);
@@ -43,7 +43,7 @@
 .word-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card-hover);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--card-glass-2);
 }
 .word-card:active {
   transform: translateY(-1px) scale(0.995);
