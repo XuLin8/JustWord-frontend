@@ -44,6 +44,26 @@
     "detailPhonetic": "Phonetic",
     "detailExample": "Example"
   },
+  "recitation": {
+    "known": "Know",
+    "unknown": "Don't know",
+    "badgeNew": "New",
+    "badgeReview": "Review",
+    "play": "Pronounce",
+    "swipeHint": "Drag the card to judge",
+    "dragHint": "Swipe left = know · swipe right = don't know",
+    "similar": "Similar-looking",
+    "synonym": "Synonyms",
+    "antonym": "Antonyms",
+    "next": "Next",
+    "exit": "Exit",
+    "doneTitle": "Today's session complete!",
+    "doneSub": "{{total}} words done",
+    "checkin": "Check in",
+    "checked": "Checked in today",
+    "checkinSuccess": "Checked in, keep it up!",
+    "restart": "Do it again"
+  },
   "theme": {
     "light": "Light",
     "dark": "Dark",

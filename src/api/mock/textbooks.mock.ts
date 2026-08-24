@@ -30,24 +30,78 @@ const TEXTBOOKS: Textbook[] = [
   },
 ]
 
-function w(word: string, phonetic: string, meaning: string, example: string): TextbookWord {
-  return { id: word, word, phonetic, meaning, example, level: 'CET4' }
+function w(
+  word: string,
+  phonetic: string,
+  meaning: string,
+  example: string,
+  extra?: { similarWords?: string[]; synonyms?: string[]; antonyms?: string[] },
+): TextbookWord {
+  return { id: word, word, phonetic, meaning, example, level: 'CET4', ...extra }
 }
 
 const WORDS_BY_BOOK: Record<number, TextbookWord[]> = {
   1: [
-    w('abandon', '/əˈbændən/', 'v. 放弃；抛弃', 'He abandoned his plan to study abroad.'),
-    w('ability', '/əˈbɪləti/', 'n. 能力；才能', 'She has the ability to solve complex problems.'),
-    w('abroad', '/əˈbrɔːd/', 'adv. 在国外；到国外', 'Many students choose to study abroad.'),
-    w('abrupt', '/əˈbrʌpt/', 'adj. 突然的；唐突的', 'The meeting came to an abrupt end.'),
-    w('absence', '/ˈæbsəns/', 'n. 缺席；缺乏', 'His absence from class was noticed.'),
-    w('absolute', '/ˈæbsəluːt/', 'adj. 绝对的；完全的', 'It takes absolute trust to cooperate.'),
-    w('absorb', '/əbˈzɔːb/', 'v. 吸收；吸引', 'Plants absorb water through their roots.'),
-    w('abstract', '/ˈæbstrækt/', 'adj. 抽象的', 'The theory is too abstract to understand.'),
-    w('abundant', '/əˈbʌndənt/', 'adj. 丰富的；充裕的', 'The region is abundant in natural resources.'),
-    w('academic', '/ˌækəˈdemɪk/', 'adj. 学术的', 'His academic performance is excellent.'),
-    w('accelerate', '/əkˈseləreɪt/', 'v. 加速；促进', 'The car accelerated to overtake the truck.'),
-    w('accept', '/əkˈsept/', 'v. 接受；同意', 'She accepted the job offer happily.'),
+    w('abandon', '/əˈbændən/', 'v. 放弃；抛弃', 'He abandoned his plan to study abroad.', {
+      similarWords: ['abandoned', 'abandonment'],
+      synonyms: ['give up', 'desert'],
+      antonyms: ['keep', 'retain'],
+    }),
+    w('ability', '/əˈbɪləti/', 'n. 能力；才能', 'She has the ability to solve complex problems.', {
+      similarWords: ['capability', 'possibility'],
+      synonyms: ['capacity', 'competence'],
+      antonyms: ['inability', 'incompetence'],
+    }),
+    w('abroad', '/əˈbrɔːd/', 'adv. 在国外；到国外', 'Many students choose to study abroad.', {
+      similarWords: ['aboard', 'broad'],
+      synonyms: ['overseas'],
+      antonyms: ['home', 'domestic'],
+    }),
+    w('abrupt', '/əˈbrʌpt/', 'adj. 突然的；唐突的', 'The meeting came to an abrupt end.', {
+      similarWords: ['abruptly', 'erupt'],
+      synonyms: ['sudden', 'unexpected'],
+      antonyms: ['gradual', 'gentle'],
+    }),
+    w('absence', '/ˈæbsəns/', 'n. 缺席；缺乏', 'His absence from class was noticed.', {
+      similarWords: ['absent', 'presence'],
+      synonyms: ['lack', 'deficiency'],
+      antonyms: ['presence', 'attendance'],
+    }),
+    w('absolute', '/ˈæbsəluːt/', 'adj. 绝对的；完全的', 'It takes absolute trust to cooperate.', {
+      similarWords: ['absolutely', 'absorb'],
+      synonyms: ['complete', 'total'],
+      antonyms: ['relative', 'partial'],
+    }),
+    w('absorb', '/əbˈzɔːb/', 'v. 吸收；吸引', 'Plants absorb water through their roots.', {
+      similarWords: ['absorbing', 'abrupt'],
+      synonyms: ['take in', 'soak up'],
+      antonyms: ['release', 'emit'],
+    }),
+    w('abstract', '/ˈæbstrækt/', 'adj. 抽象的', 'The theory is too abstract to understand.', {
+      similarWords: ['absorb', 'attract'],
+      synonyms: ['theoretical', 'conceptual'],
+      antonyms: ['concrete', 'specific'],
+    }),
+    w('abundant', '/əˈbʌndənt/', 'adj. 丰富的；充裕的', 'The region is abundant in natural resources.', {
+      similarWords: ['abundance', 'bound'],
+      synonyms: ['plentiful', 'ample'],
+      antonyms: ['scarce', 'rare'],
+    }),
+    w('academic', '/ˌækəˈdemɪk/', 'adj. 学术的', 'His academic performance is excellent.', {
+      similarWords: ['academy', 'academia'],
+      synonyms: ['scholarly', 'educational'],
+      antonyms: ['practical', 'vocational'],
+    }),
+    w('accelerate', '/əkˈseləreɪt/', 'v. 加速；促进', 'The car accelerated to overtake the truck.', {
+      similarWords: ['accelerator', 'celebrate'],
+      synonyms: ['speed up', 'hasten'],
+      antonyms: ['decelerate', 'slow down'],
+    }),
+    w('accept', '/əkˈsept/', 'v. 接受；同意', 'She accepted the job offer happily.', {
+      similarWords: ['except', 'expect'],
+      synonyms: ['receive', 'approve'],
+      antonyms: ['reject', 'refuse'],
+    }),
     w('access', '/ˈækses/', 'n. 通道；机会 v. 访问', 'Students have free access to the library.'),
     w('accident', '/ˈæksɪdənt/', 'n. 事故；意外', 'He was injured in a car accident.'),
     w('accompany', '/əˈkʌmpəni/', 'v. 陪伴；伴随', 'I will accompany you to the station.'),

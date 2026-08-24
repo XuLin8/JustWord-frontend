@@ -21,6 +21,12 @@ export interface TextbookWord {
   meaning: string
   example?: string
   level: string
+  /** 形近词（外观相近、易混） */
+  similarWords?: string[]
+  /** 近义词 */
+  synonyms?: string[]
+  /** 反义词 */
+  antonyms?: string[]
 }
 
 export interface TextbookWordsResponse {

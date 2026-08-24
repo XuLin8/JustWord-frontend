@@ -3,9 +3,10 @@
 // 大屏占比、渐变背景明暗双态。背诵流程（M2-E）与背诵规则（M2-F）在此页深化。
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, BookOpen, CalendarDays, Minus, Play, Plus, Search, Sparkles } from 'lucide-react'
+import { BookOpen, CalendarDays, Minus, Play, Plus, Search, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { RecitationStage } from '@/components/organisms/RecitationStage'
 import { useLearningPlanStore } from '@/store/learningPlanStore'
 import { useTextbookStore } from '@/store/textbookStore'
 import { useDictionary, type DictionaryEntry } from '@/hooks/useDictionary'
@@ -24,7 +25,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
   const [detail, setDetail] = useState<DictionaryEntry | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
-  const { dailyTarget, setDailyTarget, newWords, reviewWords, planDate, generatePlan, loading } =
+  const { dailyTarget, setDailyTarget, newWords, reviewWords, planDate, generatePlan } =
     useLearningPlanStore()
   const { enrolledIds, textbooks, loadTextbooks } = useTextbookStore()
   const { search } = useDictionary()
@@ -171,41 +172,8 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
           </div>
         </>
       ) : (
-        /* ============ 背诵主区（M2-D 起步：今日队列；M2-E 深化背诵流程） ============ */
-        <div className="lh-stage">
-          <div className="lh-stage-head">
-            <div className="lh-task-title">
-              <BookOpen size={20} />
-              {t('learningHome.stageTitle', { count: todayWords.length })}
-            </div>
-            <Button variant="outline" size="sm" onClick={() => setView('home')}>
-              <ArrowLeft size={16} />
-              {t('learningHome.back')}
-            </Button>
-          </div>
-
-          {loading ? (
-            <p>{t('word.loading')}</p>
-          ) : todayWords.length === 0 ? (
-            <div className="lh-empty">
-              <BookOpen size={40} className="lh-search-icon" />
-              <p>{t('learningHome.stageEmpty')}</p>
-            </div>
-          ) : (
-            <>
-              <div className="lh-stage-queue">
-                {todayWords.map((w) => (
-                  <span key={w.id} className={`lh-chip ${w.source === 'new' ? 'is-new' : 'is-review'}`}>
-                    {w.word}
-                  </span>
-                ))}
-              </div>
-              <p className="lh-task-source" style={{ marginTop: 'var(--spacing-lg)' }}>
-                {t('learningHome.stageHint')}
-              </p>
-            </>
-          )}
-        </div>
+        /* ============ 背诵主区（M2-E：认识/不认识判定 → 详情 → 打卡） ============ */
+        <RecitationStage words={todayWords} onExit={() => setView('home')} />
       )}
 
       {/* ============ 字典详情弹窗 ============ */}

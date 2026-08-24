@@ -19,6 +19,12 @@ export interface PlanWord {
   meaning: string
   example?: string
   source: 'new' | 'review'
+  /** 形近词 */
+  similarWords?: string[]
+  /** 近义词 */
+  synonyms?: string[]
+  /** 反义词 */
+  antonyms?: string[]
 }
 
 interface LearningPlanStore {
@@ -124,6 +130,9 @@ export const useLearningPlanStore = create<LearningPlanStore>((set, get) => ({
           meaning: it.meaning,
           example: it.example,
           source: 'new',
+          similarWords: it.similarWords,
+          synonyms: it.synonyms,
+          antonyms: it.antonyms,
         })
         if (newWords.length >= dailyTarget) break
       }

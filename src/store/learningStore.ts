@@ -2,7 +2,8 @@
 
 import { create } from 'zustand'
 import localforage from 'localforage'
-import type { LearningRecord, LearningStats, AnswerResult } from '../types/learning.types'
+import type { LearningRecord, LearningStats } from '../types/learning.types'
+import { AnswerResult } from '../types/learning.types'
 import type { SyncRecordItem } from '../api/endpoints/sync.api'
 
 const learningStorage = localforage.createInstance({
@@ -16,6 +17,8 @@ interface LearningStore {
   addRecord: (record: LearningRecord) => Promise<void>
   loadRecords: () => Promise<void>
   getStats: () => LearningStats
+  /** 背诵判定（认识/不认识）→ upsert 学习记录 */
+  recordJudgement: (input: { wordId: string; english: string; chinese: string; known: boolean }) => Promise<void>
   /** 同步引擎：返回 lastSyncAt 之后的新增/更新记录（供 push） */
   getRecordsSince: (lastSyncAt: number | null) => SyncRecordItem[]
   /** 同步引擎：合并服务端增量（本地优先冲突策略） */
@@ -81,6 +84,41 @@ export const useLearningStore = create<LearningStore>((set, get) => ({
     // 添加后更新统计
     const stats = get().getStats()
     set({ stats })
+  },
+
+  recordJudgement: async ({ wordId, english, chinese, known }) => {
+    const now = Date.now()
+    const existing = get().records.find((r) => r.wordId === wordId)
+
+    let next: LearningRecord
+    if (existing) {
+      next = {
+        ...existing,
+        correctCount: existing.correctCount + (known ? 1 : 0),
+        wrongCount: existing.wrongCount + (known ? 0 : 1),
+        en2zhResult: known ? AnswerResult.CORRECT : AnswerResult.WRONG,
+        lastLearnedAt: now,
+      }
+    } else {
+      next = {
+        wordId,
+        english,
+        chinese,
+        en2zhResult: known ? AnswerResult.CORRECT : AnswerResult.WRONG,
+        zh2enResult: AnswerResult.WRONG,
+        correctCount: known ? 1 : 0,
+        wrongCount: known ? 0 : 1,
+        lastLearnedAt: now,
+        mistakes: [],
+        similarWords: [],
+      }
+    }
+
+    const others = get().records.filter((r) => r.wordId !== wordId)
+    const records = [...others, next]
+    set({ records })
+    await learningStorage.setItem('records', records)
+    set({ stats: get().getStats() })
   },
   
   // ✅ 实现 getStats

@@ -215,38 +215,3 @@
   color: var(--color-label-secondary);
 }
 
-/* ============ 背诵主区（M2-D 起步视图，M2-E 深化） ============ */
-.lh-stage {
-  position: relative;
-  z-index: 1;
-  border-radius: var(--br-2xl);
-  background: var(--card-glass-2);
-  border: 0.5px solid var(--color-separator);
-  box-shadow: var(--shadow-card-rest);
-  backdrop-filter: saturate(180%) blur(24px);
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
-  padding: var(--spacing-2xl);
-}
-.lh-stage-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-.lh-stage-queue {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-}
-.lh-chip {
-  font-size: var(--font-size-sm);
-  padding: 4px 12px;
-  border-radius: var(--br-pill);
-  background: var(--color-fill-secondary);
-  border: 0.5px solid var(--color-separator);
-  color: var(--color-label-secondary);
-}
-.lh-chip.is-new { color: var(--apple-blue); }
-.lh-chip.is-review { color: var(--apple-purple); }
