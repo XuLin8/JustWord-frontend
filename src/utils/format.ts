@@ -1,6 +1,8 @@
 // src/utils/format.ts
-// 展示层通用：日期格式化 + 学习/分析展示常量映射。
-// 纯函数与静态数据，不含 React 依赖，可独立单元测试。
+// 展示层通用：日期格式化 + 学习/分析展示映射。
+// 纯函数与展示映射，不含 React 依赖；文案依赖 i18n 实例（非组件环境）。
+
+import i18n from '@/i18n'
 
 /** 学习结果展示色板（答题结果 -> 颜色） */
 export const RESULT_COLORS: Record<string, string> = {
@@ -11,27 +13,27 @@ export const RESULT_COLORS: Record<string, string> = {
   wrong: '#e74c3c',
 }
 
-/** 学习结果中文标签（答题结果 -> 文案） */
-export const RESULT_LABELS: Record<string, string> = {
-  correct: '完全正确',
-  partial: '部分正确',
-  close: '近义词',
-  typo: '拼写错误',
-  wrong: '错误',
+/** 学习结果标签（答题结果 -> 文案；未知结果回退为原始值） */
+export function getResultLabel(key: string): string {
+  const label = i18n.t(`dashboard.result.${key}`)
+  return label === `dashboard.result.${key}` ? key : label
 }
 
-/** 学习模式中文标签 */
-export const MODE_LABELS: Record<string, string> = {
-  en2zh: '英译汉',
-  zh2en: '汉译英',
+/** 学习模式标签（未知模式回退为原始值） */
+export function getModeLabel(key: string): string {
+  const label = i18n.t(`dashboard.mode.${key}`)
+  return label === `dashboard.mode.${key}` ? key : label
 }
 
 /** 成就分类展示（分类 -> 图标 + 文案） */
-export const CATEGORY_LABELS: Record<string, { emoji: string; label: string }> = {
-  words: { emoji: '📚', label: '词汇' },
-  checkin: { emoji: '📅', label: '打卡' },
-  answer: { emoji: '✏️', label: '作答' },
-  wrong: { emoji: '🧹', label: '错题' },
+export function getCategoryMeta(key: string): { emoji: string; label: string } {
+  const emojiMap: Record<string, string> = {
+    words: '📚',
+    checkin: '📅',
+    answer: '✏️',
+    wrong: '🧹',
+  }
+  return { emoji: emojiMap[key] ?? '🎖️', label: i18n.t(`dashboard.category.${key}`) }
 }
 
 /**
@@ -57,11 +59,11 @@ export function timeAgo(ts: number): string {
   if (!ts) return ''
   const diff = Date.now() - ts
   const m = Math.floor(diff / 60000)
-  if (m < 1) return '刚刚'
-  if (m < 60) return `${m} 分钟前`
+  if (m < 1) return i18n.t('dashboard.justNow')
+  if (m < 60) return i18n.t('dashboard.minutesAgo', { count: m })
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} 小时前`
+  if (h < 24) return i18n.t('dashboard.hoursAgo', { count: h })
   const d = Math.floor(h / 24)
-  if (d < 30) return `${d} 天前`
+  if (d < 30) return i18n.t('dashboard.daysAgo', { count: d })
   return formatDate(new Date(ts).toISOString())
 }
