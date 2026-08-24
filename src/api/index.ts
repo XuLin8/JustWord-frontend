@@ -7,6 +7,8 @@ export { dashboardApi } from './endpoints/dashboard.api'
 export { checkinApi } from './endpoints/checkin.api'
 export { achievementsApi } from './endpoints/achievements.api'
 export { wordbooksApi } from './endpoints/wordbooks.api'
+export { textbooksApi } from './endpoints/textbooks.api'
+export { syncApi } from './endpoints/sync.api'
 export { API_PATH } from './paths'
 
 export type {
@@ -59,3 +61,19 @@ export type {
   CreateWordbookRequest,
   UpdateWordbookRequest,
 } from './endpoints/wordbooks.api'
+
+export type {
+  Textbook,
+  TextbookWord,
+  TextbookWordsResponse,
+  TextbookWordsParams,
+  EnrollResponse,
+} from './endpoints/textbooks.api'
+
+export type {
+  SyncWordItem,
+  SyncRecordItem,
+  SyncPushRequest,
+  SyncPushResponse,
+  SyncPullResponse,
+} from './endpoints/sync.api'

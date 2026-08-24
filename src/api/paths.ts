@@ -28,6 +28,16 @@ export const API_PATH = {
     detail: (id: number) => `/api/wordbooks/${id}`,
     word: (bookId: number, wordId: string) => `/api/wordbooks/${bookId}/words/${wordId}`,
   },
+  textbooks: {
+    root: '/api/textbooks',
+    detail: (id: number) => `/api/textbooks/${id}`,
+    words: (id: number) => `/api/textbooks/${id}/words`,
+    enroll: (id: number) => `/api/textbooks/${id}/enroll`,
+  },
+  sync: {
+    words: '/api/sync/words',
+    records: '/api/sync/records',
+  },
   library: {
     root: '/api/library',
     detail: (id: number) => `/api/library/${id}`,
