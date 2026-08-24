@@ -1,4 +1,5 @@
 // src/pages/DashboardPage/index.tsx
+// 仪表盘页面：组装统计概览、趋势、成就与最近活动。业务展示块已拆入 molecules/atoms。
 import React, { useEffect, useMemo } from 'react'
 import { useStatsStore } from '../../store/statsStore'
 import { useWordStore } from '../../store/wordStore'
@@ -6,61 +7,21 @@ import { useAuth } from '../../context/AuthContext'
 import { useUIStore } from '../../store/uiStore'
 import { Button } from '../../components/atoms/Button'
 import { Spinner } from '../../components/atoms/Spinner'
+import { EmptyHint } from '../../components/atoms/EmptyHint'
+import { LegendItem } from '../../components/atoms/LegendItem'
+import { TodoItem } from '../../components/atoms/TodoItem'
+import { MetricCard } from '../../components/molecules/MetricCard'
+import { CorrectnessDonut } from '../../components/molecules/CorrectnessDonut'
+import { TrendChart } from '../../components/molecules/TrendChart'
+import {
+  RESULT_COLORS,
+  RESULT_LABELS,
+  MODE_LABELS,
+  CATEGORY_LABELS,
+  formatDate,
+  timeAgo,
+} from '../../utils/format'
 import './DashboardPage.css'
-
-const CATEGORY_LABELS: Record<string, { emoji: string; label: string }> = {
-  words: { emoji: '📚', label: '词汇' },
-  checkin: { emoji: '📅', label: '打卡' },
-  answer: { emoji: '✏️', label: '作答' },
-  wrong: { emoji: '🧹', label: '错题' },
-}
-
-const RESULT_COLORS: Record<string, string> = {
-  correct: '#27ae60',
-  partial: '#f39c12',
-  close: '#3498db',
-  typo: '#8e44ad',
-  wrong: '#e74c3c',
-}
-
-const RESULT_LABELS: Record<string, string> = {
-  correct: '完全正确',
-  partial: '部分正确',
-  close: '近义词',
-  typo: '拼写错误',
-  wrong: '错误',
-}
-
-const MODE_LABELS: Record<string, string> = {
-  en2zh: '英译汉',
-  zh2en: '汉译英',
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—'
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return dateStr
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function formatShortDate(dateStr: string): string {
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return dateStr
-  return `${d.getMonth() + 1}/${d.getDate()}`
-}
-
-function timeAgo(ts: number): string {
-  if (!ts) return ''
-  const diff = Date.now() - ts
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return '刚刚'
-  if (m < 60) return `${m} 分钟前`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h} 小时前`
-  const d = Math.floor(h / 24)
-  if (d < 30) return `${d} 天前`
-  return formatDate(new Date(ts).toISOString())
-}
 
 export const DashboardPage: React.FC = () => {
   const {
@@ -398,133 +359,3 @@ export const DashboardPage: React.FC = () => {
     </div>
   )
 }
-
-/* ========== 小组件 ========== */
-
-interface MetricCardProps {
-  title: string
-  value: string | number
-  hint: string
-  progress: number
-  tone: 'primary' | 'success' | 'warning' | 'violet'
-  loading?: boolean
-}
-
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, hint, progress, tone, loading }) => (
-  <div className={`metric-card metric-${tone}`}>
-    {loading && <Spinner size="sm" />}
-    <div className="metric-head">
-      <span className="metric-title">{title}</span>
-    </div>
-    <div className="metric-value">{loading ? '—' : value}</div>
-    <div className="metric-hint">{hint}</div>
-    <div className="metric-progress">
-      <i style={{ width: `${Math.max(0, Math.min(100, progress * 100))}%` }} />
-    </div>
-  </div>
-)
-
-interface TodoItemProps {
-  title: string
-  count: number
-  tone: MetricCardProps['tone']
-  suffix?: string
-}
-
-const TodoItem: React.FC<TodoItemProps> = ({ title, count, tone, suffix }) => (
-  <div className={`todo-item todo-${tone}`}>
-    <div className="todo-badge">{count}</div>
-    <div className="todo-body">
-      <span className="todo-title">{title}</span>
-      {suffix && <small className="todo-suffix">{suffix}</small>}
-    </div>
-  </div>
-)
-
-interface LegendItemProps {
-  color: string
-  label: string
-  count: number
-  share?: number
-}
-
-const LegendItem: React.FC<LegendItemProps> = ({ color, label, count, share }) => (
-  <div className="legend-item">
-    <span className="legend-dot" style={{ background: color }} />
-    <span className="legend-label">{label}</span>
-    <span className="legend-count">{count}</span>
-    {share != null && (
-      <div className="legend-bar">
-        <i style={{ width: `${share * 100}%`, background: color }} />
-      </div>
-    )}
-  </div>
-)
-
-interface CorrectnessDonutProps {
-  rate: number
-  loading?: boolean
-}
-
-const CorrectnessDonut: React.FC<CorrectnessDonutProps> = ({ rate, loading }) => {
-  const pct = Math.max(0, Math.min(100, Math.round((rate || 0) * 100)))
-  const deg = Math.round((rate || 0) * 360)
-  return (
-    <div className="donut-wrap">
-      <div
-        className="donut-ring"
-        style={{
-          background: loading
-            ? 'conic-gradient(#e0e0e0 0deg 360deg)'
-            : `conic-gradient(#4a90d9 0deg ${deg}deg, #f0f0f0 ${deg}deg 360deg)`,
-        }}
-        aria-hidden
-      >
-        <div className="donut-hole">
-          <span className="donut-value">{loading ? '—' : `${pct}%`}</span>
-          <small>正确率</small>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const EmptyHint: React.FC<{ text: string }> = ({ text }) => (
-  <div className="empty-hint">
-    <span className="empty-emoji" aria-hidden>🌱</span>
-    <p>{text}</p>
-  </div>
-)
-
-interface TrendChartProps {
-  data: { date: string; attempts: number; correct: number; correctRate: number }[]
-  max: number
-}
-
-const TrendChart: React.FC<TrendChartProps> = ({ data, max }) => (
-  <div className="trend-chart">
-    <div className="trend-bars">
-      {data.map((d) => {
-        const h = (d.attempts / max) * 100
-        const correctH = (d.correct / Math.max(1, d.attempts)) * 100
-        return (
-          <div
-            key={d.date}
-            className="trend-col"
-            title={`${formatShortDate(d.date)} 作答 ${d.attempts}，正确率 ${Math.round(d.correctRate * 100)}%`}
-          >
-            <div className="trend-col-stack" style={{ height: `${h}%` }}>
-              <i className="trend-col-wrong" style={{ height: `${100 - correctH}%` }} />
-              <i className="trend-col-correct" style={{ height: `${correctH}%` }} />
-            </div>
-            <span className="trend-col-label">{formatShortDate(d.date)}</span>
-          </div>
-        )
-      })}
-    </div>
-    <div className="trend-legend">
-      <LegendItem color="#27ae60" label="答对" count={data.reduce((s, d) => s + d.correct, 0)} />
-      <LegendItem color="#e74c3c" label="答错" count={data.reduce((s, d) => s + (d.attempts - d.correct), 0)} />
-    </div>
-  </div>
-)
