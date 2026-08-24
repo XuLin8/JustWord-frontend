@@ -1,59 +1,87 @@
-/* src/App.css */
-
-/* 导入变量和重置 */
-@import './styles/variables.css';
-@import './styles/reset.css';
+/* src/App.css — Apple-style app shell */
 
 /* ========== 应用布局 ========== */
 .app {
-  max-width: 800px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  padding-top: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 /* ========== 通用工具类 ========== */
-.text-center {
-  text-align: center;
-}
-.text-muted {
-  color: var(--color-text-light, #999);
-}
-.mt-md {
-  margin-top: var(--spacing-md, 16px);
-}
-.mb-md {
-  margin-bottom: var(--spacing-md, 16px);
+.text-center  { text-align: center; }
+.text-muted   { color: var(--color-text-secondary); }
+.text-hint    { color: var(--color-text-light); }
+.tabular      { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+/* 卡片底壳 —— 毛玻璃 + 软阴影 + 大圆角 */
+.surface {
+  background: rgba(255, 255, 255, 0.78);
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(22px);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+  padding: var(--spacing-xl);
 }
 
-/* ========== 加载动画 ========== */
+/* ========== 加载动画（重写 spinner — Apple 细蓝圈） ========== */
 .spinner {
   display: inline-block;
-  border: 2px solid var(--color-border, #e0e0e0);
-  border-top-color: var(--color-primary, #4a90d9);
+  border: 2px solid var(--color-fill);
+  border-top-color: var(--apple-blue);
+  border-left-color: var(--apple-blue);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.75s linear infinite;
 }
-.spinner-sm {
-  width: 16px;
-  height: 16px;
-  border-width: 2px;
-}
-.spinner-md {
-  width: 32px;
-  height: 32px;
-  border-width: 3px;
-}
-.spinner-lg {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
-}
+.spinner-sm { width: 16px; height: 16px; border-width: 2px; }
+.spinner-md { width: 28px; height: 28px; border-width: 2.5px; }
+.spinner-lg { width: 42px; height: 42px; border-width: 3px; }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
+}
+
+/* EmptyHint 苹果化 */
+.empty-hint {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-label-tertiary);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-lg);
+  background: var(--color-fill-tertiary);
+  border: 0.5px dashed var(--color-separator);
+}
+
+/* ========== 页面通用动画入场 stagger ========== */
+.page-shell {
+  animation: page-in 480ms var(--ease-spring) both;
+}
+@keyframes page-in {
+  0%   { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.995); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0)    scale(1);     }
+}
+
+/* Tab 切换：slide in from side */
+.tab-panel {
+  animation: tab-panel-in 380ms var(--ease-spring) both;
+}
+@keyframes tab-panel-in {
+  0%   { opacity: 0; transform: translate3d(8px, 0, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0);   }
 }

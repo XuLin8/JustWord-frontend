@@ -1,18 +1,79 @@
+/* src/index.css — Apple-style global base */
 :root {
   color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
 }
 
-#root {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text);
+  letter-spacing: var(--tracking-tight);
+  background: var(--color-bg);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 全局多层光斑 + 极轻微颗粒噪声，赋予"一块有质感的屏幕" */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background: var(--apple-bg-mesh);
+  z-index: -2;
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 选中颜色 — Apple 蓝 */
+::selection {
+  background: var(--apple-blue-p);
+  color: var(--color-label);
+}
+
+/* 滚动条 —— iOS 风格细条 */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(60, 60, 67, 0.26);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(60, 60, 67, 0.42); background-clip: content-box; border: 2px solid transparent; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* 所有交互元素走新过渡 */
+a, button, [role="button"], summary, .lift, .press {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  color: var(--color-label);
+  letter-spacing: var(--tracking-tight);
   margin: 0;
-  min-height: 100svh;
 }
