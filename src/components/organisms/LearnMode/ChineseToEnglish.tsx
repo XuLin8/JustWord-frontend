@@ -1,6 +1,7 @@
 // components/LearnMode/ChineseToEnglish.tsx
 
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Word, SimilarWord } from '../../../types/learning.types'
 import { AnswerResult } from '../../../types/learning.types'
 import { useUIStore } from '../../../store/uiStore'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumber, total }: Props) {
+  const { t } = useTranslation()
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState<AnswerResult | null>(null)
   const [similarWords, setSimilarWords] = useState<SimilarWord[]>([])
@@ -29,7 +31,7 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
 
   const handleSubmit = () => {
     if (!answer.trim()) {
-      showToast('请输入英文拼写！', 'warning')
+      showToast(t('learn.inputEnglishWarning'), 'warning')
       return
     }
 
@@ -61,24 +63,24 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
 
   const getResultLabel = () => {
     switch (result) {
-      case AnswerResult.CORRECT: return '✅ 拼写完全正确！'
-      case AnswerResult.TYPO: return '⚠️ 拼写有误（建议检查拼写）'
-      case AnswerResult.CLOSE: return '📖 是近义词，有细微差别'
-      default: return '❌ 不正确'
+      case AnswerResult.CORRECT: return t('learn.resultSpellCorrect')
+      case AnswerResult.TYPO: return t('learn.resultSpellTypo')
+      case AnswerResult.CLOSE: return t('learn.resultClose')
+      default: return t('learn.resultIncorrect')
     }
   }
 
   return (
     <div className="question-card">
       <div className="question-number">
-        第 {questionNumber + 1} / {total} 题
+        {t('learn.questionCount', { current: questionNumber + 1, total })}
       </div>
       
       <div className="question-word">
         <h2>{word.chinese}</h2>
         {showHint && (
           <div className="hint">
-            💡 提示：{word.chinese} 对应的英文是...
+            {t('learn.hintZh2en', { word: word.chinese })}
           </div>
         )}
       </div>
@@ -89,7 +91,7 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="请输入英文拼写..."
+          placeholder={t('learn.inputEnglishPlaceholder')}
           disabled={!!result}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -109,27 +111,27 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
             className="hint-btn"
             onClick={() => setShowHint(!showHint)}
           >
-            💡 提示
+            {t('learn.hint')}
           </button>
           <button 
             className="submit-btn"
             onClick={handleSubmit}
           >
-            ✓ 提交
+            {t('learn.submit')}
           </button>
         </div>
       ) : (
         <div className={`result-box ${getResultColor()}`}>
           <div className="result-text">{getResultLabel()}</div>
           <div className="result-detail">
-            <span>你的答案：{answer}</span>
-            <span>正确答案：{word.english}</span>
+            <span>{t('learn.yourAnswer', { answer })}</span>
+            <span>{t('learn.correctAnswer', { answer: word.english })}</span>
           </div>
 
           {/* 近义词详解 */}
           {result === AnswerResult.CLOSE && similarWords.length > 0 && (
             <div className="similar-words-section">
-              <h4>📖 近义词辨析</h4>
+              <h4>{t('learn.similarTitle')}</h4>
               {similarWords.map((sw, idx) => (
                 <div key={idx} className="similar-word-detail">
                   <div className="sw-compare">
@@ -138,14 +140,14 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
                     <span className="sw-word">{sw.word}</span>
                   </div>
                   <div className="sw-meaning">
-                    <span>"{word.english}" 含义：{word.chinese}</span>
-                    <span>"{sw.word}" 含义：{sw.meaning}</span>
+                    <span>{t('learn.similarMeaning', { word: word.english, meaning: word.chinese })}</span>
+                    <span>{t('learn.similarMeaning', { word: sw.word, meaning: sw.meaning })}</span>
                   </div>
                   <div className="sw-usage">
-                    <span>使用场景：{sw.usage}</span>
+                    <span>{t('learn.similarUsage', { usage: sw.usage })}</span>
                   </div>
                   <div className="sw-difference">
-                    💡 {sw.difference}
+                    {t('learn.similarDifference', { difference: sw.difference })}
                   </div>
                 </div>
               ))}
@@ -155,12 +157,12 @@ export default function ChineseToEnglish({ word, onSubmit, onNext, questionNumbe
           {/* 拼写错误提示 */}
           {result === AnswerResult.TYPO && (
             <div className="typo-hint">
-              💡 检查拼写：你写的是 "{answer}"，正确拼写是 "{word.english}"
+              {t('learn.typoHint', { answer, word: word.english })}
             </div>
           )}
 
           <button className="next-btn" onClick={handleNext}>
-            {questionNumber + 1 === total ? '📊 查看结果' : '下一题 →'}
+            {questionNumber + 1 === total ? t('learn.viewResult') : t('learn.nextQuestion')}
           </button>
         </div>
       )}

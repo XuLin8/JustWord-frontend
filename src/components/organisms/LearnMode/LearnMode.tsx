@@ -1,6 +1,7 @@
 // components/LearnMode/LearnMode.tsx
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../../store/wordStore'
 import { useLearning } from '../../../hooks/useLearning'
 import { LearnMode as LearnModeEnum } from '../../../types/learning.types'
@@ -11,6 +12,7 @@ import ResultReview from './ResultReview'
 import './LearnMode.css'
 
 export default function LearnMode() {
+  const { t } = useTranslation()
   const { words } = useWordStore()
   const { showToast } = useUIStore()
   const [selectedMode, setSelectedMode] = useState<LearnModeEnum | null>(null)
@@ -27,7 +29,7 @@ export default function LearnMode() {
 
   const handleStart = (mode: LearnModeEnum) => {
     if (words.length < 5) {
-      showToast('词库至少需要 5 个单词才能开始学习！', 'warning')
+      showToast(t('learn.minWordsWarning', { count: 5 }), 'warning')
       return
     }
     startLearning(mode)
@@ -37,20 +39,20 @@ export default function LearnMode() {
   if (!selectedMode) {
     return (
       <div className="learn-mode-select">
-        <h2>📚 选择学习模式</h2>
+        <h2>{t('learn.selectTitle')}</h2>
         <div className="learn-mode-cards">
-          <div className="learn-card" onClick={() => handleStart(LearnModeEnum.ENGLISH_TO_CHINESE)}>  {/* ← 改这里 */}
+          <div className="learn-card" onClick={() => handleStart(LearnModeEnum.ENGLISH_TO_CHINESE)}>
             <div className="card-icon">🇬🇧→🇨🇳</div>
-            <h3>英译汉</h3>
-            <p>看英文写中文释义</p>
-            <span className="card-count">📝 {words.length} 个单词</span>
+            <h3>{t('dashboard.mode.en2zh')}</h3>
+            <p>{t('learn.en2zhDesc')}</p>
+            <span className="card-count">{t('learn.wordCount', { count: words.length })}</span>
           </div>
-          
-          <div className="learn-card" onClick={() => handleStart(LearnModeEnum.CHINESE_TO_ENGLISH)}>  {/* ← 改这里 */}
+
+          <div className="learn-card" onClick={() => handleStart(LearnModeEnum.CHINESE_TO_ENGLISH)}>
             <div className="card-icon">🇨🇳→🇬🇧</div>
-            <h3>汉译英</h3>
-            <p>看中文写英文拼写</p>
-            <span className="card-count">📝 {words.length} 个单词</span>
+            <h3>{t('dashboard.mode.zh2en')}</h3>
+            <p>{t('learn.zh2enDesc')}</p>
+            <span className="card-count">{t('learn.wordCount', { count: words.length })}</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,10 @@
 // components/LearnMode/ResultReview.tsx
 import React, { useMemo } from 'react'
+import { useTranslation, Trans } from 'react-i18next'
 import { AnswerResult } from '../../../types/learning.types'
 import type { LearningSession } from '../../../types/learning.types'
+import { getModeLabel } from '../../../utils/format'
+import i18n from '@/i18n'
 
 interface Props {
   session: LearningSession
@@ -10,22 +13,23 @@ interface Props {
   hasRound2?: boolean
 }
 
-const RESULT_META: Record<AnswerResult, { label: string; color: string; bg: string }> = {
-  correct: { label: '完全正确', color: '#27ae60', bg: '#e8f8ef' },
-  partial: { label: '部分正确', color: '#f39c12', bg: '#fff5e0' },
-  typo:    { label: '拼写错误', color: '#8e44ad', bg: '#f3e8ff' },
-  close:   { label: '近义答案', color: '#4a90d9', bg: '#eaf3ff' },
-  wrong:   { label: '错误',     color: '#e74c3c', bg: '#fdecea' },
+const RESULT_META: Record<AnswerResult, { color: string; bg: string }> = {
+  correct: { color: '#27ae60', bg: '#e8f8ef' },
+  partial: { color: '#f39c12', bg: '#fff5e0' },
+  typo:    { color: '#8e44ad', bg: '#f3e8ff' },
+  close:   { color: '#4a90d9', bg: '#eaf3ff' },
+  wrong:   { color: '#e74c3c', bg: '#fdecea' },
 }
 
 const MASTERY = [
-  { thresh: 0.85, level: '已掌握', tone: 'A', color: '#27ae60', bg: '#e8f8ef' },
-  { thresh: 0.60, level: '熟悉中', tone: 'B', color: '#4a90d9', bg: '#eaf3ff' },
-  { thresh: 0.30, level: '学习中', tone: 'C', color: '#f39c12', bg: '#fff5e0' },
-  { thresh: 0,    level: '需巩固', tone: 'D', color: '#e74c3c', bg: '#fdecea' },
+  { thresh: 0.85, tone: 'A', color: '#27ae60', bg: '#e8f8ef' },
+  { thresh: 0.60, tone: 'B', color: '#4a90d9', bg: '#eaf3ff' },
+  { thresh: 0.30, tone: 'C', color: '#f39c12', bg: '#fff5e0' },
+  { thresh: 0,    tone: 'D', color: '#e74c3c', bg: '#fdecea' },
 ]
 
 export default function ResultReview({ session, onRestart, onContinue, hasRound2 }: Props) {
+  const { t } = useTranslation()
   const { wordList, questions, score, mode } = session
 
   const countMap: Record<AnswerResult, number> = useMemo(() => {
@@ -93,7 +97,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
     return Math.max(0, (end - session.startTime) / 1000)
   }, [session.startTime, session.endTime])
   const avgSecPerQ = questions.length === 0 ? 0 : duration / questions.length
-  const modeLabel = mode === 'zh2en' ? '汉译英' : '英译汉'
+  const modeLabel = getModeLabel(mode)
 
   const accuracyDeg = Math.round(Math.max(0, Math.min(100, accuracy)) * 3.6)
   const countSegments = [
@@ -110,18 +114,27 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
         <div className="result-hero-left">
           <div className="result-mode-chip">
             <i className="mode-chip-dot" />
-            <span>当前模式：<b>{modeLabel}</b> · 共 {total} 题</span>
+            <span>
+              <Trans
+                i18nKey="learn.currentMode"
+                values={{ mode: modeLabel, total }}
+                components={{ b: <b /> }}
+              />
+            </span>
           </div>
-          <h2>📊 本轮学习报告</h2>
+          <h2>{t('learn.reportTitle')}</h2>
           <p className="result-hero-sub">
-            用时 <b>{formatDuration(duration)}</b>，平均每题 <b>{avgSecPerQ.toFixed(1)} 秒</b>。
-            根据你的作答情况，下方给出掌握度分层与逐题回顾。
+            <Trans
+              i18nKey="learn.reportSub"
+              values={{ duration: formatDuration(duration), avg: avgSecPerQ.toFixed(1) }}
+              components={{ b: <b /> }}
+            />
           </p>
           <div className="result-quick-metrics">
-            <Metric label="正确数" value={countMap.correct} tone="success" />
-            <Metric label="部分正确" value={countMap.partial} tone="warning" />
-            <Metric label="拼写偏差" value={countMap.typo} tone="violet" />
-            <Metric label="错误数" value={countMap.wrong} tone="danger" />
+            <Metric label={t('learn.metricCorrect')} value={countMap.correct} tone="success" />
+            <Metric label={t('learn.metricPartial')} value={countMap.partial} tone="warning" />
+            <Metric label={t('learn.metricTypo')} value={countMap.typo} tone="violet" />
+            <Metric label={t('learn.metricWrong')} value={countMap.wrong} tone="danger" />
           </div>
         </div>
         <div className="result-hero-right">
@@ -132,7 +145,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
           >
             <div className="score-hole">
               <div className="score-value">{accuracy}%</div>
-              <small>正确率</small>
+              <small>{t('dashboard.accuracy')}</small>
             </div>
           </div>
           <MasteryBadge level={getMastery(accuracy / 100)} />
@@ -142,12 +155,12 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
       {/* ========== 构成堆叠条 ========== */}
       <div className="result-card">
         <div className="result-card-head">
-          <h3>答题构成</h3>
-          <small>5 档结果分布 · 按占比可视化</small>
+          <h3>{t('learn.compositionTitle')}</h3>
+          <small>{t('learn.compositionSub')}</small>
         </div>
         <div className="result-stack">
           {countSegments.length === 0 ? (
-            <div className="result-stack-empty">暂无数据</div>
+            <div className="result-stack-empty">{t('learn.noData')}</div>
           ) : (
             countSegments.map((s) => (
               <div
@@ -158,7 +171,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
                   background: s.color,
                   minWidth: s.count > 0 ? 6 : 0,
                 }}
-                title={`${RESULT_META[s.result].label}：${s.count}`}
+                title={t('learn.segTitle', { label: t(`learn.result.${s.result}`), count: s.count })}
               />
             ))
           )}
@@ -167,7 +180,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
           {(Object.keys(RESULT_META) as AnswerResult[]).map((k) => (
             <div className="legend-line" key={k}>
               <span className="legend-dot" style={{ background: RESULT_META[k].color }} />
-              <span className="legend-label">{RESULT_META[k].label}</span>
+              <span className="legend-label">{t(`learn.result.${k}`)}</span>
               <span className="legend-count">{countMap[k]}</span>
               <div className="legend-bar">
                 <i style={{ background: RESULT_META[k].color, width: `${(countMap[k] / total) * 100}%` }} />
@@ -181,18 +194,18 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
       <div className="result-grid">
         <div className="result-card">
           <div className="result-card-head">
-            <h3>节奏分布</h3>
-            <small>按题号分块 · 每块正确率</small>
+            <h3>{t('learn.rhythmTitle')}</h3>
+            <small>{t('learn.rhythmSub')}</small>
           </div>
           {chunkStats.length === 0 ? (
-            <EmptyTip text="暂无作答" />
+            <EmptyTip text={t('learn.noAnswers')} />
           ) : (
             <div className="chunk-chart">
               {chunkStats.map((c) => {
                 const wrong = c.total - c.correct
                 return (
                   <div key={c.idx} className="chunk-col">
-                    <div className="chunk-stack" title={`${c.idx} 题 · 正确率 ${Math.round(c.rate * 100)}%`}>
+                    <div className="chunk-stack" title={t('learn.chunkTitle', { idx: c.idx, rate: Math.round(c.rate * 100) })}>
                       <i className="chunk-correct" style={{ height: `${Math.max(6, c.rate * 100)}%` }} />
                       {wrong > 0 && (
                         <i className="chunk-wrong" style={{ height: `${Math.max(0, (1 - c.rate) * 100)}%` }} />
@@ -209,8 +222,8 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
 
         <div className="result-card">
           <div className="result-card-head">
-            <h3>掌握度分层</h3>
-            <small>基于本轮作答，按得分率从低到高</small>
+            <h3>{t('learn.masteryTitle')}</h3>
+            <small>{t('learn.masterySub')}</small>
           </div>
           <div className="mastery-summary">
             {MASTERY.map((m) => {
@@ -218,7 +231,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
               return (
                 <div className="mastery-chip" key={m.tone} style={{ background: m.bg, color: m.color, borderColor: m.color }}>
                   <b className="mastery-tone">{m.tone}</b>
-                  <span>{m.level}</span>
+                  <span>{t(`learn.mastery.${m.tone}`)}</span>
                   <em>{n}</em>
                 </div>
               )
@@ -245,7 +258,7 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
                 <span className="mastery-rate">{Math.round(w.rate * 100)}%</span>
               </li>
             ))}
-            {wordMastery.length === 0 && <EmptyTip text="暂无掌握度数据" inline />}
+            {wordMastery.length === 0 && <EmptyTip text={t('learn.noMastery')} inline />}
           </ul>
         </div>
       </div>
@@ -253,8 +266,8 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
       {/* ========== 逐题回顾 ========== */}
       <div className="result-card">
         <div className="result-card-head">
-          <h3>逐题回顾</h3>
-          <small>点击题目可快速定位</small>
+          <h3>{t('learn.reviewTitle')}</h3>
+          <small>{t('learn.reviewSub')}</small>
         </div>
         <div className="result-list">
           {questions.map((q, idx) => {
@@ -265,13 +278,13 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
                 <div className="result-item-head">
                   <span className="result-index">#{idx + 1}</span>
                   <span className="result-tag" style={{ background: meta.bg, color: meta.color }}>
-                    {meta.label}
+                    {t(`learn.result.${q.result ?? 'wrong'}`)}
                   </span>
                   <span
                     className="result-mini-mastery"
                     style={{ background: mastery.bg, color: mastery.color, borderColor: mastery.color }}
                   >
-                    {mastery.level}
+                    {t(`learn.mastery.${mastery.tone}`)}
                   </span>
                 </div>
                 <div className="result-item-body">
@@ -281,13 +294,13 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
                   </div>
                   <div className="result-answers">
                     <div className="result-answer-row">
-                      <span className="answer-label">你的答案</span>
+                      <span className="answer-label">{t('learn.yourAnswerLabel')}</span>
                       <span className="answer-value answer-user">
-                        {q.userAnswer || <em>（未作答）</em>}
+                        {q.userAnswer || <em>{t('learn.notAnswered')}</em>}
                       </span>
                     </div>
                     <div className="result-answer-row">
-                      <span className="answer-label">正确答案</span>
+                      <span className="answer-label">{t('learn.correctAnswerLabel')}</span>
                       <span className="answer-value answer-correct">{q.correctAnswer}</span>
                     </div>
                   </div>
@@ -302,18 +315,18 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
       <div className="result-actions">
         {hasRound2 && accuracy >= 80 ? (
           <button className="continue-btn" onClick={onContinue}>
-            🚀 进入第二轮（汉译英）
+            {t('learn.round2Cta')}
           </button>
         ) : hasRound2 && accuracy < 80 ? (
           <div className="round2-hint">
-            <span>💪 建议先巩固第一轮（正确率 80% 以上再进入第二轮）</span>
+            <span>{t('learn.round2Hint')}</span>
             <button className="restart-btn" onClick={onRestart}>
-              🔄 重新学习
+              {t('learn.restudy')}
             </button>
           </div>
         ) : null}
         <button className="restart-btn" onClick={onRestart}>
-          🔄 重新开始
+          {t('learn.restart')}
         </button>
       </div>
     </div>
@@ -331,12 +344,15 @@ const Metric: React.FC<{ label: string; value: number; tone: 'success' | 'warnin
   </div>
 )
 
-const MasteryBadge: React.FC<{ level: typeof MASTERY[number] }> = ({ level }) => (
-  <div className="mastery-hero-badge" style={{ background: level.bg, color: level.color, borderColor: level.color }}>
-    <b className="mastery-tone-lg">{level.tone}</b>
-    <span>{level.level}</span>
-  </div>
-)
+const MasteryBadge: React.FC<{ level: typeof MASTERY[number] }> = ({ level }) => {
+  const { t } = useTranslation()
+  return (
+    <div className="mastery-hero-badge" style={{ background: level.bg, color: level.color, borderColor: level.color }}>
+      <b className="mastery-tone-lg">{level.tone}</b>
+      <span>{t(`learn.mastery.${level.tone}`)}</span>
+    </div>
+  )
+}
 
 const EmptyTip: React.FC<{ text: string; inline?: boolean }> = ({ text, inline }) => (
   <div className={`empty-tip ${inline ? 'inline' : ''}`}>
@@ -348,11 +364,11 @@ const EmptyTip: React.FC<{ text: string; inline?: boolean }> = ({ text, inline }
 /* ========== 工具函数 ========== */
 
 function formatDuration(sec: number): string {
-  if (!isFinite(sec) || sec <= 0) return '0 秒'
+  if (!isFinite(sec) || sec <= 0) return i18n.t('learn.zeroSeconds')
   const m = Math.floor(sec / 60)
   const s = Math.round(sec % 60)
-  if (m <= 0) return `${s} 秒`
-  return `${m} 分 ${s} 秒`
+  if (m <= 0) return i18n.t('learn.seconds', { count: s })
+  return i18n.t('learn.minutesSeconds', { min: m, sec: s })
 }
 
 function getMastery(rate: number) {

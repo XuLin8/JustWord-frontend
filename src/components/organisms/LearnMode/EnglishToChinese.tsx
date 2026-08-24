@@ -1,6 +1,7 @@
 // components/LearnMode/EnglishToChinese.tsx
 
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnswerResult } from '../../../types/learning.types'
 import type { Word } from '../../../types/learning.types'
 import { useUIStore } from '../../../store/uiStore'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function EnglishToChinese({ word, onSubmit, onNext, questionNumber, total }: Props) {
+  const { t } = useTranslation()
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState<AnswerResult | null>(null)
   const [showHint, setShowHint] = useState(false)
@@ -28,7 +30,7 @@ export default function EnglishToChinese({ word, onSubmit, onNext, questionNumbe
 
   const handleSubmit = () => {
     if (!answer.trim()) {
-      showToast('请输入中文释义！', 'warning')
+      showToast(t('learn.inputChineseWarning'), 'warning')
       return
     }
 
@@ -55,23 +57,23 @@ export default function EnglishToChinese({ word, onSubmit, onNext, questionNumbe
 
   const getResultLabel = () => {
     switch (result) {
-      case AnswerResult.CORRECT: return '✅ 完全正确！'
-      case AnswerResult.PARTIAL: return '⚠️ 部分正确'
-      default: return '❌ 错误'
+      case AnswerResult.CORRECT: return t('learn.resultCorrect')
+      case AnswerResult.PARTIAL: return t('learn.resultPartial')
+      default: return t('learn.resultWrong')
     }
   }
 
   return (
     <div className="question-card">
       <div className="question-number">
-        第 {questionNumber + 1} / {total} 题
+        {t('learn.questionCount', { current: questionNumber + 1, total })}
       </div>
       
       <div className="question-word">
         <h2>{word.english}</h2>
         {showHint && (
           <div className="hint">
-            💡 提示：{word.english} 的意思是...
+            {t('learn.hintEn2zh', { word: word.english })}
           </div>
         )}
       </div>
@@ -82,7 +84,7 @@ export default function EnglishToChinese({ word, onSubmit, onNext, questionNumbe
           type="text"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="请输入中文释义..."
+          placeholder={t('learn.inputChinesePlaceholder')}
           disabled={!!result}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -102,24 +104,24 @@ export default function EnglishToChinese({ word, onSubmit, onNext, questionNumbe
             className="hint-btn"
             onClick={() => setShowHint(!showHint)}
           >
-            💡 提示
+            {t('learn.hint')}
           </button>
           <button 
             className="submit-btn"
             onClick={handleSubmit}
           >
-            ✓ 提交
+            {t('learn.submit')}
           </button>
         </div>
       ) : (
         <div className={`result-box ${getResultColor()}`}>
           <div className="result-text">{getResultLabel()}</div>
           <div className="result-detail">
-            <span>你的答案：{answer}</span>
-            <span>正确答案：{word.chinese}</span>
+            <span>{t('learn.yourAnswer', { answer })}</span>
+            <span>{t('learn.correctAnswer', { answer: word.chinese })}</span>
           </div>
           <button className="next-btn" onClick={handleNext}>
-            {questionNumber + 1 === total ? '📊 查看结果' : '下一题 →'}
+            {questionNumber + 1 === total ? t('learn.viewResult') : t('learn.nextQuestion')}
           </button>
         </div>
       )}
