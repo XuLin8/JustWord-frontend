@@ -1,5 +1,6 @@
 // src/api/client.ts
 import { BASE_URL } from '../config'  // 从 config 导入，不是 config/api
+import i18n from '@/i18n'
 
 // ============ 错误类型 ============
 export class ApiError extends Error {
@@ -15,30 +16,26 @@ export class ApiError extends Error {
 }
 
 export class NetworkError extends Error {
-  constructor(message: string = '网络连接失败，请检查网络') {
+  constructor(message: string = i18n.t('api.networkError')) {
     super(message)
     this.name = 'NetworkError'
   }
 }
 
 export class AuthError extends Error {
-  constructor(message: string = '登录已过期，请重新登录') {
+  constructor(message: string = i18n.t('api.authExpired')) {
     super(message)
     this.name = 'AuthError'
   }
 }
 
 // ============ 错误码映射 ============
-export const ErrorMessages: Record<number, string> = {
-  400: '请求参数错误',
-  401: '登录已过期，请重新登录',
-  403: '权限不足，无法访问',
-  404: '请求的资源不存在',
-  422: '数据验证失败，请检查输入',
-  429: '请求过于频繁，请稍后再试',
-  500: '服务器内部错误，请稍后重试',
-  502: '服务暂时不可用',
-  503: '服务维护中',
+export function getErrorMessage(status: number): string {
+  const key = `api.status.${status}`
+  if (i18n.exists(key)) {
+    return i18n.t(key)
+  }
+  return i18n.t('api.requestFailedWithStatus', { status })
 }
 
 // ============ 请求配置 ============
@@ -105,7 +102,7 @@ export async function request<T>(
     if (token) {
       requestHeaders['Authorization'] = `Bearer ${token}`
     } else {
-      throw new AuthError('未登录，请先登录')
+      throw new AuthError(i18n.t('api.notLoggedIn'))
     }
   }
 
@@ -137,7 +134,7 @@ export async function request<T>(
       if (data?.error) {
         throw new ApiError(
           data.error.code || response.status,
-          data.error.message || ErrorMessages[response.status] || '请求失败',
+          data.error.message || getErrorMessage(response.status),
           data.error.detail
         )
       }
@@ -150,7 +147,7 @@ export async function request<T>(
 
       throw new ApiError(
         response.status,
-        ErrorMessages[response.status] || `请求失败 (${response.status})`
+        getErrorMessage(response.status)
       )
     }
 
@@ -163,14 +160,14 @@ export async function request<T>(
     }
 
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new NetworkError('请求超时，请重试')
+      throw new NetworkError(i18n.t('api.timeout'))
     }
 
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       throw new NetworkError()
     }
 
-    throw new NetworkError(error instanceof Error ? error.message : '网络异常')
+    throw new NetworkError(error instanceof Error ? error.message : i18n.t('api.networkAbnormal'))
   }
 }
 

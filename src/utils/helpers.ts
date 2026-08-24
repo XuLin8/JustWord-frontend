@@ -20,6 +20,7 @@
 
 
 import type { Word } from '../types'
+import i18n from '@/i18n'
 
 export const generateId = (): string => {
   return Date.now().toString()
@@ -43,15 +44,15 @@ export const downloadFile = (data: string, filename: string, type: string) => {
 
 export const exportToJSON = (words: Word[]) => {
   const data = JSON.stringify(words, null, 2)
-  const filename = `词库_${new Date().toISOString().slice(0, 10)}.json`
+  const filename = `${i18n.t('importExport.filePrefix')}_${new Date().toISOString().slice(0, 10)}.json`
   downloadFile(data, filename, 'application/json')
 }
 
 export const exportToCSV = (words: Word[]) => {
-  let csv = '英文,中文,创建时间\n'
+  let csv = `${i18n.t('importExport.csvHeader')}\n`
   words.forEach(word => {
     csv += `"${word.english}","${word.chinese}","${formatDate(word.createdAt)}"\n`
   })
-  const filename = `词库_${new Date().toISOString().slice(0, 10)}.csv`
+  const filename = `${i18n.t('importExport.filePrefix')}_${new Date().toISOString().slice(0, 10)}.csv`
   downloadFile('\uFEFF' + csv, filename, 'text/csv;charset=utf-8;')
 }

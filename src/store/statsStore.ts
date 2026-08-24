@@ -19,6 +19,7 @@ import type {
   DashboardDailyTrendView,
 } from '../types'
 import { useWordStore } from './wordStore'
+import i18n from '@/i18n'
 
 // ===== 后端 snake_case → 前端 camelCase 映射 =====
 function mapDashboard(data: DashboardResponse): DashboardData {
@@ -226,7 +227,7 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
       })
       return { ok: true, message: res.message, created: res.created }
     } catch (e: any) {
-      return { ok: false, message: e?.message ?? '打卡失败' }
+      return { ok: false, message: e?.message ?? i18n.t('dashboard.checkinFailed') }
     }
   },
 

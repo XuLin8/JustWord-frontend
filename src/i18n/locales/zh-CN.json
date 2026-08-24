@@ -221,7 +221,17 @@
     "restart": "🔄 重新开始",
     "zeroSeconds": "0 秒",
     "seconds": "{{count}} 秒",
-    "minutesSeconds": "{{min}} 分 {{sec}} 秒"
+    "minutesSeconds": "{{min}} 分 {{sec}} 秒",
+    "similar": {
+      "run": {
+        "jog": { "meaning": "慢跑", "usage": "休闲/锻炼用", "difference": "run 速度更快，jog 是慢跑/轻松跑" },
+        "sprint": { "meaning": "冲刺", "usage": "短距离全力跑", "difference": "run 是通用词，sprint 是短距离冲刺" }
+      },
+      "big": {
+        "large": { "meaning": "大的", "usage": "形容尺寸/数量", "difference": "big 更口语化，large 更正式" },
+        "huge": { "meaning": "巨大的", "usage": "强调非常大", "difference": "big 是普通大，huge 是巨大" }
+      }
+    }
   },
   "word": {
     "addTitle": "添加单词",
@@ -286,6 +296,28 @@
     "clearTitle": "清空词库",
     "clearDesc": "确定要删除全部 {{count}} 个单词吗？此操作不可撤销！",
     "clearConfirm": "全部删除",
-    "clearSuccess": "已清空所有单词"
+    "clearSuccess": "已清空所有单词",
+    "csvHeader": "英文,中文,创建时间",
+    "filePrefix": "词库"
+  },
+  "api": {
+    "networkError": "网络连接失败，请检查网络",
+    "timeout": "请求超时，请重试",
+    "networkAbnormal": "网络异常",
+    "notLoggedIn": "未登录，请先登录",
+    "authExpired": "登录已过期，请重新登录",
+    "requestFailed": "请求失败",
+    "requestFailedWithStatus": "请求失败 ({{status}})",
+    "status": {
+      "400": "请求参数错误",
+      "401": "登录已过期，请重新登录",
+      "403": "权限不足，无法访问",
+      "404": "请求的资源不存在",
+      "422": "数据验证失败，请检查输入",
+      "429": "请求过于频繁，请稍后再试",
+      "500": "服务器内部错误，请稍后重试",
+      "502": "服务暂时不可用",
+      "503": "服务维护中"
+    }
   }
 }

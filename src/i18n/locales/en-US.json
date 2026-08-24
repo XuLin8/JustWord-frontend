@@ -221,7 +221,17 @@
     "restart": "🔄 Restart",
     "zeroSeconds": "0 sec",
     "seconds": "{{count}} sec",
-    "minutesSeconds": "{{min}} min {{sec}} sec"
+    "minutesSeconds": "{{min}} min {{sec}} sec",
+    "similar": {
+      "run": {
+        "jog": { "meaning": "jogging", "usage": "casual / exercise", "difference": "run is faster; jog is easy/slow running" },
+        "sprint": { "meaning": "sprint", "usage": "full-speed short distance", "difference": "run is a general word; sprint is a short-distance burst" }
+      },
+      "big": {
+        "large": { "meaning": "big/large", "usage": "describing size/quantity", "difference": "big is more colloquial; large is more formal" },
+        "huge": { "meaning": "huge", "usage": "emphasizing very large", "difference": "big is ordinary large; huge is enormous" }
+      }
+    }
   },
   "word": {
     "addTitle": "Add word",
@@ -286,6 +296,28 @@
     "clearTitle": "Clear wordbook",
     "clearDesc": "Delete all {{count}} words? This cannot be undone!",
     "clearConfirm": "Delete all",
-    "clearSuccess": "All words cleared"
+    "clearSuccess": "All words cleared",
+    "csvHeader": "English,Chinese,Created at",
+    "filePrefix": "wordbook"
+  },
+  "api": {
+    "networkError": "Network connection failed, please check your network",
+    "timeout": "Request timed out, please retry",
+    "networkAbnormal": "Network error",
+    "notLoggedIn": "Not logged in, please sign in first",
+    "authExpired": "Session expired, please sign in again",
+    "requestFailed": "Request failed",
+    "requestFailedWithStatus": "Request failed ({{status}})",
+    "status": {
+      "400": "Bad request",
+      "401": "Session expired, please sign in again",
+      "403": "Access denied",
+      "404": "Resource not found",
+      "422": "Validation failed, please check your input",
+      "429": "Too many requests, please try again later",
+      "500": "Internal server error, please retry later",
+      "502": "Service temporarily unavailable",
+      "503": "Service under maintenance"
+    }
   }
 }

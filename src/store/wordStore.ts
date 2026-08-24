@@ -76,7 +76,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     const trimmedChinese = chinese.trim()
 
     if (get().isWordExist(trimmedEnglish)) {
-      return { success: false, message: `单词 "${trimmedEnglish}" 已存在！` }
+      return { success: false, message: i18n.t('word.exists', { word: trimmedEnglish }) }
     }
 
     try {
@@ -94,7 +94,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       return { success: true }
     } catch (error: any) {
       console.error('添加失败:', error)
-      return { success: false, message: error.message || '添加失败，请重试' }
+      return { success: false, message: error.message || i18n.t('word.addFailedRetry') }
     }
   },
 
@@ -120,7 +120,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     const trimmedChinese = chinese.trim()
 
     if (get().isWordExist(trimmedEnglish, id)) {
-      return { success: false, message: `单词 "${trimmedEnglish}" 已存在！` }
+      return { success: false, message: i18n.t('word.exists', { word: trimmedEnglish }) }
     }
 
     try {
@@ -140,7 +140,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       return { success: true }
     } catch (error: any) {
       console.error('更新失败:', error)
-      return { success: false, message: error.message || '更新失败，请重试' }
+      return { success: false, message: error.message || i18n.t('word.updateFailedRetry') }
     }
   },
 
@@ -175,12 +175,12 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     if (imported === 0) {
-      return { success: false, message: '没有可导入的单词', imported: 0, skipped }
+      return { success: false, message: i18n.t('word.noImportable'), imported: 0, skipped }
     }
 
     return {
       success: true,
-      message: `成功导入 ${imported} 个单词，跳过 ${skipped} 个`,
+      message: i18n.t('word.importResult', { imported, skipped }),
       imported,
       skipped,
     }
@@ -227,7 +227,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
     }
 
     if (toRemove.length === 0) {
-      return { success: true, message: '当前无重复单词', removed: 0 }
+      return { success: true, message: i18n.t('word.noDuplicate'), removed: 0 }
     }
 
     let removed = 0
