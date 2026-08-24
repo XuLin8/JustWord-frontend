@@ -1,5 +1,6 @@
 // src/components/molecules/AuthForm/index.tsx
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../../atoms/Button'
 import { Input } from '../../atoms/Input'
 import { Label } from '@/components/ui/label'
@@ -34,9 +35,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [success, setSuccess] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const { t } = useTranslation()
   const isLogin = mode === 'login'
-  const title = isLogin ? '登录' : '注册'
-  const switchText = isLogin ? '还没有账号？立即注册' : '已有账号？去登录'
+  const title = isLogin ? t('auth.login') : t('auth.register')
+  const switchText = isLogin ? t('auth.switchToRegister') : t('auth.switchToLogin')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,12 +48,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
     if (!isLogin) {
       if (password !== confirmPassword) {
-        setError('两次密码输入不一致')
+        setError(t('auth.passwordMismatch'))
         setIsSubmitting(false)
         return
       }
       if (password.length < 6) {
-        setError('密码长度至少为 6 位')
+        setError(t('auth.passwordTooShort'))
         setIsSubmitting(false)
         return
       }
@@ -69,9 +71,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     setIsSubmitting(false)
 
     if (result.success) {
-      if (!isLogin) setSuccess('注册成功！请登录')
+      if (!isLogin) setSuccess(t('auth.registerSuccess'))
     } else {
-      setError(result.message || (isLogin ? '登录失败' : '注册失败'))
+      setError(result.message || (isLogin ? t('auth.loginFailed') : t('auth.registerFailed')))
     }
   }
 
@@ -80,11 +82,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <h2 className="text-center text-xl font-semibold">{title}</h2>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="auth-email">邮箱</Label>
+        <Label htmlFor="auth-email">{t('auth.email')}</Label>
         <Input
           id="auth-email"
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('auth.emailPlaceholder')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -93,11 +95,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {!isLogin && (
         <div className="flex flex-col gap-2">
-          <Label htmlFor="auth-username">用户名</Label>
+          <Label htmlFor="auth-username">{t('auth.username')}</Label>
           <Input
             id="auth-username"
             type="text"
-            placeholder="用户名"
+            placeholder={t('auth.usernamePlaceholder')}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -106,11 +108,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       )}
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="auth-password">密码</Label>
+        <Label htmlFor="auth-password">{t('auth.password')}</Label>
         <Input
           id="auth-password"
           type="password"
-          placeholder="密码（至少 6 位）"
+          placeholder={t('auth.passwordPlaceholder')}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -119,11 +121,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {!isLogin && (
         <div className="flex flex-col gap-2">
-          <Label htmlFor="auth-confirm">确认密码</Label>
+          <Label htmlFor="auth-confirm">{t('auth.confirmPassword')}</Label>
           <Input
             id="auth-confirm"
             type="password"
-            placeholder="再次输入密码"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -135,7 +137,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       {success && <p className="text-center text-sm text-emerald-600">{success}</p>}
 
       <Button type="submit" loading={isSubmitting || loading} fullWidth>
-        {isLogin ? '登录' : '注册'}
+        {isLogin ? t('auth.login') : t('auth.register')}
       </Button>
 
       <button

@@ -1,5 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react'
+import i18n from '../i18n'
 import { authApi } from '../api'
 import { useWordStore } from '../store/wordStore'
 
@@ -128,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 如果获取用户信息失败，可能是 token 无效
         setToken(null)
         localStorage.removeItem('justword_token')
-        return { success: false, message: '获取用户信息失败，请重试' }
+        return { success: false, message: i18n.t('auth.fetchUserFailed') }
       }
       
       return { success: true }
@@ -136,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('登录失败:', error)
       return { 
         success: false, 
-        message: error.message || '登录失败，请检查邮箱和密码' 
+        message: error.message || i18n.t('auth.loginErrorHint') 
       }
     }
   }, [])
@@ -150,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('注册失败:', error)
       return { 
         success: false, 
-        message: error.message || '注册失败，请检查邮箱或用户名是否已被使用' 
+        message: error.message || i18n.t('auth.registerErrorHint') 
       }
     }
   }, [])

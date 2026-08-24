@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import i18n from '../i18n'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -84,8 +85,8 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({
       confirmDialog: {
         isOpen: true,
-        confirmText: '确认',
-        cancelText: '取消',
+        confirmText: i18n.t('common.confirm'),
+        cancelText: i18n.t('common.cancel'),
         confirmVariant: 'primary',
         ...options,
       },
