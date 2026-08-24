@@ -234,13 +234,13 @@
 ### 5.6 PWA
 - [x] 桌面 / 手机可安装，具备独立图标与应用名（manifest + 4 枚图标，已验证 manifest 注入与图标 200）
 - [x] 核心页面离线可访问（Service Worker 缓存策略：precache + navigateFallback，已验证 SW 自动注册激活 / 页面受控 / workbox-precache 就绪）
-- [ ] 加载性能达标（首屏可交互时间合理，构建体积可接受）：`index.js` 574 kB（gzip 179 kB）、CSS 126 kB（gzip 22 kB），可接受但 >500 kB 触发告警，代码分割留待 M4
+- [x] 加载性能达标（首屏可交互时间合理，构建体积可接受）：代码分割后 `index.js` 42 kB（gzip 12.6 kB）、CSS 51 kB（gzip 11.4 kB），>500 kB 告警解除（M4-D 已验证）
 
 ### 5.7 通用（非功能）
-- [ ] 明 / 暗主题双态全部通过
-- [ ] 中 / 英 i18n 全覆盖，无硬编码中文
-- [ ] 响应式：桌面 / 移动端（≥420px）布局正确
-- [ ] `tsc -b` 与 `vite build` 零错误
+- [x] 明 / 暗主题双态全部通过（M4-B 语义 token 回归；含 `--color-fill*` 暗色原语、`--border` 统一）
+- [x] 中 / 英 i18n 全覆盖，无硬编码中文（M4-A 迁移 + 静态扫描）
+- [x] 响应式：桌面 / 移动端（≥420px）布局正确（M4-C 断点审计；622px 视口实测无横向溢出）
+- [x] `tsc -b` 与 `vite build` 零错误（M4 全程通过）
 
 ### 5.8 云养猫（精简版 · 已定入 MVP）
 - [ ] 开局可领养 1 只猫（AI 形象），首页展示 + 待机动画
@@ -534,4 +534,66 @@
 - PWA 仅在**生产构建**（`vite build` + `vite preview` / 部署）下生效；开发模式 `devOptions.enabled=false` 不注入 SW。
 - 验证命令：`vite build` → `vite preview`（浏览器检查 `manifest.webmanifest`、`sw.js`、`caches`）。
 - §5.6 性能项：体积可接受，代码分割记入 M4；PWA 其余（安装引导 / 图标 AI 化）留待 M4 / M5。
+- 未推送，本地提交。
+
+## 13. M4 实现规划（打磨与验收）
+
+> 规划 / 验收日期：2026-08-25。
+> 目标：对 M0–M3 全部已交付功能做最终打磨与验收回归，覆盖 §5.7 通用（非功能）验收项，并解除 §5.6 性能告警。P1 增强（云养猫等）留待后续阶段。
+
+### 13.1 目标与范围
+
+- 交付形态：**M0–M3 全部功能达成 §5 DoD**（功能可用 + 明/暗双态 + 中英 i18n + 零 TS/构建错误 + 分模块提交）。
+- 验收范围：
+  - **i18n 全覆盖**：全仓无硬编码中文，统一走 i18n key。
+  - **明暗双态回归**：所有硬编码颜色迁移到语义 token，暗色下无不可见 / 色差问题。
+  - **响应式 ≥420px**：桌面与移动端布局正确，无横向溢出。
+  - **性能代码分割**：四页面按需懒加载 + vendor 独立 chunk，解除 >500 kB 告警。
+  - **DoD 总检**：`tsc -b` / `vite build` 零错误 + 生产构建浏览器回归。
+- 范围外：云养猫（§5.8，P1）、安装引导按钮（beforeinstallprompt）、PWA 图标 AI 化，均留待后续阶段。
+
+### 13.2 模块划分与提交计划（分模块本地提交，不推送）
+
+| 模块 | 内容 | 状态 |
+|---|---|---|
+| M4-A i18n 全覆盖 | 迁移 `constants/app.ts`、`LearningHomePage`、`LearnMode`、背诵键盘提示等硬编码中文到 i18n key；删除无引用死代码（`constants/index.ts`） | ✅ |
+| M4-B 明暗双态回归 | 审计并修复硬编码颜色 → 语义 token：`globals.css` 新增暗色 `--color-fill*` 原语（49 处填充在暗色下可见）；`.surface` / `.glass` / WordCard / Dashboard / LearnMode / WordBook 边框、内阴影、背景、进度环底色全部 `--border` / 原语化 | ✅ |
+| M4-C 响应式 ≥420px | 审计所有网格（auto-fit/auto-fill minmax）、flex-wrap、clamp；补 `LearnMode` 模式卡片 560px 单列断点；622px 视口实测四 Tab 无横向溢出 | ✅ |
+| M4-D 性能代码分割 | 四页面 `React.lazy` + `Suspense`（Spinner fallback）+ `manualChunks`（vendor-react / state / i18n / ui / lucide）；**修复生产 `BASE_URL` 双 `/api` 拼接 bug**（`config/index.ts`） | ✅ |
+| M4-E DoD 总检 + 文档 | 本章节；§5.6 / §5.7 勾选；生产构建登录 + 四 Tab 懒加载浏览器回归 | ✅ |
+
+### 13.3 验收标准映射（§5.6 性能 + §5.7 通用）
+
+| 验收项 | 实现 | 验证 |
+|---|---|---|
+| 加载性能 | `React.lazy` 四页面 + `manualChunks` 5 组 vendor | 已验证：`index.js` 574 kB → 42 kB（gzip 12.6 kB），>500 kB 告警解除；页面 chunk 首屏不加载 |
+| 明 / 暗双态 | 语义 token 迁移 + 暗色 `--color-fill*` 原语 | 已验证：M4-B 修复后暗色下填充 / 边框 / 进度环均可见 |
+| 中 / 英 i18n | 硬编码中文 → i18n key | 已验证：全仓静态扫描无硬编码中文残留 |
+| 响应式 ≥420px | 断点 + 自适应网格 | 已验证：622px 视口实测无横向溢出 |
+| `tsc -b` / `vite build` | 全程零错误 | 已验证：M4 各模块构建均通过 |
+
+### 13.4 风险与开放问题（M4 视角）
+
+| 风险 / 问题 | 影响 | 应对 |
+|---|---|---|
+| 生产 `BASE_URL` 拼接 bug | 生产构建登录请求变为 `/api/api/auth/login`（dev 直连后端掩盖） | 已修复：`config/index.ts` 生产 `BASE_URL=''`（paths 已含 `/api`），全新端口验证登录 200 |
+| 旧 Service Worker 缓存干扰 | 换端口后旧 SW 仍缓存旧版 JS，导致回归误判 | 验证时使用全新 origin 端口（4180）避开旧 SW；发布后用户经更新提示刷新 |
+| 自动化视口下限 | 浏览器无法缩至 420px，实测 622px | 622px 已覆盖移动端断点，420px 由 CSS 断点保证 |
+
+### 13.5 实现进度（M4 分模块验收）
+
+> `tsc -b` 与 `vite build` 零错误；`vite preview` 生产构建浏览器回归通过。
+
+| 模块 | 状态 | 验证结果 |
+|---|---|---|
+| M4-A i18n 全覆盖 | ✅ 完成 | 硬编码中文全迁移；`constants/index.ts` 死代码删除；构建通过 |
+| M4-B 明暗双态回归 | ✅ 完成 | 暗色填充 / 边框 / 进度环修复；语义 token 统一 |
+| M4-C 响应式 ≥420px | ✅ 完成 | 560px 卡片断点；622px 视口四 Tab 无横向溢出 |
+| M4-D 性能代码分割 | ✅ 完成 | 首屏 `index.js` 42 kB（gzip 12.6 kB）；四页面 chunk 按需加载（登录后学习页仅加载 `LearningHomePage`；词库 / 统计 / 我的 切换时才加载对应 chunk）；生产登录 `/api/auth/login` 200 |
+| M4-E DoD 总检 + 文档 | ✅ 完成 | §5.6 / §5.7 全部勾选；本文档 13.5 章节 |
+
+**说明与遗留**
+- 生产构建验证环境：`vite preview` 于 4180 端口（全新 origin）以新账号 `m4_20260825@example.com` 登录，学习首页仅加载 `LearningHomePage-*.js`，切 Tab 按需加载 `WordBookPage / DashboardPage / ProfilePage` chunk，均无阻断性报错。
+- M4-D 顺带修复生产 `BASE_URL` 重复拼接 bug（`/api/api/...` → `/api/...`），属生产可用性修复，非 M0–M3 回归。
+- P1 增强（云养猫 §5.8、安装引导、图标 AI 化）留待后续阶段。
 - 未推送，本地提交。
