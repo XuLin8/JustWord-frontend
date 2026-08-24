@@ -337,14 +337,63 @@
 
 ---
 
-## 10. 附录：现有能力盘点（复用清单）
+## 10. M0 现状基线盘点（已确认）
 
-| 能力 | 现状文件 | 复用方式 |
-|---|---|---|
-| 两轮学习 + 规则批改 | `components/organisms/LearnMode/*`、`hooks/useLearning.ts` | 复用为背诵规则选项之一（看词选意 / 两轮学习） |
-| 词库 CRUD / 导入导出 | `store/wordStore.ts`、`utils/helpers.ts`、`ImportExportPanel` | 直接复用 |
-| 仪表盘 / 打卡 / 成就 / 趋势 | `store/statsStore.ts`、`pages/DashboardPage` | 直接复用 + 接同步 |
-| 登录注册 UI 与状态 | `context/AuthContext.tsx`、`AuthModal`、`AuthForm` | 复用 + 对齐接口 |
-| 主题 / 国际化 | `uiStore.ts`、`hooks/useTheme.ts`、`i18n/*` | 直接复用 |
-| UI 组件库 | `components/ui/*`（shadcn） | 直接复用 |
-| 后端统计类接口 | `api/endpoints/{dashboard,checkin,achievements,learning}.api.ts` | 复用 + 补充契约 |
+> 盘点日期：2026-08-24　结论：**能力可支撑 MVP 起点**，无回归（`tsc -b && vite build` 零错误通过）。
+
+### 10.1 能力盘点（可复用模块清单）
+
+| 模块 | 复用件 | 现状文件 | 复用方式 |
+|---|---|---|---|
+| 学习 | 两轮学习 + 规则批改（Levenshtein / 关键词匹配 / 近义判定） | `hooks/useLearning.ts` | 复用为背诵规则选项（看词选意 / 两轮学习） |
+| 学习 | 英译汉 / 汉译英交互 | `LearnMode/{EnglishToChinese,ChineseToEnglish}.tsx` | 复用 |
+| 学习 | 结果回顾 / 逐题对比 | `LearnMode/{ResultReview,WordComparison}.tsx` | 复用 |
+| 学习 | 学习记录本地存储（localforage） | `store/learningStore.ts` | 改造：与 `learningApi` 打通 / 接同步 |
+| 词库 | CRUD / 搜索 / 去重 / 导入导出 | `store/wordStore.ts`、`pages/WordBookPage`、`ImportExportPanel`、`WordForm`、`WordList` | 直接复用 |
+| 词库 | CSV / JSON 解析与导出 | `utils/helpers.ts`、`useFileImport.ts` | 复用 |
+| 仪表盘 | 统计 / 打卡 / 成就 / 趋势组件 | `pages/DashboardPage`、`store/statsStore.ts`、`CorrectnessDonut`、`TrendChart`、`MetricCard` | 复用（降级为次级统计页） |
+| 登录 | JWT 认证 / 上下文 / 弹窗 / 表单 | `context/AuthContext.tsx`、`AuthModal`、`AuthForm`、`auth.api` | 复用 + 对齐接口契约 |
+| 基础 | 主题切换（明 / 暗） | `uiStore.ts`、`useTheme.ts`、`ThemeSwitcher` | 直接复用 |
+| 基础 | 国际化（中 / 英） | `i18n/*`、`LanguageSwitcher` | 直接复用 |
+| 基础 | UI 组件库 | `components/ui/*`（shadcn 9 组件） | 直接复用 |
+| 基础 | 全局编排 / 布局 | `useAppShell.ts`、`App.tsx`、`templates/Layout` | 复用 + 扩展（登录门禁 / 首页路由） |
+| 基础 | Toast / 二次确认 / 粒子背景 | `ToastContainer`、`ConfirmDialog`、`ParticleBackground` | 直接复用 |
+| 接口 | 统计 / 打卡 / 成就 / 学习记录端点 | `api/endpoints/{dashboard,checkin,achievements,learning}.api.ts`、`api/paths.ts` | 复用 + 补充 sync/textbooks 契约 |
+
+### 10.2 需求映射（MVP P0 → 复用 / 改造 / 新增）
+
+| MVP P0 功能 | 现状 | 映射 | 归属 |
+|---|---|---|---|
+| 用户系统（注册 / 登录 / 退出 / 当前用户） | AuthContext + AuthModal + auth.api 已有 | **复用 + 对齐** | M1 |
+| 登录门禁（未登录引导登录 / 受保护页） | 无；App 层 `activeTab` 切换 | **新增**（App 层基于 `isAuthenticated` 渲染） | M1 |
+| 核心学习首页（搜索条 + 记忆主区 + 控制区） | 首页当前为 DashboardPage | **新增**（重构首页，仪表盘降级） | M2 |
+| 背诵规则（听词默写 / 看词选意 / 两轮 / 表格） | 两轮已实现 | **改造 + 新增**（两轮复用；听词默写 / 表格背诵新增） | M2 |
+| 单词详情（发音 / 音标 / 释义 / 例句 / 形近 / 近义 / 反义） | 无；近义词 `SIMILAR_WORDS_DB` 已有 2 组 | **新增 + 复用**（近义复用；形近 / 反义补数据） | M2 |
+| 学习配置（自定义当日数量 / 打卡） | 打卡 checkin.api 已有；无数量配置 | **改造 + 复用** | M2 |
+| 云养猫（精简版：首页陪伴 / 得币 / 音效 / 看板页） | 无 | **新增**（核心闭环随学习首页落地） | M2 + M5 |
+| 内置词书（列表 / 词条 / 订阅） | `wordbooks.api` 已封装但未接入 | **新增**（需词书数据源） | M2 |
+| 词库管理（CRUD / 导入导出 / 去重） | 完整实现 | **直接复用** | — |
+| 学习记录（记录 / 掌握度 / 结果报告） | statsStore + ResultReview 已有 | **复用 + 接同步** | M1 |
+| 仪表盘（统计 / 打卡 / 成就 / 趋势） | 完整实现 | **复用（降级为次级页）** | — |
+| 云端同步（词库 + 学习记录） | 无 | **新增**（本地优先 + lastSyncAt 增量） | M1 |
+| PWA（manifest + SW + 可安装 + 离线） | 无（public 仅有 favicon） | **新增** | M3 |
+
+### 10.3 缺口识别（资源与技术差距）
+
+| # | 缺口 | 现状 | 应对方案 | 需就绪 |
+|---|---|---|---|---|
+| 1 | TTS 发音（听词默写 / 单词详情） | 无 TTS 实现；词条无音标数据 | Web Speech API 起步 + 规则判定；音标数据随词书补充 | M2 |
+| 2 | 内置词书数据源 | 无词书数据；仅自建词库 | 从公开大纲词表整理，先一本可用词书起步 | M2 前 |
+| 3 | 猫咪形象 / 动画 / 音效资产 | 无任何猫咪资产 | AI 生成形象（Seedream）+ CSS/SVG 待机动画；音效用 Web Audio 合成或短音频 | M2 |
+| 4 | textbooks / sync 后端接口 | 契约已定义（§6.3 / §6.4），`paths.ts` 未加 | 前端 mock 先行，后端后续补充 | M1 |
+| 5 | 登录门禁 / 路由保护 | 无路由库；Tab 切换 | App 层基于 `isAuthenticated` 拦截；可选引入 react-router | M1 |
+| 6 | 学习记录双轨 | `learningStore`（localforage）与 `learningApi` 未打通 | 统一走同步引擎，`learningStore` 改为本地缓存层 | M1 |
+| 7 | 形近词 / 反义词数据 | 近义 `SIMILAR_WORDS_DB` 仅 2 组 | 规则生成或随词书补充数据 | M2 |
+| 8 | PWA 缓存更新 | 无 SW | SW 版本管理 + 更新提示 | M3 |
+
+### 10.4 基线验证
+
+- [x] `tsc -b` 通过（零错误）
+- [x] `vite build` 通过（1974 模块，4.00s，零错误）
+- [x] 复用清单 / 需求映射 / 缺口识别已确认（见上）
+- 结论：**M0 出口标准「清单确认，无回归」达成**，可进入 M1。
