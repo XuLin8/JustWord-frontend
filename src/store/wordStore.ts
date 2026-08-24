@@ -2,6 +2,7 @@
 import { create } from 'zustand'
 import type { Word, OperationResult, ImportResult, WordMetadata } from '../types'
 import { wordsApi, type WordResponse } from '../api'
+import i18n from '@/i18n'
 
 // ============ 辅助函数：API 响应 → 前端 Word ============
 function toWord(response: WordResponse): Word {
@@ -109,7 +110,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       return { success: true }
     } catch (error: any) {
       console.error('删除失败:', error)
-      return { success: false, message: error.message || '删除失败，请重试' }
+      return { success: false, message: error.message || i18n.t('word.deleteFailedRetry') }
     }
   },
 
@@ -193,7 +194,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
       return { success: true }
     } catch (error: any) {
       console.error('清空失败:', error)
-      return { success: false, message: error.message || '清空失败，请重试' }
+      return { success: false, message: error.message || i18n.t('word.clearFailedRetry') }
     }
   },
 
@@ -246,13 +247,13 @@ export const useWordStore = create<WordStore>((set, get) => ({
     if (failed > 0) {
       return {
         success: removed > 0,
-        message: `去重完成：删除 ${removed} 个重复项，失败 ${failed} 个`,
+        message: i18n.t('word.dedupPartial', { removed, failed }),
         removed,
       }
     }
     return {
       success: true,
-      message: `去重完成：共删除 ${removed} 个重复项（保留最新一条）`,
+      message: i18n.t('word.dedupDone', { removed }),
       removed,
     }
   },

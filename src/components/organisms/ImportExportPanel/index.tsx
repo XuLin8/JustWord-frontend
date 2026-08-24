@@ -1,5 +1,6 @@
 // src/components/organisms/ImportExportPanel/index.tsx
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../../store/wordStore'
 import { useUIStore } from '../../../store/uiStore'
 import { exportToJSON, exportToCSV } from '../../../utils/helpers'
@@ -13,6 +14,7 @@ interface ImportExportPanelProps {
 export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   onImportComplete,
 }) => {
+  const { t } = useTranslation()
   const { words, importWords, clearAllWords } = useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
   const [isImporting, setIsImporting] = useState(false)
@@ -23,16 +25,16 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   // 导出 JSON
   const handleExportJSON = () => {
     if (words.length === 0) {
-      showToast('词库为空，没有可导出的数据', 'warning')
+      showToast(t('importExport.emptyWarning'), 'warning')
       return
     }
     setIsExporting(true)
     try {
       exportToJSON(words)
-      showToast(`成功导出 ${words.length} 个单词`, 'success')
+      showToast(t('importExport.exportSuccess', { count: words.length }), 'success')
     } catch (error) {
       console.error('导出失败:', error)
-      showToast('导出失败，请重试', 'error')
+      showToast(t('importExport.exportFailed'), 'error')
     } finally {
       setIsExporting(false)
     }
@@ -41,16 +43,16 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   // 导出 CSV
   const handleExportCSV = () => {
     if (words.length === 0) {
-      showToast('词库为空，没有可导出的数据', 'warning')
+      showToast(t('importExport.emptyWarning'), 'warning')
       return
     }
     setIsExporting(true)
     try {
       exportToCSV(words)
-      showToast(`成功导出 ${words.length} 个单词`, 'success')
+      showToast(t('importExport.exportSuccess', { count: words.length }), 'success')
     } catch (error) {
       console.error('导出失败:', error)
-      showToast('导出失败，请重试', 'error')
+      showToast(t('importExport.exportFailed'), 'error')
     } finally {
       setIsExporting(false)
     }
@@ -70,7 +72,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         const importedData = JSON.parse(content)
 
         if (!Array.isArray(importedData)) {
-          showToast('无效的 JSON 格式：数据必须是数组', 'error')
+          showToast(t('importExport.invalidJson'), 'error')
           return
         }
 
@@ -80,20 +82,20 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         )
 
         if (validWords.length === 0) {
-          showToast('没有找到有效的单词数据（需要 english 和 chinese 字段）', 'error')
+          showToast(t('importExport.noValidWordsJson'), 'error')
           return
         }
 
         const result = await importWords(validWords)
         if (result.success) {
-          showToast(result.message ?? '导入成功', 'success')
+          showToast(result.message ?? t('importExport.importSuccess'), 'success')
           if (onImportComplete) onImportComplete()
         } else {
-          showToast(result.message ?? '导入失败', 'warning')
+          showToast(result.message ?? t('importExport.importFailed'), 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
-        showToast('导入失败：请检查 JSON 格式是否正确', 'error')
+        showToast(t('importExport.importJsonError'), 'error')
       } finally {
         setIsImporting(false)
         if (jsonInputRef.current) {
@@ -103,7 +105,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
     }
 
     reader.onerror = () => {
-      showToast('读取文件失败', 'error')
+      showToast(t('importExport.readFileFailed'), 'error')
       setIsImporting(false)
     }
 
@@ -135,7 +137,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         const lines = content.split('\n').filter(line => line.trim())
 
         if (lines.length < 2) {
-          showToast('CSV 文件格式无效：至少需要标题行和一行数据', 'error')
+          showToast(t('importExport.invalidCsv'), 'error')
           return
         }
 
@@ -180,7 +182,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         )
 
         if (englishIndex === -1 || chineseIndex === -1) {
-          showToast('CSV 格式无效：请确保包含 "英文" 和 "中文" 列', 'error')
+          showToast(t('importExport.invalidCsvColumns'), 'error')
           return
         }
 
@@ -196,20 +198,20 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         }
 
         if (wordsToImport.length === 0) {
-          showToast('没有找到有效的单词数据', 'error')
+          showToast(t('importExport.noValidWordsCsv'), 'error')
           return
         }
 
         const result = await importWords(wordsToImport)
         if (result.success) {
-          showToast(result.message ?? '导入成功', 'success')
+          showToast(result.message ?? t('importExport.importSuccess'), 'success')
           if (onImportComplete) onImportComplete()
         } else {
-          showToast(result.message ?? '导入失败', 'warning')
+          showToast(result.message ?? t('importExport.importFailed'), 'warning')
         }
       } catch (error) {
         console.error('导入失败:', error)
-        showToast('导入失败：请检查 CSV 格式是否正确', 'error')
+        showToast(t('importExport.importCsvError'), 'error')
       } finally {
         setIsImporting(false)
         if (csvInputRef.current) {
@@ -219,7 +221,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
     }
 
     reader.onerror = () => {
-      showToast('读取文件失败', 'error')
+      showToast(t('importExport.readFileFailed'), 'error')
       setIsImporting(false)
     }
 
@@ -228,17 +230,17 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
 
   const handleClearAll = () => {
     openConfirmDialog({
-      title: '清空词库',
-      description: `确定要删除全部 ${words.length} 个单词吗？此操作不可撤销！`,
-      confirmText: '全部删除',
-      cancelText: '取消',
+      title: t('importExport.clearTitle'),
+      description: t('importExport.clearDesc', { count: words.length }),
+      confirmText: t('importExport.clearConfirm'),
+      cancelText: t('common.cancel'),
       confirmVariant: 'danger',
       onConfirm: async () => {
         const result = await clearAllWords()
         if (result.success) {
-          showToast('已清空所有单词', 'success')
+          showToast(t('importExport.clearSuccess'), 'success')
         } else {
-          showToast(result.message ?? '清空失败', 'error')
+          showToast(result.message ?? t('importExport.importFailed'), 'error')
         }
       },
     })
@@ -247,14 +249,14 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   return (
     <div className="import-export-panel">
       <div className="ie-header">
-        <span className="ie-title">📦 词库管理</span>
-        <span className="ie-count">共 {words.length} 个单词</span>
+        <span className="ie-title">{t('importExport.title')}</span>
+        <span className="ie-count">{t('word.footerCount', { count: words.length })}</span>
       </div>
 
       <div className="ie-actions">
         {/* 导出 */}
         <div className="ie-group">
-          <span className="ie-label">导出</span>
+          <span className="ie-label">{t('importExport.export')}</span>
           <div className="ie-buttons">
             <Button size="sm" variant="secondary" onClick={handleExportJSON} disabled={isExporting || words.length === 0}>
               📄 JSON
@@ -267,7 +269,7 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
 
         {/* 导入 */}
         <div className="ie-group">
-          <span className="ie-label">导入</span>
+          <span className="ie-label">{t('importExport.import')}</span>
           <div className="ie-buttons">
             <label className="file-label">
               📄 JSON
@@ -297,13 +299,13 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         {/* 清空 */}
         <div className="ie-group ie-danger">
           <Button variant="danger" size="sm" onClick={handleClearAll} disabled={words.length === 0}>
-            🗑️ 清空词库
+            {t('importExport.clearAll')}
           </Button>
         </div>
       </div>
 
-      {isImporting && <div className="ie-status">⏳ 导入中...</div>}
-      {isExporting && <div className="ie-status">⏳ 导出中...</div>}
+      {isImporting && <div className="ie-status">{t('importExport.importing')}</div>}
+      {isExporting && <div className="ie-status">{t('importExport.exporting')}</div>}
     </div>
   )
 }
