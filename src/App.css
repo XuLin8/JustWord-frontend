@@ -32,7 +32,7 @@
 /* 卡片底壳 —— 毛玻璃 + 软阴影 + 大圆角 */
 .surface {
   background: var(--card-glass-3);
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border);
   border-radius: var(--br-xl);
   box-shadow: var(--shadow-card-rest);
   backdrop-filter: saturate(180%) blur(22px);
@@ -92,4 +92,12 @@
 @keyframes tab-panel-in {
   0%   { opacity: 0; transform: translate3d(8px, 0, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0);   }
+}
+
+/* 懒加载页面 fallback：居中显示 Spinner */
+.tab-panel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 180px);
 }

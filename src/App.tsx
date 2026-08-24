@@ -1,14 +1,10 @@
 // src/App.tsx
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import { useStatsStore } from './store/statsStore'
 import { useSyncStore } from './store/syncStore'
 import { useAuth } from './context/AuthContext'
 import { Layout } from './components/templates/Layout'
-import { DashboardPage } from './pages/DashboardPage'
-import { WordBookPage } from './pages/WordBookPage'
-import { LearningHomePage } from './pages/LearningHomePage'
-import { ProfilePage } from './pages/ProfilePage'
 import { LoginGate } from './pages/LoginGate'
 import { AuthModal } from './components/organisms/AuthModal'
 import { ImportExportPanel } from './components/organisms/ImportExportPanel'
@@ -23,6 +19,20 @@ import { ThemeSwitcher } from './components/atoms/ThemeSwitcher'
 import { LanguageSwitcher } from './components/atoms/LanguageSwitcher'
 import type { AppTab } from './components/templates/Layout/AppHeader'
 import './App.css'
+
+// M4-D 性能代码分割：四个 Tab 页面按需懒加载，降低首屏 JS 体积
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage }))
+)
+const WordBookPage = lazy(() =>
+  import('./pages/WordBookPage').then((m) => ({ default: m.WordBookPage }))
+)
+const LearningHomePage = lazy(() =>
+  import('./pages/LearningHomePage').then((m) => ({ default: m.LearningHomePage }))
+)
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage }))
+)
 
 function App() {
   const shell = useAppShell()
@@ -133,20 +143,28 @@ function App() {
           <ImportExportPanel onImportComplete={handleImportComplete} />
         )}
 
-        {shell.activeTab === 'home' && (
-          <div key="home" className="tab-panel">
-            <LearningHomePage onGoWordbook={() => shell.setTab('word')} />
-          </div>
-        )}
-        {shell.activeTab === 'word' && (
-          <div key="word" className="tab-panel"><WordBookPage /></div>
-        )}
-        {shell.activeTab === 'stats' && (
-          <div key="stats" className="tab-panel"><DashboardPage /></div>
-        )}
-        {shell.activeTab === 'profile' && (
-          <div key="profile" className="tab-panel"><ProfilePage /></div>
-        )}
+        <Suspense
+          fallback={
+            <div className="tab-panel tab-panel-loading">
+              <Spinner size="lg" />
+            </div>
+          }
+        >
+          {shell.activeTab === 'home' && (
+            <div key="home" className="tab-panel">
+              <LearningHomePage onGoWordbook={() => shell.setTab('word')} />
+            </div>
+          )}
+          {shell.activeTab === 'word' && (
+            <div key="word" className="tab-panel"><WordBookPage /></div>
+          )}
+          {shell.activeTab === 'stats' && (
+            <div key="stats" className="tab-panel"><DashboardPage /></div>
+          )}
+          {shell.activeTab === 'profile' && (
+            <div key="profile" className="tab-panel"><ProfilePage /></div>
+          )}
+        </Suspense>
       </Layout>
 
       <ToastContainer />

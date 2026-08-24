@@ -61,6 +61,29 @@ export default defineConfig({
       devOptions: { enabled: false },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // M4-D 性能优化：将跨页面共享的 vendor 依赖拆分为独立 chunk，
+        // 提升浏览器缓存命中率并降低首屏 index.js 体积
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return undefined
+          // 注意判断顺序：先命中更具体的包，避免 react-i18next 等被误分
+          if (
+            id.includes('@radix-ui') ||
+            id.includes('class-variance-authority') ||
+            id.includes('clsx') ||
+            id.includes('tailwind-merge')
+          ) return 'vendor-ui'
+          if (id.includes('i18next')) return 'vendor-i18n'
+          if (id.includes('zustand') || id.includes('localforage')) return 'vendor-state'
+          if (id.includes('lucide-react')) return 'vendor-lucide'
+          if (id.includes('node_modules/react') || id.includes('node_modules/scheduler')) return 'vendor-react'
+          return undefined
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src'),
