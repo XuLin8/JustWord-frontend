@@ -1,11 +1,17 @@
-/* src/index.css — Apple-style global base */
-:root {
-  color-scheme: light;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-size-adjust: 100%;
+/* src/index.css — global base. Tailwind + shadcn theme live in styles/globals.css */
+@import './styles/reset.css';
+@import './styles/variables.css';
+@import './styles/globals.css';
+
+@layer base {
+  :root {
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
 }
 
 html, body, #root {
