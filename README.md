@@ -140,6 +140,43 @@ ui（shadcn）► 独立基础层，被任意上层引用，但自身不依赖�
 4. 设计令牌统一在 `styles/variables.css` 与 `styles/globals.css` 中定义，**组件内禁止硬编码颜色/圆角/阴影数字**。
 5. Tailwind 工具类仅在组件内使用；鉴于是 CSS-first，全局主题在 `globals.css` 用 `@theme` 扩展。
 
+### 设计令牌（Design Tokens）规约
+
+> 视觉样式一律通过 **CSS 变量（token）** 表达，禁止在组件内硬编码颜色 / 圆角 / 阴影 / 间距数字。
+> 令牌采用 **"原语 → 语义 → 组件/工具" 三层金字塔**，命名与存放位置有强制约定。
+
+**三层结构**
+
+```
+ 原语 Primitive   存于 styles/variables.css   单一来源（只读，不在组件直接消费）
+   --color-blue-600  --space-4  --radius-12  --shadow-3  --dur-220
+
+      │  语义层通过 var() 引用原语，随主题（light/dark）切换
+      ▼
+ 语义 Semantic    存于 styles/globals.css    组件统一消费入口
+   --primary  --background  --card  --foreground  --border  --ring
+
+      ▼
+ 组件 / 工具       存于各组件 CSS / variables.css 工具类
+   .btn  .card  .glass  .lift  .metric-*    只管组装、不再定义底层数值
+```
+
+**token 命名规则**
+
+| 层级 | 命名模式 | 示例 | 说明 |
+|------|----------|------|------|
+| 原语 | `<类别>-<值>` | `--color-blue-600` / `--space-4` / `--radius-12` / `--dur-220` | 值即名称，**不含业务含义** |
+| 语义 | `--<角色>` | `--primary` / `--surface` / `--text-muted` / `--card` | 含义是"用途"而非具体颜色 |
+| 组件/工具 | `.<类名>` | `.btn` / `.card` / `.glass` / `.lift` | 组装的唯一出口 |
+
+**强制性约定（红线）**
+1. **原语只存 `variables.css`，语义只存 `globals.css`**，二者不得互相重复定义同名 token（历史上 `--radius-md`、`--color-primary` 曾两文件同名冲突，值被无声覆盖——禁止再次发生）。
+2. 全局语义 token（shadcn 的 `--primary` / `--background` / `--card` 等）统一走 `globals.css` 的 `:root`/`.dark`，并让它们 `var()` 引用 `variables.css` 原语，保证单一数据源。
+3. `--radius-*` 圆角族：原语取**绝对值**（`--radius-12px`），语义圆角由 `globals.css` 计算派生，避免原语/语义同名互相覆盖。
+4. 组件不得直接引用语义层之外的裸值；需要新视觉值先补进原语 / 语义层，而非写进组件。
+5. Dark / light 主题只改**语义层**，原语层保持恒定。
+6. 新增 token 前先检查 `variables.css`/`globals.css` 是否已有等价定义，优先复用而非新增。
+
 ### 编码约定（简版）
 
 - 组件内不产生随机/不纯调用（`Date.now()`、`Math.random()` 等）放在 `useMemo` 或事件处理器中。
