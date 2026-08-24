@@ -1,10 +1,12 @@
 // src/components/templates/Layout/AppFooter.tsx
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface AppFooterProps {
   wordCount: number
 }
 
 export const AppFooter: React.FC<AppFooterProps> = ({ wordCount }) => {
-  return <footer className="app-footer">共 {wordCount} 个单词</footer>
+  const { t } = useTranslation()
+  return <footer className="app-footer">{t('word.footerCount', { count: wordCount })}</footer>
 }

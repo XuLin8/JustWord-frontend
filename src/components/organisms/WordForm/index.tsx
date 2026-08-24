@@ -1,5 +1,6 @@
 // src/components/organisms/WordForm/index.tsx
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Input } from '../../atoms/Input'
 import { Button } from '../../atoms/Button'
 import { isValidEnglish, isValidChinese } from '../../../utils/validation'
@@ -15,6 +16,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const { showToast } = useUIStore()
+  const { t } = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,30 +26,30 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
     const trimmedChinese = chinese.trim()
 
     if (!trimmedEnglish) {
-      setError('请输入英文单词')
+      setError(t('word.emptyEnglish'))
       return
     }
     if (!trimmedChinese) {
-      setError('请输入中文释义')
+      setError(t('word.emptyChinese'))
       return
     }
     if (!isValidEnglish(trimmedEnglish)) {
-      setError('英文只能包含字母、空格、连字符和撇号')
+      setError(t('word.invalidEnglish'))
       return
     }
     if (!isValidChinese(trimmedChinese)) {
-      setError('请输入中文释义')
+      setError(t('word.invalidChinese'))
       return
     }
 
     setIsSubmitting(true)
     try {
       await onSubmit(trimmedEnglish, trimmedChinese)
-      showToast('单词添加成功', 'success')
+      showToast(t('word.addSuccess'), 'success')
       setEnglish('')
       setChinese('')
     } catch (err: any) {
-      showToast(err.message || '添加失败', 'error')
+      showToast(err.message || t('word.addFailed'), 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -59,7 +61,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
         <Input
           id="add-english"
           name="english"
-          placeholder="英文单词 (仅字母)"
+          placeholder={t('word.englishPlaceholder')}
           value={english}
           onChange={(e) => {
             const filtered = e.target.value.replace(/[^a-zA-Z\s\-']/g, '')
@@ -72,7 +74,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
         <Input
           id="add-chinese"
           name="chinese"
-          placeholder="中文释义"
+          placeholder={t('word.chinesePlaceholder')}
           value={chinese}
           onChange={(e) => setChinese(e.target.value)}
           autoComplete="off"
@@ -80,7 +82,7 @@ export const WordForm: React.FC<WordFormProps> = ({ onSubmit }) => {
           fullWidth
         />
         <Button type="submit" loading={isSubmitting}>
-          添加
+          {t('word.add')}
         </Button>
       </div>
       {error && <div className="text-sm text-destructive">{error}</div>}

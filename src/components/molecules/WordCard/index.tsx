@@ -1,5 +1,6 @@
 // src/components/molecules/WordCard/index.tsx
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../../atoms/Button'
 import { Input } from '../../atoms/Input'
 import type { Word } from '../../../types'
@@ -20,6 +21,7 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { showToast, openConfirmDialog } = useUIStore()
+  const { t } = useTranslation()
 
   const handleStartEdit = () => {
     setIsEditing(true)
@@ -38,29 +40,29 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
     const trimmedChinese = editChinese.trim()
 
     if (!trimmedEnglish) {
-      showToast('英文单词不能为空', 'warning')
+      showToast(t('word.editEnglishEmpty'), 'warning')
       return
     }
     if (!trimmedChinese) {
-      showToast('中文释义不能为空', 'warning')
+      showToast(t('word.editChineseEmpty'), 'warning')
       return
     }
     if (!isValidEnglish(trimmedEnglish)) {
-      showToast('英文只能包含字母、空格、连字符和撇号', 'warning')
+      showToast(t('word.invalidEnglish'), 'warning')
       return
     }
     if (!isValidChinese(trimmedChinese)) {
-      showToast('请输入中文释义', 'warning')
+      showToast(t('word.invalidChinese'), 'warning')
       return
     }
 
     setIsSubmitting(true)
     try {
       await onUpdate(word.id, trimmedEnglish, trimmedChinese)
-      showToast('单词更新成功', 'success')
+      showToast(t('word.updateSuccess'), 'success')
       setIsEditing(false)
     } catch (err: any) {
-      showToast(err.message || '更新失败', 'error')
+      showToast(err.message || t('word.updateFailed'), 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -68,17 +70,17 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
 
   const handleDelete = () => {
     openConfirmDialog({
-      title: '删除单词',
-      description: `确定要删除单词「${word.english}」吗？此操作不可撤销。`,
-      confirmText: '删除',
-      cancelText: '取消',
+      title: t('word.deleteTitle'),
+      description: t('word.deleteConfirm', { word: word.english }),
+      confirmText: t('word.deleteConfirmText'),
+      cancelText: t('word.cancel'),
       confirmVariant: 'danger',
       onConfirm: async () => {
         try {
           await onDelete(word.id)
-          showToast('单词删除成功', 'success')
+          showToast(t('word.deleteSuccess'), 'success')
         } catch (err: any) {
-          showToast(err.message || '删除失败', 'error')
+          showToast(err.message || t('word.deleteFailed'), 'error')
         }
       },
     })
@@ -91,20 +93,20 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
           <Input
             value={editEnglish}
             onChange={(e) => setEditEnglish(e.target.value)}
-            placeholder="英文"
+            placeholder={t('word.english')}
             disabled={isSubmitting}
           />
           <Input
             value={editChinese}
             onChange={(e) => setEditChinese(e.target.value)}
-            placeholder="中文"
+            placeholder={t('word.chinese')}
             disabled={isSubmitting}
           />
           <Button onClick={handleSaveEdit} loading={isSubmitting}>
-            保存
+            {t('word.save')}
           </Button>
           <Button variant="ghost" onClick={handleCancelEdit}>
-            取消
+            {t('word.cancel')}
           </Button>
         </div>
       </div>
@@ -120,10 +122,10 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
       </div>
       <div className="word-card-actions">
         <Button variant="secondary" size="sm" onClick={handleStartEdit}>
-          编辑
+          {t('word.edit')}
         </Button>
         <Button variant="danger" size="sm" onClick={handleDelete}>
-          删除
+          {t('word.delete')}
         </Button>
       </div>
     </div>

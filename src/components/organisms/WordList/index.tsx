@@ -1,5 +1,6 @@
 // src/components/organisms/WordList/index.tsx
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { WordCard } from '../../molecules/WordCard'
 import { Spinner } from '../../atoms/Spinner'
 import type { Word } from '../../../types'
@@ -18,17 +19,19 @@ export const WordList: React.FC<WordListProps> = ({
   onDelete,
   onUpdate,
 }) => {
+  const { t } = useTranslation()
+
   if (loading) {
     return (
       <div className="word-list-loading">
         <Spinner size="lg" />
-        <p>加载中...</p>
+        <p>{t('word.loading')}</p>
       </div>
     )
   }
 
   if (words.length === 0) {
-    return <p className="word-list-empty">还没有单词，添加一个吧！</p>
+    return <p className="word-list-empty">{t('word.emptyList')}</p>
   }
 
   return (

@@ -1,6 +1,7 @@
 // src/components/molecules/CorrectnessDonut/index.tsx
 // 作答正确率圆环图（纯 CSS conic-gradient）。样式类沿用 Dashboard 视觉。
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface CorrectnessDonutProps {
   rate: number
@@ -8,6 +9,7 @@ interface CorrectnessDonutProps {
 }
 
 export const CorrectnessDonut: React.FC<CorrectnessDonutProps> = ({ rate, loading }) => {
+  const { t } = useTranslation()
   const pct = Math.max(0, Math.min(100, Math.round((rate || 0) * 100)))
   const deg = Math.round((rate || 0) * 360)
   return (
@@ -23,7 +25,7 @@ export const CorrectnessDonut: React.FC<CorrectnessDonutProps> = ({ rate, loadin
       >
         <div className="donut-hole">
           <span className="donut-value">{loading ? '—' : `${pct}%`}</span>
-          <small>正确率</small>
+          <small>{t('dashboard.accuracy')}</small>
         </div>
       </div>
     </div>
