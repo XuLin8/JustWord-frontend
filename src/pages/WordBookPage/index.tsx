@@ -1,5 +1,5 @@
 // src/pages/WordBookPage/index.tsx
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
@@ -12,12 +12,16 @@ import './WordBookPage.css'
 
 type DifficultyFilter = 0 | 1 | 2 | 3 | 4 | 5
 
+/** 词列表每页条数（订阅导入可能数千条，分页避免一次性全量渲染） */
+const PAGE_SIZE = 50
+
 export const WordBookPage: React.FC = () => {
   const { t } = useTranslation()
   const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate, loadWords } =
     useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
   const [difficulty, setDifficulty] = useState<DifficultyFilter>(0)
+  const [page, setPage] = useState(1)
 
   const overview = useMemo(() => {
     const total = words.length
@@ -66,6 +70,36 @@ export const WordBookPage: React.FC = () => {
     }
     return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6)
   }, [filteredWords])
+
+  // 筛选条件变化时回到第一页
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, difficulty])
+
+  // ============ 分页（每页 50 条） ============
+  const totalPages = Math.max(1, Math.ceil(filteredWords.length / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const paginatedWords = useMemo(() => {
+    const start = (safePage - 1) * PAGE_SIZE
+    return filteredWords.slice(start, start + PAGE_SIZE)
+  }, [filteredWords, safePage])
+
+  // 页码窗口：1 … (current-1..current+1) … total
+  const pageNumbers = useMemo<(number | '…')[]>(() => {
+    const nums: (number | '…')[] = []
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) nums.push(i)
+      return nums
+    }
+    const start = Math.max(2, safePage - 1)
+    const end = Math.min(totalPages - 1, safePage + 1)
+    nums.push(1)
+    if (start > 2) nums.push('…')
+    for (let i = start; i <= end; i++) nums.push(i)
+    if (end < totalPages - 1) nums.push('…')
+    nums.push(totalPages)
+    return nums
+  }, [totalPages, safePage])
 
   const handleAddWord = async (english: string, chinese: string): Promise<void> => {
     const result = await addWord(english, chinese)
@@ -224,11 +258,51 @@ export const WordBookPage: React.FC = () => {
       </div>
 
       <WordList
-        words={filteredWords}
+        words={paginatedWords}
         loading={loading}
         onDelete={handleDeleteWord}
         onUpdate={handleUpdateWord}
       />
+
+      {totalPages > 1 && (
+        <div className="wb-pagination" aria-label={t('wordbook.pagination', { page: safePage, pages: totalPages })}>
+          <button
+            className="wb-pg-btn"
+            disabled={safePage <= 1}
+            onClick={() => setPage(safePage - 1)}
+            type="button"
+          >
+            {t('textbooks.prev')}
+          </button>
+          {pageNumbers.map((p, i) =>
+            p === '…' ? (
+              <span key={`e${i}`} className="wb-pg-ellipsis" aria-hidden>
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                className={`wb-pg-num ${safePage === p ? 'wb-pg-active' : ''}`}
+                onClick={() => setPage(p)}
+                type="button"
+              >
+                {p}
+              </button>
+            ),
+          )}
+          <button
+            className="wb-pg-btn"
+            disabled={safePage >= totalPages}
+            onClick={() => setPage(safePage + 1)}
+            type="button"
+          >
+            {t('textbooks.next')}
+          </button>
+          <span className="wb-pg-info">
+            {t('wordbook.pagination', { page: safePage, pages: totalPages })}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -379,3 +379,86 @@
   font-size: 11px;
   box-shadow: inset 0 0 0 0.5px rgba(175, 82, 222, 0.2);
 }
+
+/* ============ 分页器（每页 50 条） ============ */
+.wb-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border, rgba(0,0,0,0.06));
+}
+.wb-pg-btn {
+  padding: 6px 14px;
+  border-radius: var(--br-pill);
+  border: 0.5px solid var(--color-border, rgba(0,0,0,0.08));
+  background: var(--color-fill-tertiary, rgba(120,120,128,0.08));
+  color: var(--color-label, #1d1d1f);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-spring-soft),
+    background-color var(--dur-fast),
+    opacity var(--dur-fast);
+  line-height: 1;
+}
+.wb-pg-btn:hover:not(:disabled) {
+  background: var(--color-fill-secondary, rgba(120,120,128,0.16));
+  transform: translateY(-1px);
+}
+.wb-pg-btn:active:not(:disabled) { transform: scale(0.96); }
+.wb-pg-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.wb-pg-num {
+  min-width: 32px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--br-pill);
+  border: 0.5px solid transparent;
+  background: transparent;
+  color: var(--color-label-secondary, #6e6e73);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-spring-soft),
+    background-color var(--dur-fast),
+    color var(--dur-fast);
+  line-height: 1;
+}
+.wb-pg-num:hover {
+  background: var(--color-fill-secondary, rgba(120,120,128,0.16));
+  color: var(--color-label, #1d1d1f);
+}
+.wb-pg-num:active { transform: scale(0.94); }
+.wb-pg-active {
+  background: linear-gradient(135deg,
+              var(--apple-blue) 0%,
+              var(--apple-indigo) 100%);
+  color: var(--card-glass-2, #fff);
+  border-color: transparent;
+  box-shadow: 0 2px 8px -2px rgba(0, 122, 255, 0.5);
+  font-weight: var(--font-weight-semibold);
+}
+.wb-pg-ellipsis {
+  color: var(--color-label-tertiary, #a0a0a5);
+  padding: 0 2px;
+  user-select: none;
+}
+.wb-pg-info {
+  margin-left: 8px;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary, #6e6e73);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .wb-pg-info { display: none; }
+}
