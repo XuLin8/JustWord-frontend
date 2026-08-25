@@ -293,6 +293,27 @@
       "wrong": "Mistakes"
     }
   },
+  "viz": {
+    "title": "Learning Insights",
+    "radarTitle": "6-Dimension Radar",
+    "radarSub": "Last 30 days performance",
+    "radarEmpty": "No ability data yet, learn a few days and check back",
+    "heatTitle": "Learning Heatmap",
+    "heatSub": "Daily attempts over the past year",
+    "heatEmpty": "No daily data yet, answer some questions in learn mode",
+    "curveTitle": "Memory Curve",
+    "curveSub": "EF easiness factor over time",
+    "curveSelectLabel": "Select word",
+    "curveSelectPlaceholder": "Pick a word",
+    "curveEmpty": "No snapshots for this word yet",
+    "curveHint": "SM-2 snapshots are recorded as you answer, the curve will grow",
+    "dimAccuracy": "Accuracy",
+    "dimVolume": "Volume",
+    "dimFocus": "Focus",
+    "dimReview": "Review",
+    "dimStreak": "Streak",
+    "dimMastery": "Mastery"
+  },
   "wordbook": {
     "totalLabel": "Total words",
     "uniqueLabel": "Unique",

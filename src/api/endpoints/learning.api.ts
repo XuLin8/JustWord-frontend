@@ -134,6 +134,20 @@ export interface DailyStatsResponse {
   items: DailyStatItem[]
 }
 
+/** GET /stats/snapshots 单词 SM-2 调度快照历史（记忆曲线 EF 演变数据源） */
+export interface WordSnapshotItem {
+  captured_at: string | null
+  repetitions: number
+  interval_days: number
+  ef: number
+  next_review_at: string | null
+}
+
+export interface WordSnapshotsResponse {
+  word_id: string
+  items: WordSnapshotItem[]
+}
+
 export const learningApi = {
   createRecord: (data: CreateLearningRecordRequest) =>
     http.post<LearningRecordResponse>(API_PATH.learning.records, data),
@@ -199,6 +213,12 @@ export const learningApi = {
   /** 每日聚合统计（懒聚合回填；热力图/日历/趋势数据源） */
   getDailyStats: (days = 365) =>
     http.get<DailyStatsResponse>(`${API_PATH.learning.statsDaily}?days=${days}`),
+
+  /** 单词 SM-2 调度快照历史（记忆曲线 EF 演变数据源） */
+  getWordSnapshots: (wordId: string) =>
+    http.get<WordSnapshotsResponse>(
+      `${API_PATH.learning.statsSnapshots}?word_id=${encodeURIComponent(wordId)}`,
+    ),
 }
 
 // 兼容旧命名导出

@@ -24,6 +24,7 @@ export const API_PATH = {
     checkin: '/api/learning/checkin',
     sessions: '/api/learning/sessions',
     statsDaily: '/api/learning/stats/daily',
+    statsSnapshots: '/api/learning/stats/snapshots',
   },
   progress: '/api/progress',
   achievements: '/api/achievements',

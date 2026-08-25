@@ -14,6 +14,11 @@ import { TodoItem } from '../../components/atoms/TodoItem'
 import { MetricCard } from '../../components/molecules/MetricCard'
 import { CorrectnessDonut } from '../../components/molecules/CorrectnessDonut'
 import { TrendChart } from '../../components/molecules/TrendChart'
+import { AbilityRadar } from '../../components/organisms/DataViz/AbilityRadar'
+import { HeatmapChart } from '../../components/organisms/DataViz/HeatmapChart'
+import { MemoryCurve } from '../../components/organisms/DataViz/MemoryCurve'
+import { useVizStore } from '../../store/vizStore'
+import '../../components/organisms/DataViz/DataViz.css'
 import {
   RESULT_COLORS,
   getResultLabel,
@@ -43,10 +48,38 @@ export const DashboardPage: React.FC = () => {
   const { words } = useWordStore()
   const { isAuthenticated } = useAuth()
   const { showToast } = useUIStore()
+  const {
+    radar,
+    heat,
+    loadingDaily,
+    snapshots,
+    snapshotWordId,
+    loadingSnapshots,
+    loadDaily,
+    loadSnapshots,
+  } = useVizStore()
 
   useEffect(() => {
     if (isAuthenticated) refreshAll()
   }, [isAuthenticated, refreshAll])
+
+  // 数据可视化：每日聚合（雷达/热力图）
+  useEffect(() => {
+    if (isAuthenticated) loadDaily()
+  }, [isAuthenticated, loadDaily])
+
+  // 记忆曲线：首次进入自动选中第一个单词加载快照
+  useEffect(() => {
+    if (isAuthenticated && !snapshotWordId && words.length > 0) {
+      loadSnapshots(words[0].id)
+    }
+  }, [isAuthenticated, snapshotWordId, words, loadSnapshots])
+
+  // 记忆曲线选词器候选：按英文升序便于查找
+  const curveWords = useMemo(
+    () => [...words].sort((a, b) => a.english.localeCompare(b.english)),
+    [words],
+  )
 
   const totalWords = dashboard?.wordStats.total ?? words.length
   const masteredRate = totalWords > 0 ? (dashboard?.wordStats.mastered ?? 0) / totalWords : 0
@@ -369,6 +402,76 @@ export const DashboardPage: React.FC = () => {
               ))}
             </ul>
           )}
+        </div>
+      </section>
+
+      {/* ========== P2 数据可视化：雷达 / 热力图 / 记忆曲线 ========== */}
+      <section className="dash-viz-section">
+        <div className="dash-viz-head">
+          <h3 className="dash-viz-title">{t('viz.title')}</h3>
+        </div>
+        <div className="dash-viz-grid">
+          <div className="dash-card">
+            <div className="dash-card-head">
+              <h3 className="dash-card-title">{t('viz.radarTitle')}</h3>
+              <span className="dash-card-sub">{t('viz.radarSub')}</span>
+            </div>
+            {loadingDaily ? (
+              <Spinner size="sm" />
+            ) : radar.length === 0 ? (
+              <EmptyHint text={t('viz.radarEmpty')} />
+            ) : (
+              <AbilityRadar data={radar} />
+            )}
+          </div>
+
+          <div className="dash-card">
+            <div className="dash-card-head">
+              <h3 className="dash-card-title">{t('viz.heatTitle')}</h3>
+              <span className="dash-card-sub">{t('viz.heatSub')}</span>
+            </div>
+            {loadingDaily ? (
+              <Spinner size="sm" />
+            ) : heat.length === 0 ? (
+              <EmptyHint text={t('viz.heatEmpty')} />
+            ) : (
+              <HeatmapChart items={heat} />
+            )}
+          </div>
+
+          <div className="dash-card">
+            <div className="dash-card-head">
+              <h3 className="dash-card-title">{t('viz.curveTitle')}</h3>
+              <span className="dash-card-sub">{t('viz.curveSub')}</span>
+            </div>
+            <label className="viz-curve-select">
+              <span>{t('viz.curveSelectLabel')}</span>
+              <select
+                value={snapshotWordId ?? ''}
+                onChange={(e) => {
+                  const v = e.target.value
+                  if (v) loadSnapshots(v)
+                }}
+              >
+                <option value="" disabled>
+                  {t('viz.curveSelectPlaceholder')}
+                </option>
+                {curveWords.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.english} · {w.chinese}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {loadingSnapshots ? (
+              <Spinner size="sm" />
+            ) : snapshots.length === 0 ? (
+              <EmptyHint text={t('viz.curveEmpty')} />
+            ) : (
+              <MemoryCurve items={snapshots} />
+            )}
+            <p className="viz-curve-hint">{t('viz.curveHint')}</p>
+          </div>
         </div>
       </section>
     </div>

@@ -771,3 +771,67 @@
   padding-top: 3px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ================= P2 数据可视化：雷达 / 热力图 / 记忆曲线 ================= */
+.dash-viz-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+.dash-viz-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+.dash-viz-title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.015em;
+  color: var(--color-label);
+}
+.dash-viz-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+}
+@media (max-width: 900px) {
+  .dash-viz-grid { grid-template-columns: 1fr; }
+}
+.dash-viz-grid > .dash-card:nth-child(1) { animation-delay: 480ms; }
+.dash-viz-grid > .dash-card:nth-child(2) { animation-delay: 530ms; }
+.dash-viz-grid > .dash-card:nth-child(3) { animation-delay: 580ms; }
+
+/* 记忆曲线选词器 */
+.viz-curve-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+.viz-curve-select > span {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+  letter-spacing: var(--tracking-wide);
+}
+.viz-curve-select select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--br-md);
+  border: 0.5px solid var(--border);
+  background: var(--card-glass-3);
+  color: var(--color-label);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.viz-curve-select select:focus {
+  border-color: var(--apple-indigo);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--apple-indigo) 20%, transparent);
+}
+.viz-curve-hint {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+  line-height: 1.6;
+}

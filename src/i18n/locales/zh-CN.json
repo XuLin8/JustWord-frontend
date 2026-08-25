@@ -293,6 +293,27 @@
       "wrong": "错题"
     }
   },
+  "viz": {
+    "title": "学习可视化",
+    "radarTitle": "六维能力雷达",
+    "radarSub": "近 30 天综合表现",
+    "radarEmpty": "暂无能力数据，先学习几天再看看",
+    "heatTitle": "学习热力图",
+    "heatSub": "近一年每日作答量",
+    "heatEmpty": "暂无每日作答数据，去学习模式答题吧",
+    "curveTitle": "记忆曲线",
+    "curveSub": "单词 EF 易度因子演变",
+    "curveSelectLabel": "选择单词",
+    "curveSelectPlaceholder": "选择一个单词",
+    "curveEmpty": "该单词暂无快照数据",
+    "curveHint": "作答后系统会记录 SM-2 调度快照，曲线会逐步成型",
+    "dimAccuracy": "准确度",
+    "dimVolume": "词汇量",
+    "dimFocus": "专注度",
+    "dimReview": "复习比",
+    "dimStreak": "连续度",
+    "dimMastery": "掌握度"
+  },
   "wordbook": {
     "totalLabel": "单词总数",
     "uniqueLabel": "不重复",

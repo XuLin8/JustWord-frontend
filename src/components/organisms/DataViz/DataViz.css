@@ -1,0 +1,117 @@
+/* src/components/organisms/DataViz/DataViz.css
+   P2 数据可视化：六维雷达图 / GitHub 热力图 / EF 记忆曲线（明暗双态） */
+
+/* ===== 六维雷达图 ===== */
+.viz-radar-svg {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+.viz-radar-ring {
+  fill: none;
+  stroke: color-mix(in oklab, var(--apple-indigo) 14%, transparent);
+  stroke-width: 1;
+}
+.viz-radar-axis {
+  stroke: color-mix(in oklab, var(--apple-indigo) 18%, transparent);
+  stroke-width: 1;
+}
+.viz-radar-area {
+  fill: color-mix(in oklab, var(--apple-indigo) 26%, transparent);
+  stroke: var(--apple-indigo);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.viz-radar-dot {
+  fill: var(--apple-indigo);
+  stroke: var(--color-card);
+  stroke-width: 1.5;
+}
+.viz-radar-label {
+  fill: var(--color-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+.viz-radar-label-val {
+  fill: var(--color-label-secondary);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ===== GitHub 热力图 ===== */
+.viz-heat-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.viz-heat-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+}
+.viz-heat-month {
+  fill: var(--color-label-tertiary);
+  font-size: 9px;
+  font-weight: 600;
+}
+.viz-heat-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+}
+.viz-heat-cell.hv-0 { fill: var(--color-fill-tertiary); }
+.viz-heat-cell.hv-1 { fill: color-mix(in oklab, var(--apple-indigo) 26%, var(--color-fill-secondary)); }
+.viz-heat-cell.hv-2 { fill: color-mix(in oklab, var(--apple-indigo) 52%, var(--color-fill-secondary)); }
+.viz-heat-cell.hv-3 { fill: color-mix(in oklab, var(--apple-indigo) 76%, var(--color-fill-secondary)); }
+.viz-heat-cell.hv-4 { fill: var(--apple-indigo); }
+.viz-heat-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.viz-heat-legend .viz-heat-cell { display: inline-block; }
+.viz-heat-legend-text {
+  font-size: 10px;
+  color: var(--color-label-tertiary);
+}
+
+/* ===== EF 记忆曲线 ===== */
+.viz-curve-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.viz-curve-grid {
+  stroke: color-mix(in oklab, var(--apple-indigo) 12%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.viz-curve-ytick {
+  fill: var(--color-label-tertiary);
+  font-size: 10px;
+}
+.viz-curve-baseline {
+  stroke: color-mix(in oklab, var(--apple-orange) 55%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+}
+.viz-curve-baseline-label {
+  fill: color-mix(in oklab, var(--apple-orange) 80%, transparent);
+  font-size: 9px;
+  font-weight: 600;
+}
+.viz-curve-line {
+  fill: none;
+  stroke: var(--apple-indigo);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.viz-curve-dot {
+  fill: var(--apple-indigo);
+  stroke: var(--color-card);
+  stroke-width: 1.5;
+}
