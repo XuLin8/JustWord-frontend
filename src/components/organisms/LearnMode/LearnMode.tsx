@@ -6,7 +6,7 @@ import { useLearning } from '../../../hooks/useLearning'
 import { LearnMode as LearnModeEnum } from '../../../types/learning.types'
 import { useUIStore } from '../../../store/uiStore'
 import { useReviewStore } from '../../../store/reviewStore'
-import { useProgressStore } from '../../../store/progressStore'
+import { TodayProgressBar } from '../TodayProgressBar'
 import { useLearningSession } from '../../../hooks/useLearningSession'
 import type { PlanWord } from '../../../store/learningPlanStore'
 import EnglishToChinese from './EnglishToChinese'
@@ -24,7 +24,6 @@ export default function LearnMode({ onExit, words }: LearnModeProps) {
   const { t } = useTranslation()
   const { showToast } = useUIStore()
   const storeWords = useReviewStore((s) => s.todayWords)
-  const progressStore = useProgressStore()
   const [selectedMode, setSelectedMode] = useState<LearnModeEnum | null>(null)
 
   // 词序快照：进入模式时固定当日待学队列，两轮共用同一批词，不随提交移除而变化
@@ -96,26 +95,20 @@ export default function LearnMode({ onExit, words }: LearnModeProps) {
   }
 
   if (currentWord) {
-    // 顶部进度条 = 今日学习进度（已学/目标，后端为准），与其它模式共用
-    const todayProgress = Math.min(100, (progressStore.todayCorrect / Math.max(1, progressStore.dailyTarget)) * 100)
     return (
       <div className="learn-session">
         <div className="learn-header">
-          <div className="learn-progress">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${todayProgress}%` }}
-              />
-            </div>
-            <span>
+          {/* 今日学习进度（双段式：今日计划 + 超额完成），与其它模式共用 */}
+          <TodayProgressBar />
+          <div className="learn-meta">
+            <span className="learn-progress-count">
               {session?.questions.length || 0} / {session?.wordList.length || 0}
             </span>
-          </div>
-          <div className="learn-score">
-            ✅ {session?.score.correct || 0} 
-            ⚠️ {session?.score.partial || 0}
-            ❌ {session?.score.wrong || 0}
+            <div className="learn-score">
+              ✅ {session?.score.correct || 0} 
+              ⚠️ {session?.score.partial || 0}
+              ❌ {session?.score.wrong || 0}
+            </div>
           </div>
         </div>
 

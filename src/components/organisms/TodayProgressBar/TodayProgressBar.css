@@ -1,0 +1,49 @@
+/* src/components/organisms/TodayProgressBar/TodayProgressBar.css
+   今日学习进度条（双段式）：计划段(主题蓝) + 超额段(高亮橙)，占比始终从 0 正确填充 */
+.tp-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.tp-bar {
+  height: 6px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  overflow: hidden;
+}
+.tp-fill {
+  display: flex;
+  height: 100%;
+  border-radius: var(--br-pill);
+  overflow: hidden;
+  transition: width 360ms var(--ease-spring-soft);
+}
+.tp-seg {
+  display: block;
+  height: 100%;
+  flex: 0 0 auto;
+  border-radius: 0;
+  transition: width 360ms var(--ease-spring-soft);
+}
+.tp-seg.is-planned {
+  background-image: linear-gradient(90deg, var(--apple-blue), var(--apple-indigo));
+}
+.tp-seg.is-extra {
+  background-image: linear-gradient(90deg, var(--apple-orange), #ff9f0a);
+}
+.tp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-label-secondary);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.005em;
+}
+.tp-extra {
+  color: var(--apple-orange);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
