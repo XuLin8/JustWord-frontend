@@ -4,6 +4,7 @@ import { useTranslation, Trans } from 'react-i18next'
 import { AnswerResult } from '../../../types/learning.types'
 import type { LearningSession } from '../../../types/learning.types'
 import { getModeLabel } from '../../../utils/format'
+import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import i18n from '@/i18n'
 
 interface Props {
@@ -314,6 +315,8 @@ export default function ResultReview({ session, onRestart, onContinue, hasRound2
 
       {/* ========== 底部操作 ========== */}
       <div className="result-actions">
+        {/* 完成整轮（无第二轮可继续）时展示共用打卡按钮；中间过渡屏不展示 */}
+        {!(hasRound2 && accuracy >= 80) && <CheckinButton />}
         {hasRound2 && accuracy >= 80 ? (
           <button className="continue-btn" onClick={onContinue}>
             {t('learn.round2Cta')}

@@ -18,6 +18,7 @@ import { useCatStore } from '@/store/catStore'
 import { useFeatureStore } from '@/store/featureStore'
 import { usePreferenceStore } from '@/store/preferenceStore'
 import { useReviewStore } from '@/store/reviewStore'
+import { useLearningStore } from '@/store/learningStore'
 import './LearningHomePage.css'
 
 interface LearningHomePageProps {
@@ -40,6 +41,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
   const { recitationRule, setRecitationRule, loadPreferences } = usePreferenceStore()
   const { enrolledIds, textbooks, loadTextbooks } = useTextbookStore()
   const { todayWords, loadDue, loading, totalDue } = useReviewStore()
+  const loadRecords = useLearningStore((s) => s.loadRecords)
   const catAdopted = useCatStore((s) => s.adopted)
   const catCoins = useCatStore((s) => s.coins)
   const catAsBoard = useCatStore((s) => s.asBoard)
@@ -55,15 +57,12 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
   const enrolledBooks = textbooks.filter((b) => enrolledIds.includes(b.id))
   const bookName = enrolledBooks.map((b) => b.name).join('、') || t('learningHome.noBook')
 
-  // 挂载：加载订阅词书 + 恢复偏好 + 拉取 SM-2 待学队列；首页即背诵
+  // 挂载：加载订阅词书 + 恢复偏好 + 恢复今日学习记录（供进度条刷新后不清零）；待学队列由下方 effect 在订阅就绪后拉取（首页即背诵）
   useEffect(() => {
     const boot = async () => {
       if (textbooks.length === 0) await loadTextbooks()
       await loadPreferences()
-      if (enrolledIds.length > 0) {
-        autoLoadAttempted.current = true
-        await loadDue()
-      }
+      await loadRecords()
     }
     void boot()
     if (catEnabled) void loadCat()
@@ -176,7 +175,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
         ) : rule === 'table' ? (
           <TableMode words={todayWords} onExit={exitMode} />
         ) : rule === 'round2' ? (
-          <LearnMode onExit={exitMode} />
+          <LearnMode words={todayWords} onExit={exitMode} />
         ) : (
           <RecitationStage words={todayWords} onExit={exitMode} />
         )}

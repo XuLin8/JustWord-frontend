@@ -151,4 +151,11 @@ export const textbooksApi = {
         textbook_id: res.library_id,
         subscribed: res.imported,
       })),
+
+  // 已订阅词库 ID 列表（服务端为准，账号级）
+  enrolled: () => http.get<number[]>(API_PATH.textbooks.enrolled),
+
+  // 取消订阅（仅移除订阅关系，保留已导入单词与学习记录）
+  unsubscribe: (id: number) =>
+    http.delete<{ unsubscribed: boolean; library_id: number }>(API_PATH.textbooks.unsubscribe(id)),
 }

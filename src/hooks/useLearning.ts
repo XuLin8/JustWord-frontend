@@ -1,8 +1,11 @@
 // hooks/useLearning.ts
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import type { Word, Question, LearningSession, SimilarWord } from '../types/learning.types'
-import { LearnMode, AnswerResult } from '../types/learning.types'  
+import { LearnMode, AnswerResult } from '../types/learning.types'
+import type { PlanWord } from '../store/learningPlanStore'
+import { useReviewStore } from '../store/reviewStore'
+import { useLearningStore } from '../store/learningStore'
 
 // 近义词数据库（可配置）—— meaning/usage/difference 存 i18n 键，渲染时经 t() 解析
 export const SIMILAR_WORDS_DB: Record<string, SimilarWord[]> = {
@@ -37,10 +40,28 @@ export const SIMILAR_WORDS_DB: Record<string, SimilarWord[]> = {
   // ... 可扩展
 }
 
-export function useLearning(words: Word[]) {
+/** PlanWord → 会话内部 Word 形状（id/english/chinese） */
+function toWord(p: PlanWord): Word {
+  return { id: p.id, english: p.word, chinese: p.meaning, createdAt: Date.now() }
+}
+
+/** 结果映射到后端判定：正确=correct；部分/拼写近似/近义词=partial；其余=wrong */
+function toBackendResult(r: AnswerResult): 'correct' | 'partial' | 'wrong' {
+  switch (r) {
+    case AnswerResult.CORRECT: return 'correct'
+    case AnswerResult.PARTIAL:
+    case AnswerResult.TYPO:
+    case AnswerResult.CLOSE: return 'partial'
+    default: return 'wrong'
+  }
+}
+
+export function useLearning(words: PlanWord[]) {
   const [session, setSession] = useState<LearningSession | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<string[]>([])
+  // 反应耗时埋点：进入新题记录时间点，判定时算差
+  const shownAtRef = useRef<number>(Date.now())
 
   // 计算相似度（Levenshtein 距离）
   const calculateSimilarity = useCallback((str1: string, str2: string): number => {
@@ -134,10 +155,10 @@ export function useLearning(words: Word[]) {
     return { result: AnswerResult.WRONG }
   }, [])
 
-  // 开始学习
+  // 开始学习（词序快照：本轮固定 words 传入序列，不随 todayWords 被提交移除而变化）
   const startLearning = useCallback((mode: LearnMode) => {
     const shuffled = [...words].sort(() => Math.random() - 0.5)
-    const wordList = shuffled.slice(0, 20) // 每次学习 20 个
+    const wordList = shuffled.map(toWord) // 使用当日待学全量词（SM-2 已按每日目标限流）
     
     setSession({
       id: Date.now().toString(),
@@ -149,6 +170,7 @@ export function useLearning(words: Word[]) {
     })
     setCurrentQuestionIndex(0)
     setUserAnswers([])
+    shownAtRef.current = Date.now()
   }, [words])
 
   // 提交答案
@@ -156,6 +178,7 @@ export function useLearning(words: Word[]) {
     if (!session) return null
     
     const currentWord = session.wordList[currentQuestionIndex]
+    const sourceWord = words.find((w) => w.id === currentWord.id)
     let result: AnswerResult
     let similarWords: SimilarWord[] = []
 
@@ -197,8 +220,27 @@ export function useLearning(words: Word[]) {
       score: newScore
     })
 
+    // 后端化：判定记录 + SM-2 提交（mode='tworound'，统一进度；correct/partial 计入今日答对）
+    if (sourceWord) {
+      const responseMs = Math.max(0, Date.now() - shownAtRef.current)
+      void useLearningStore.getState().recordJudgement({
+        wordId: sourceWord.id,
+        english: sourceWord.word,
+        chinese: sourceWord.meaning,
+        known: result === AnswerResult.CORRECT,
+      })
+      void useReviewStore.getState().submitAttempt({
+        word: sourceWord,
+        result: toBackendResult(result),
+        mode: 'tworound',
+        userAnswer: answer,
+        correctAnswer: question.correctAnswer,
+        responseMs,
+      }).catch(() => undefined)
+    }
+
     return question
-  }, [session, currentQuestionIndex, checkChineseMeaning, checkEnglishSpelling])
+  }, [session, currentQuestionIndex, words, checkChineseMeaning, checkEnglishSpelling])
 
   // 下一题
   const nextQuestion = useCallback(() => {
@@ -212,6 +254,7 @@ export function useLearning(words: Word[]) {
       return false
     }
     setCurrentQuestionIndex(prev => prev + 1)
+    shownAtRef.current = Date.now()
     return true
   }, [session, currentQuestionIndex])
 
@@ -221,7 +264,7 @@ export function useLearning(words: Word[]) {
     return session.wordList[currentQuestionIndex]
   }, [session, currentQuestionIndex])
 
-  // 获取学习进度
+  // 获取学习进度（本会话内部进度：已答 / 本轮词数）
   const progress = useMemo(() => {
     if (!session) return 0
     return (session.questions.length / session.wordList.length) * 100

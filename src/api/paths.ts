@@ -22,7 +22,10 @@ export const API_PATH = {
     checkinStatus: '/api/learning/checkin/status',
     checkinHistory: '/api/learning/checkin/history',
     checkin: '/api/learning/checkin',
+    sessions: '/api/learning/sessions',
+    statsDaily: '/api/learning/stats/daily',
   },
+  progress: '/api/progress',
   achievements: '/api/achievements',
   wordbooks: {
     root: '/api/wordbooks',
@@ -35,6 +38,8 @@ export const API_PATH = {
     detail: (id: number) => `/api/library/${id}`,
     words: (id: number) => `/api/library/${id}`,
     enroll: (id: number) => `/api/library/${id}/import`,
+    enrolled: '/api/library/enrolled',
+    unsubscribe: (id: number) => `/api/library/${id}/subscribe`,
   },
   sync: {
     words: '/api/sync/words',

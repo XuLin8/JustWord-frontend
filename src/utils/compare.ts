@@ -41,3 +41,26 @@ export function checkChinese(userInput: string, correct: string): AnswerResult {
   if (input.length >= 2 && (target.includes(input) || input.includes(target))) return AnswerResult.CORRECT
   return AnswerResult.WRONG
 }
+
+/** 英译中·表格：三档（全中=correct，部分命中>30%=partial，否则 wrong） */
+export function checkChineseTable(userInput: string, correct: string): AnswerResult {
+  const input = userInput.trim()
+  const target = correct.trim()
+  if (!input) return AnswerResult.WRONG
+  if (input === target) return AnswerResult.CORRECT
+  const words = target.split(/[，,、;；\s]+/).filter(Boolean)
+  if (words.length === 0) {
+    // 无分隔符单义词：包含即全对，否则错
+    return target.includes(input) || input.includes(target) ? AnswerResult.CORRECT : AnswerResult.WRONG
+  }
+  const ratio = words.filter((w) => input.includes(w)).length / words.length
+  if (ratio >= 1) return AnswerResult.CORRECT
+  if (ratio > 0.3) return AnswerResult.PARTIAL
+  return AnswerResult.WRONG
+}
+
+/** 中译英·表格：命中（相似度）≥90% 算正确，否则错误 */
+export function checkEnglishTable(userInput: string, correct: string): AnswerResult {
+  const similarity = 1 - levenshtein(userInput, correct) / Math.max(correct.length, 1)
+  return similarity >= 0.9 ? AnswerResult.CORRECT : AnswerResult.WRONG
+}

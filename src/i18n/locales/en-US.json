@@ -93,7 +93,8 @@
     "checkin": "Check in",
     "checked": "Checked in today",
     "checkinSuccess": "Checked in, keep it up!",
-    "restart": "Do it again",
+    "checkinNeeds": "{{n}} more to check in",
+    "restart": "Again",
     "space": "Space"
   },
   "pwa": {
@@ -130,6 +131,7 @@
     "tableDoneSub": "{{correct}} / {{total}} correct",
     "correct": "Correct",
     "wrong": "Wrong",
+    "partial": "Partial",
     "again": "Do it again",
     "submit": "Submit",
     "next": "Next",

@@ -93,6 +93,7 @@
     "checkin": "打卡",
     "checked": "今日已打卡",
     "checkinSuccess": "打卡成功，继续保持！",
+    "checkinNeeds": "还差 {{n}} 个词可打卡",
     "restart": "再来一轮",
     "space": "空格"
   },
@@ -130,6 +131,7 @@
     "tableDoneSub": "正确 {{correct}} / 共 {{total}} 词",
     "correct": "正确",
     "wrong": "错误",
+    "partial": "部分正确",
     "again": "再来一轮",
     "submit": "提交",
     "next": "下一个",

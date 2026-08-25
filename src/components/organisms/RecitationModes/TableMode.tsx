@@ -1,8 +1,10 @@
 // src/components/organisms/RecitationModes/TableMode.tsx
 // M2-F 表格背诵法（Excel 背诵法）：
-//   阶段一 正向填意：给出英文列，在中文列填写释义，逐格比对
-//   阶段二 反向遮罩写词：隐藏英文列，按中文意思写出英文列
-// 支持单元格焦点跳格（Enter/Tab）、错词标记、完成后错词复习
+//   阶段一 正向填意：给出英文列，在中文列填写释义，逐格比对（英译中三档判定）
+//   阶段二 反向遮罩写词：隐藏英文列，按中文意思写出英文列（中译英 ≥90% 命中为正确）
+// 判定规则（用户确认）：英译中 全部命中=正确 / 部分命中>30%=部分正确 / 否则不正确；
+// 中译英 命中≥90%=正确 否则错误；仅 部分正确 + 完全正确 计入学习进度。
+// 每格判定一次即提交后端 SM-2；判后显示正确答案方便比对；完成后错词复习。
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Check, ChevronRight, Grid3X3, PartyPopper, RotateCcw, X } from 'lucide-react'
@@ -10,7 +12,11 @@ import { Button } from '@/components/ui/button'
 import { AnswerResult } from '@/types/learning.types'
 import { type PlanWord } from '@/store/learningPlanStore'
 import { useLearningStore } from '@/store/learningStore'
-import { checkChinese, checkEnglish } from '@/utils/compare'
+import { checkChineseTable, checkEnglishTable } from '@/utils/compare'
+import { useReviewStore } from '@/store/reviewStore'
+import { useProgressStore } from '@/store/progressStore'
+import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
+import { useLearningSession } from '@/hooks/useLearningSession'
 import './RecitationModes.css'
 
 type Phase = 'en2zh' | 'zh2en'
@@ -23,6 +29,11 @@ interface TableModeProps {
 export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
   const { t } = useTranslation()
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
+  const submitAttempt = useReviewStore((s) => s.submitAttempt)
+  const progressStore = useProgressStore()
+
+  // 会话时长上报
+  useLearningSession('table')
 
   const [phase, setPhase] = useState<Phase>('en2zh')
   const [pool, setPool] = useState<PlanWord[]>(words) // 当前表格词集（错词复习时缩为错词）
@@ -32,25 +43,52 @@ export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
   const [wrongWords, setWrongWords] = useState<PlanWord[]>([])
 
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  // 结果镜像 ref：避免回调闭包里 results 过期导致同一格被重复判定/重复提交
+  const resultsRef = useRef<Record<string, AnswerResult>>({})
+  // 每格反应耗时：聚焦该格时记录时间点
+  const cellFocusAtRef = useRef<number>(Date.now())
 
+  const setRes = useCallback((id: string, res: AnswerResult) => {
+    resultsRef.current = { ...resultsRef.current, [id]: res }
+    setResults(resultsRef.current)
+  }, [])
+
+  const resetRound = useCallback(() => {
+    setInputs({})
+    setResults({})
+    resultsRef.current = {}
+  }, [])
+
+  /** 判定一格（仅一次）：空格在完成列时才判（allowEmpty，判为 wrong） */
   const judgeCell = useCallback(
-    (w: PlanWord, value: string) => {
+    (w: PlanWord, value: string, opts?: { allowEmpty?: boolean }): AnswerResult | undefined => {
+      if (resultsRef.current[w.id] !== undefined) return resultsRef.current[w.id]
       const trimmed = value.trim()
+      if (!trimmed && !opts?.allowEmpty) return undefined
       const res =
         phase === 'en2zh'
-          ? checkChinese(trimmed, w.meaning)
-          : checkEnglish(trimmed, w.word)
-      setResults((prev) => ({ ...prev, [w.id]: res }))
-      // 实时 upsert 学习记录
+          ? checkChineseTable(trimmed, w.meaning)
+          : checkEnglishTable(trimmed, w.word)
+      setRes(w.id, res)
       void recordJudgement({
         wordId: w.id,
         english: w.word,
         chinese: w.meaning,
         known: res === AnswerResult.CORRECT,
       })
+      // 提交后端 SM-2（correct/partial 计入今日答对进度）
+      const responseMs = Math.max(0, Date.now() - cellFocusAtRef.current)
+      void submitAttempt({
+        word: w,
+        result: res === AnswerResult.CORRECT ? 'correct' : res === AnswerResult.PARTIAL ? 'partial' : 'wrong',
+        mode: 'table',
+        userAnswer: trimmed,
+        correctAnswer: phase === 'en2zh' ? w.meaning : w.word,
+        responseMs,
+      }).catch(() => undefined)
       return res
     },
-    [phase, recordJudgement],
+    [phase, recordJudgement, submitAttempt, setRes],
   )
 
   const onCellKeyDown = useCallback(
@@ -67,39 +105,31 @@ export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
     [judgeCell, inputs, pool],
   )
 
-  /** 完成当前阶段：比对所有格（未填记为错），统计 */
+  /** 完成当前阶段：未判定的格统一判定（空格=错），统计错词 */
   const finishPhase = useCallback(() => {
-    const nextResults = { ...results }
-    const wrong: PlanWord[] = []
     for (const w of pool) {
-      const val = inputs[w.id] ?? ''
-      const res = val.trim() ? judgeCell(w, val) : AnswerResult.WRONG
-      nextResults[w.id] = res
-      if (res !== AnswerResult.CORRECT) wrong.push(w)
+      judgeCell(w, inputs[w.id] ?? '', { allowEmpty: true })
     }
-    setResults(nextResults)
     if (phase === 'en2zh') {
       // 进入反向默写阶段（隐藏英文列）
       setPhase('zh2en')
-      setInputs({})
-      setResults({})
-      // 聚焦第一格
+      resetRound()
       requestAnimationFrame(() => inputRefs.current[pool[0]?.id]?.focus())
     } else {
+      const wrong = pool.filter((w) => resultsRef.current[w.id] !== AnswerResult.CORRECT)
       setFinished(true)
       setWrongWords(wrong)
     }
-  }, [phase, pool, inputs, results, judgeCell])
+  }, [phase, pool, inputs, judgeCell, resetRound])
 
   /** 错词复习：以错词重开反向默写 */
   const reviewWrong = useCallback(() => {
     setPool(wrongWords)
     setPhase('zh2en')
-    setInputs({})
-    setResults({})
+    resetRound()
     setFinished(false)
     requestAnimationFrame(() => inputRefs.current[wrongWords[0]?.id]?.focus())
-  }, [wrongWords])
+  }, [wrongWords, resetRound])
 
   const phaseTitle = useMemo(
     () => (phase === 'en2zh' ? t('modes.tablePhase1') : t('modes.tablePhase2')),
@@ -128,6 +158,8 @@ export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
           </div>
         )}
 
+        <CheckinButton />
+
         <div className="rec-done-actions">
           {wrongWords.length > 0 && (
             <Button className="rec-done-checkin" onClick={reviewWrong}>
@@ -146,8 +178,15 @@ export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
 
   if (pool.length === 0) return null
 
+  // 顶部进度条 = 今日学习进度（已学/目标），刷新/重进后从后端恢复
+  const progress = Math.min(100, (progressStore.todayCorrect / Math.max(1, progressStore.dailyTarget)) * 100)
+
   return (
     <div className="rec-stage rm-mode">
+      <div className="rec-progress">
+        <div className="rec-progress-bar" style={{ width: `${progress}%` }} />
+      </div>
+
       <div className="rec-stage-head">
         <span className="rm-mode-tag">
           <Grid3X3 size={14} />
@@ -186,20 +225,35 @@ export const TableMode: React.FC<TableModeProps> = ({ words, onExit }) => {
                       ref={(el) => { inputRefs.current[w.id] = el }}
                       className="rm-cell"
                       value={inputs[w.id] ?? ''}
-                      disabled={phase === 'en2zh' && res !== undefined}
+                      disabled={res !== undefined}
                       onChange={(e) => setInputs((prev) => ({ ...prev, [w.id]: e.target.value }))}
+                      onFocus={() => { cellFocusAtRef.current = Date.now() }}
                       onKeyDown={(e) => onCellKeyDown(e, w)}
-                      onBlur={() => judgeCell(w, inputs[w.id] ?? '')}
                       autoFocus={i === 0}
                     />
                   </td>
                   <td className="rm-td-status">
                     {res === undefined ? (
                       <span className="rm-status-pending">·</span>
-                    ) : res === AnswerResult.CORRECT ? (
-                      <Check size={16} className="rm-status-correct" />
                     ) : (
-                      <X size={16} className="rm-status-wrong" />
+                      <>
+                        <span
+                          className={`rm-status-ico ${res === AnswerResult.CORRECT ? 'is-correct' : res === AnswerResult.PARTIAL ? 'is-partial' : 'is-wrong'}`}
+                          title={res === AnswerResult.PARTIAL ? t('modes.partial') : undefined}
+                        >
+                          {res === AnswerResult.CORRECT ? (
+                            <Check size={16} />
+                          ) : res === AnswerResult.PARTIAL ? (
+                            <Check size={16} />
+                          ) : (
+                            <X size={16} />
+                          )}
+                        </span>
+                        {/* 判后显示正确答案方便比对（完成一列后整列可见） */}
+                        <span className="rm-cell-answer">
+                          {phase === 'en2zh' ? w.meaning : w.word}
+                        </span>
+                      </>
                     )}
                   </td>
                 </tr>

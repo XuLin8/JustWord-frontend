@@ -18,12 +18,14 @@ import { Button } from '@/components/ui/button'
 import { type PlanWord } from '@/store/learningPlanStore'
 import { useLearningStore } from '@/store/learningStore'
 import { useCheckinStore } from '@/store/checkinStore'
-import { useUIStore } from '@/store/uiStore'
 import { speakWord, warmupSpeech } from '@/utils/speech'
 import { playMeow, playHiss } from '@/utils/catSound'
 import { useCatStore, CAT_REWARD } from '@/store/catStore'
 import { useFeatureStore } from '@/store/featureStore'
 import { useReviewStore } from '@/store/reviewStore'
+import { useProgressStore } from '@/store/progressStore'
+import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
+import { useLearningSession } from '@/hooks/useLearningSession'
 import './RecitationStage.css'
 
 interface RecitationStageProps {
@@ -38,10 +40,12 @@ const DRAG_THRESHOLD = 72 // 拖拽触发阈值（px）
 export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit }) => {
   const { t } = useTranslation()
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
-  const { checkIn, todayChecked, loadCheckins } = useCheckinStore()
-  const showToast = useUIStore((s) => s.showToast)
+  const loadCheckins = useCheckinStore((s) => s.loadCheckins)
   const earnCoins = useCatStore((s) => s.earnCoins)
   const catEnabled = useFeatureStore((s) => s.cat)
+
+  // 会话时长上报（离开本模式时并入今日聚合）
+  useLearningSession('judge')
 
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
@@ -50,16 +54,34 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const [dragging, setDragging] = useState(false)
   const [lastJudgement, setLastJudgement] = useState<Judgement | null>(null)
   const countsRef = useRef({ known: 0, unknown: 0 })
+  // 词序快照：判定过程中固定本轮词序列，不受 submit 从 store.todayWords 移除词
+  // 导致 words prop 缩短的影响（否则切词会错位、进度条/完成统计会错乱）
+  const [queue] = useState<PlanWord[]>(() => words)
 
   // SM-2 提交（A1）：认识=correct，不认识=wrong，让后端记忆曲线生效
-  const submitReview = useReviewStore((s) => s.submit)
+  const submitAttempt = useReviewStore((s) => s.submitAttempt)
 
-  const word = words[index]
+  // 今日进度（后端为准，刷新/重进/换设备一致）：今日答对 / 每日目标
+  const progressStore = useProgressStore()
+  const todayLearned = progressStore.todayCorrect
+  const dailyTarget = progressStore.dailyTarget
+
+  const word = queue[index]
+
+  // 反应耗时埋点：进入新词记录时间点，判定时算差
+  const shownAtRef = useRef<number>(Date.now())
 
   useEffect(() => {
     warmupSpeech()
     void loadCheckins()
+    void progressStore.load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadCheckins])
+
+  // 进入新词时刷新计时起点
+  useEffect(() => {
+    shownAtRef.current = Date.now()
+  }, [word?.id])
 
   /** 判定当前单词（三通道共同入口） */
   const judge = useCallback(
@@ -72,11 +94,13 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
         chinese: word.meaning,
         known: j === 'known',
       })
-      // SM-2 提交给后端（认识=correct，不认识=wrong）
-      void submitReview({
-        word_id: word.id,
+      // SM-2 提交给后端（认识=correct，不认识=wrong，mode='judge'，附反应耗时）
+      const responseMs = Math.max(0, Date.now() - shownAtRef.current)
+      void submitAttempt({
+        word,
         result: j === 'known' ? 'correct' : 'wrong',
-        mode: 'review',
+        mode: 'judge',
+        responseMs,
       }).catch(() => undefined)
       // 云养猫联动：认识 → 甜美喵声 + 2 币；不认识 → 哈气音 + 1 币（P0-5 屏蔽）
       if (catEnabled) {
@@ -91,7 +115,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
       setLastJudgement(j)
       setRevealed(true)
     },
-    [word, revealed, finished, recordJudgement, earnCoins, submitReview],
+    [word, revealed, finished, recordJudgement, earnCoins, submitAttempt],
   )
 
   /** 播发音 */
@@ -102,7 +126,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
   /** 下一个 */
   const next = useCallback(() => {
-    if (index >= words.length - 1) {
+    if (index >= queue.length - 1) {
       setFinished(true)
       return
     }
@@ -110,7 +134,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
     setRevealed(false)
     setDragX(0)
     setLastJudgement(null)
-  }, [index, words.length])
+  }, [index, queue.length])
 
   /** 返回重来（保留已判定计数） */
   const restart = useCallback(() => {
@@ -169,7 +193,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
             <PartyPopper size={40} />
           </div>
           <h3 className="rec-done-title">{t('recitation.doneTitle')}</h3>
-          <p className="rec-done-sub">{t('recitation.doneSub', { total: words.length })}</p>
+          <p className="rec-done-sub">{t('recitation.doneSub', { total: queue.length })}</p>
 
           <div className="rec-done-stats">
             <div className="rec-done-stat is-known">
@@ -182,23 +206,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
             </div>
           </div>
 
-          <Button
-            size="lg"
-            className="rec-done-checkin"
-            disabled={todayChecked}
-            onClick={() => {
-              void (async () => {
-                const ok = await checkIn()
-                if (ok) {
-                  showToast(t('recitation.checkinSuccess'), 'success')
-                  if (catEnabled) void earnCoins(CAT_REWARD.CHECKIN) // 云养猫：打卡得币（P0-5 屏蔽）
-                }
-              })()
-            }}
-          >
-            <Check size={18} />
-            {todayChecked ? t('recitation.checked') : t('recitation.checkin')}
-          </Button>
+          <CheckinButton />
 
           <div className="rec-done-actions">
             <Button variant="outline" onClick={restart}>
@@ -217,7 +225,8 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
   if (!word) return null
 
-  const progress = ((index + (revealed ? 1 : 0)) / words.length) * 100
+  // 顶部进度条 = 今日学习进度（已学/目标），刷新/重进后从持久化记录恢复，不清零
+  const progress = Math.min(100, (todayLearned / Math.max(1, dailyTarget)) * 100)
 
   return (
     <div className="rec-stage">
@@ -228,7 +237,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
       <div className="rec-stage-head">
         <span className="rec-stage-count">
-          {index + 1} / {words.length}
+          {index + 1} / {queue.length}
         </span>
         <span className={`rec-chip ${word.source === 'new' ? 'is-new' : 'is-review'}`}>
           {word.source === 'new' ? t('recitation.badgeNew') : t('recitation.badgeReview')}

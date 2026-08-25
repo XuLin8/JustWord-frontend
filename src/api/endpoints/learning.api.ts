@@ -84,6 +84,7 @@ export interface ReviewSubmitRequest {
   mode?: string
   user_answer?: string
   correct_answer?: string
+  response_ms?: number
   feedback?: string
 }
 
@@ -94,6 +95,43 @@ export interface ReviewSubmitResponse {
   interval_days: number
   repetitions: number
   next_review_at: string
+}
+
+/** GET /progress 今日学习进度（进度条后端化数据源） */
+export interface ProgressResponse {
+  learning_date: string
+  daily_target: number
+  today_correct: number
+  progress_percent: number
+  checked_today: boolean
+  remaining: number
+}
+
+/** POST /sessions 学习会话时长上报 */
+export interface SessionReportRequest {
+  duration_seconds: number
+  mode?: string
+  date?: string
+}
+
+/** GET /stats/daily 每日聚合条目（热力图/日历/趋势数据源） */
+export interface DailyStatItem {
+  date: string
+  attempts: number
+  correct_count: number
+  partial_count: number
+  wrong_count: number
+  distinct_words: number
+  duration_seconds: number
+  avg_response_ms: number
+  new_learned: number
+  review_learned: number
+}
+
+export interface DailyStatsResponse {
+  days: number
+  start: string
+  items: DailyStatItem[]
 }
 
 export const learningApi = {
@@ -149,6 +187,18 @@ export const learningApi = {
   /** 提交一次复习结果（应用 SM-2，更新调度） */
   submitReview: (data: ReviewSubmitRequest) =>
     http.post<ReviewSubmitResponse>(API_PATH.review.submit, data),
+
+  /** 今日学习进度（进度条后端化数据源） */
+  getProgress: () =>
+    http.get<ProgressResponse>(API_PATH.progress),
+
+  /** 学习会话结束上报时长（并入对应学习日聚合） */
+  reportSession: (data: SessionReportRequest) =>
+    http.post<{ ok: boolean; learning_date: string }>(API_PATH.learning.sessions, data),
+
+  /** 每日聚合统计（懒聚合回填；热力图/日历/趋势数据源） */
+  getDailyStats: (days = 365) =>
+    http.get<DailyStatsResponse>(`${API_PATH.learning.statsDaily}?days=${days}`),
 }
 
 // 兼容旧命名导出

@@ -1,9 +1,7 @@
 // src/api/endpoints/preferences.api.ts
-// 用户偏好接口契约（新增 · 后端实现后续补充，当前走 mock）
-// 语义：账户级持久化的偏好设置（如「上次选择的背诵模式」）
+// 用户偏好接口契约：账户级持久化的偏好设置（背诵模式 / 每日目标），读写后端 /api/preferences
 import { http } from '../client'
 import { API_PATH } from '../paths'
-import { preferencesMock } from '../mock/preferences.mock'
 import type { RecitationRule } from '../../components/organisms/RecitationModes/RulePicker'
 
 /** 用户偏好（开放扩展字段；前端只消费已知字段） */
@@ -24,15 +22,12 @@ export interface UpdatePreferencesRequest {
   daily_target?: number
 }
 
-// ============ API 方法（当前走 mock） ============
+// ============ API 方法（对接后端 /api/preferences） ============
 export const preferencesApi = {
-  get: () => preferencesMock.get(),
-  update: (data: UpdatePreferencesRequest) => preferencesMock.update(data),
-}
-
-// 兼容命名导出（后端就绪后切换为 http 实现）
-export const preferencesApiHttp = {
   get: () => http.get<UserPreferences>(API_PATH.preferences.root),
   update: (data: UpdatePreferencesRequest) =>
     http.put<UserPreferences>(API_PATH.preferences.root, data),
 }
+
+// 兼容命名导出（后端已就绪，与实现一致）
+export const preferencesApiHttp = preferencesApi

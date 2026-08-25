@@ -1,13 +1,8 @@
 // src/store/textbookStore.ts
-// 内置词书订阅 store（M2-B）：维护可用词书列表 + 已订阅集合，localforage 持久化
+// 内置词书订阅 store（M2-B）：维护可用词书列表 + 已订阅集合。
+// 订阅状态以服务端为准（账号级），不再使用 localforage，避免跨账号污染（新用户误继承旧用户订阅）。
 import { create } from 'zustand'
-import localforage from 'localforage'
 import { textbooksApi, type Textbook } from '../api/endpoints/textbooks.api'
-
-const enrollStorage = localforage.createInstance({
-  name: 'JustWord',
-  storeName: 'textbook-enroll',
-})
 
 interface TextbookStore {
   textbooks: Textbook[]
@@ -19,22 +14,6 @@ interface TextbookStore {
   isEnrolled: (id: number) => boolean
 }
 
-async function loadEnrolled(): Promise<number[]> {
-  try {
-    return (await enrollStorage.getItem<number[]>('enrolledIds')) ?? []
-  } catch {
-    return []
-  }
-}
-
-async function persistEnrolled(ids: number[]): Promise<void> {
-  try {
-    await enrollStorage.setItem('enrolledIds', ids)
-  } catch (e) {
-    console.error('词书订阅本地持久化失败:', e)
-  }
-}
-
 export const useTextbookStore = create<TextbookStore>((set, get) => ({
   textbooks: [],
   enrolledIds: [],
@@ -43,7 +22,11 @@ export const useTextbookStore = create<TextbookStore>((set, get) => ({
   loadTextbooks: async () => {
     set({ loading: true })
     try {
-      const [textbooks, enrolledIds] = await Promise.all([textbooksApi.list(), loadEnrolled()])
+      const [textbooks, enrolledIds] = await Promise.all([
+        textbooksApi.list(),
+        // 已订阅列表来自后端（登录后）；未登录/失败时视为未订阅
+        textbooksApi.enrolled().catch(() => [] as number[]),
+      ])
       set({ textbooks, enrolledIds })
     } catch (error) {
       console.error('加载内置词书失败:', error)
@@ -57,9 +40,7 @@ export const useTextbookStore = create<TextbookStore>((set, get) => ({
     if (enrolledIds.includes(id)) return true
     try {
       await textbooksApi.enroll(id)
-      const next = [...enrolledIds, id]
-      set({ enrolledIds: next })
-      await persistEnrolled(next)
+      set({ enrolledIds: [...enrolledIds, id] })
       return true
     } catch (error) {
       console.error('订阅词书失败:', error)
@@ -69,8 +50,12 @@ export const useTextbookStore = create<TextbookStore>((set, get) => ({
 
   unsubscribe: async (id) => {
     const next = get().enrolledIds.filter((x) => x !== id)
+    try {
+      await textbooksApi.unsubscribe(id)
+    } catch (error) {
+      console.error('取消订阅词书失败:', error)
+    }
     set({ enrolledIds: next })
-    await persistEnrolled(next)
   },
 
   isEnrolled: (id) => get().enrolledIds.includes(id),

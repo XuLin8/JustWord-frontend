@@ -1,5 +1,5 @@
 // src/App.tsx
-import { lazy, Suspense, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useWordStore } from './store/wordStore'
 import { useStatsStore } from './store/statsStore'
 import { useSyncStore } from './store/syncStore'
@@ -22,19 +22,13 @@ import { useAppShell } from './hooks/useAppShell'
 import { useTheme } from './hooks/useTheme'
 import { ThemeSwitcher } from './components/atoms/ThemeSwitcher'
 import { LanguageSwitcher } from './components/atoms/LanguageSwitcher'
+import { DashboardPage } from './pages/DashboardPage'
+import { WordBookPage } from './pages/WordBookPage'
+import { LearningHomePage } from './pages/LearningHomePage'
 import type { AppTab } from './components/templates/Layout/AppHeader'
 import './App.css'
 
-// M4-D 性能代码分割：四个 Tab 页面按需懒加载，降低首屏 JS 体积
-const DashboardPage = lazy(() =>
-  import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage }))
-)
-const WordBookPage = lazy(() =>
-  import('./pages/WordBookPage').then((m) => ({ default: m.WordBookPage }))
-)
-const LearningHomePage = lazy(() =>
-  import('./pages/LearningHomePage').then((m) => ({ default: m.LearningHomePage }))
-)
+// 三个 Tab 页面体量小，静态导入即可（避免懒加载导致切换页签出现 loading）
 
 function App() {
   const shell = useAppShell()
@@ -98,8 +92,8 @@ function App() {
       isRegisterOpen={shell.showRegister}
       onCloseLogin={shell.closeLogin}
       onCloseRegister={shell.closeRegister}
-      onSwitchToRegister={shell.switchToRegister}
       onSwitchToLogin={shell.switchToLogin}
+      onSwitchToRegister={shell.switchToRegister}
     />
   )
 
@@ -145,25 +139,17 @@ function App() {
       >
         {authModal}
 
-        <Suspense
-          fallback={
-            <div className="tab-panel tab-panel-loading">
-              <Spinner size="lg" />
-            </div>
-          }
-        >
-          {shell.activeTab === 'home' && (
-            <div key="home" className="tab-panel">
-              <LearningHomePage onGoWordbook={() => shell.setTab('word')} />
-            </div>
-          )}
-          {shell.activeTab === 'word' && (
-            <div key="word" className="tab-panel"><WordBookPage /></div>
-          )}
-          {shell.activeTab === 'stats' && (
-            <div key="stats" className="tab-panel"><DashboardPage /></div>
-          )}
-        </Suspense>
+        {shell.activeTab === 'home' && (
+          <div key="home" className="tab-panel">
+            <LearningHomePage onGoWordbook={() => shell.setTab('word')} />
+          </div>
+        )}
+        {shell.activeTab === 'word' && (
+          <div key="word" className="tab-panel"><WordBookPage /></div>
+        )}
+        {shell.activeTab === 'stats' && (
+          <div key="stats" className="tab-panel"><DashboardPage /></div>
+        )}
       </Layout>
 
       <ToastContainer />
