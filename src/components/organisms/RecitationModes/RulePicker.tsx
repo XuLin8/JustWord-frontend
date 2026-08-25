@@ -1,8 +1,9 @@
 // src/components/organisms/RecitationModes/RulePicker.tsx
-// M2-F 背诵规则自选：认识判定 / 听词默写 / 看词选意 / 表格背诵法 / 两轮学习
+// M2-F 背诵规则自选：认识判定 / 听词默写 / 看词选意 / 表格背诵法
+// （两轮学习为表格记忆的中间产物，已从入口隐藏，后续随表格记忆完善再定去留）
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Ear, Grid3X3, Hand, ListChecks, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Ear, Grid3X3, Hand, ListChecks } from 'lucide-react'
 import './RecitationModes.css'
 
 export type RecitationRule = 'judge' | 'listen' | 'choice' | 'table' | 'round2'
@@ -39,12 +40,6 @@ export const RulePicker: React.FC<RulePickerProps> = ({ onSelect, onBack }) => {
       icon: <Grid3X3 size={22} />,
       title: t('modes.tableTitle'),
       desc: t('modes.tableDesc'),
-    },
-    {
-      id: 'round2',
-      icon: <RefreshCw size={22} />,
-      title: t('modes.round2Title'),
-      desc: t('modes.round2Desc'),
     },
   ]
 

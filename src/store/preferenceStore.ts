@@ -47,7 +47,8 @@ export const usePreferenceStore = create<PreferenceStore>((set, get) => ({
     }
     try {
       const prefs = await preferencesApi.get()
-      const rule = prefs.recitation_rule ?? DEFAULT_RULE
+      // 两轮学习已隐藏入口：若旧偏好仍为 round2，降级为默认判定模式
+      const rule = prefs.recitation_rule === 'round2' ? DEFAULT_RULE : (prefs.recitation_rule ?? DEFAULT_RULE)
       const dailyTarget = prefs.daily_target ?? DEFAULT_TARGET
       set({ recitationRule: rule, dailyTarget, loaded: true })
     } catch (e) {
