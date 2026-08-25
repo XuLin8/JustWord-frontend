@@ -1,16 +1,18 @@
 // src/components/organisms/RecitationStage/index.tsx
 // M2-E 背诵流程：认识/不认识判定 → 展开详情（TTS/音标/释义/例句/形近/近义/反义）
-// 输入通道：按钮 / 键盘（↑ 不认识 · ↓ 认识 · 空格 发音）
+// 输入通道：按钮 / 键盘（判定面 ↑ 不认识 · ↓ 认识 · 空格 发音；详情面 ↑ 上一个 · ↓/Enter 下一个 · 空格 发音）
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
   Check,
+  ChevronLeft,
   ChevronRight,
   PartyPopper,
   RotateCcw,
   Sparkles,
   Volume2,
+  VolumeX,
   X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -23,6 +25,7 @@ import { useCatStore, CAT_REWARD } from '@/store/catStore'
 import { useFeatureStore } from '@/store/featureStore'
 import { useReviewStore } from '@/store/reviewStore'
 import { useProgressStore } from '@/store/progressStore'
+import { usePreferenceStore } from '@/store/preferenceStore'
 import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
@@ -41,6 +44,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const loadCheckins = useCheckinStore((s) => s.loadCheckins)
   const earnCoins = useCatStore((s) => s.earnCoins)
   const catEnabled = useFeatureStore((s) => s.cat)
+  const { audioEnabled, setAudioEnabled } = usePreferenceStore()
 
   // 会话时长上报（离开本模式时并入今日聚合）
   useLearningSession('judge')
@@ -48,7 +52,8 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const [finished, setFinished] = useState(false)
-  const [lastJudgement, setLastJudgement] = useState<Judgement | null>(null)
+  // 每个词的判定结果：回退到已判定的词时恢复详情面（不重复提交 SM-2）
+  const [judgedMap, setJudgedMap] = useState<Record<string, Judgement>>({})
   const countsRef = useRef({ known: 0, unknown: 0 })
   // 词序快照：判定过程中固定本轮词序列，不受 submit 从 store.todayWords 移除词
   // 导致 words prop 缩短的影响（否则切词会错位、进度条/完成统计会错乱）
@@ -61,6 +66,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const progressStore = useProgressStore()
 
   const word = queue[index]
+  const lastJudgement: Judgement | null = revealed ? (judgedMap[word?.id ?? ''] ?? null) : null
 
   // 反应耗时埋点：进入新词记录时间点，判定时算差
   const shownAtRef = useRef<number>(Date.now())
@@ -76,6 +82,12 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   useEffect(() => {
     shownAtRef.current = Date.now()
   }, [word?.id])
+
+  // 展示新词时自动播报一次发音（发音开关开启时）
+  useEffect(() => {
+    if (word && audioEnabled) speakWord(word.word)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [word?.id, audioEnabled])
 
   /** 判定当前单词（三通道共同入口） */
   const judge = useCallback(
@@ -106,7 +118,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
           void earnCoins(CAT_REWARD.UNKNOWN)
         }
       }
-      setLastJudgement(j)
+      setJudgedMap((m) => ({ ...m, [word.id]: j }))
       setRevealed(true)
     },
     [word, revealed, finished, recordJudgement, earnCoins, submitAttempt],
@@ -114,47 +126,69 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
   /** 播发音 */
   const playAudio = useCallback(() => {
-    if (!word) return
+    if (!word || !audioEnabled) return
     speakWord(word.word)
-  }, [word])
+  }, [word, audioEnabled])
 
-  /** 下一个 */
+  /** 下一个（目标词若已判定则回到详情面，否则回到判定面） */
   const next = useCallback(() => {
     if (index >= queue.length - 1) {
       setFinished(true)
       return
     }
-    setIndex((i) => i + 1)
-    setRevealed(false)
-    setLastJudgement(null)
-  }, [index, queue.length])
+    const ni = index + 1
+    setIndex(ni)
+    const nw = queue[ni]
+    setRevealed(!!(nw && judgedMap[nw.id]))
+  }, [index, queue, judgedMap])
+
+  /** 返回上一个单词（回退到其已判定/未判定状态） */
+  const prev = useCallback(() => {
+    if (index <= 0) return
+    const pi = index - 1
+    setIndex(pi)
+    const pw = queue[pi]
+    setRevealed(!!(pw && judgedMap[pw.id]))
+  }, [index, queue, judgedMap])
 
   /** 返回重来（保留已判定计数） */
   const restart = useCallback(() => {
     setIndex(0)
     setRevealed(false)
     setFinished(false)
-    setLastJudgement(null)
+    setJudgedMap({})
   }, [])
 
-  /** 键盘：↑ 不认识 · ↓ 认识 · 空格 发音 */
+  /** 键盘：判定面 ↑ 不认识 · ↓ 认识 · 空格 发音；详情面 ↑ 上一个 · ↓/Enter 下一个 · 空格 发音 */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (finished) return
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
+      let handled = false
       if (e.key === 'ArrowUp') {
         e.preventDefault()
-        judge('unknown')
-      } else if (e.key === 'ArrowDown') {
+        handled = true
+        if (revealed) prev()
+        else judge('unknown')
+      } else if (e.key === 'ArrowDown' || e.key === 'Enter') {
         e.preventDefault()
-        judge('known')
+        handled = true
+        if (revealed) next()
+        else judge('known')
       } else if (e.code === 'Space') {
         e.preventDefault()
+        handled = true
         playAudio()
+      }
+      // 若焦点停留在按钮上，处理键后移除焦点，避免 Space/Enter 再次触发按钮激活（重复判定/连跳）
+      if (handled && document.activeElement instanceof HTMLElement && document.activeElement.tagName === 'BUTTON') {
+        document.activeElement.blur()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [judge, playAudio, finished])
+  }, [judge, playAudio, next, prev, revealed, finished])
 
   // ============ 完成页 ============
   if (finished) {
@@ -204,9 +238,16 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
       <TodayProgressBar />
 
       <div className="rec-stage-head">
-        <Button variant="ghost" size="sm" className="rec-head-exit" onClick={onExit}>
-          <ArrowLeft size={16} />
-          {t('recitation.exit')}
+        {/* 发音开关（点击开启/关闭自动发音；顶部模式 chip 承担退出/切换模式入口） */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rec-head-audio"
+          onClick={() => void setAudioEnabled(!audioEnabled)}
+          aria-label={t('recitation.audio')}
+          title={audioEnabled ? t('recitation.audioOn') : t('recitation.audioOff')}
+        >
+          {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
         </Button>
       </div>
 
@@ -286,6 +327,10 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
       {/* 底部操作区 */}
       {revealed ? (
         <div className="rec-actions">
+          <Button variant="outline" size="lg" className="rec-prev-btn" onClick={prev} disabled={index <= 0}>
+            <ChevronLeft size={18} />
+            {t('recitation.prev')}
+          </Button>
           <Button size="lg" className="rec-next-btn" onClick={next}>
             {t('recitation.next')}
             <ChevronRight size={18} />
@@ -306,9 +351,15 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
         </div>
       )}
 
-      <p className="rec-kbd-hint">
-        <kbd>↑</kbd> {t('recitation.unknown')} · <kbd>↓</kbd> {t('recitation.known')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
-      </p>
+      {revealed ? (
+        <p className="rec-kbd-hint">
+          <kbd>↑</kbd> {t('recitation.prev')} · <kbd>↓</kbd> / <kbd>Enter</kbd> {t('recitation.next')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
+        </p>
+      ) : (
+        <p className="rec-kbd-hint">
+          <kbd>↑</kbd> {t('recitation.unknown')} · <kbd>↓</kbd> {t('recitation.known')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
+        </p>
+      )}
     </div>
   )
 }

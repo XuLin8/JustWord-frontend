@@ -11,6 +11,7 @@ import { useLearningStore } from '@/store/learningStore'
 import { speakWord } from '@/utils/speech'
 import { checkEnglish } from '@/utils/compare'
 import { useReviewStore } from '@/store/reviewStore'
+import { usePreferenceStore } from '@/store/preferenceStore'
 import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
@@ -25,6 +26,7 @@ export const ListeningMode: React.FC<ListeningModeProps> = ({ words, onExit }) =
   const { t } = useTranslation()
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
   const submitAttempt = useReviewStore((s) => s.submitAttempt)
+  const { audioEnabled } = usePreferenceStore()
 
   // 会话时长上报
   useLearningSession('listen')
@@ -56,8 +58,8 @@ export const ListeningMode: React.FC<ListeningModeProps> = ({ words, onExit }) =
   }, [word?.id])
 
   const playAgain = useCallback(() => {
-    if (word) speakWord(word.word)
-  }, [word])
+    if (word && audioEnabled) speakWord(word.word)
+  }, [word, audioEnabled])
 
   const submit = useCallback(() => {
     if (!word || result) return

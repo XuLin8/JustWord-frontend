@@ -18,7 +18,7 @@
   gap: var(--spacing-md);
   flex-wrap: wrap;
 }
-.rec-head-exit { margin-left: auto; }
+.rec-head-audio { margin-left: auto; color: var(--color-label-secondary); }
 .rec-chip {
   font-size: var(--font-size-xs);
   padding: 3px 10px;
@@ -224,6 +224,15 @@
   filter: brightness(1.06);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05), 0 18px 44px -10px rgba(0,122,255,0.55);
+}
+.rec-prev-btn {
+  color: var(--color-label-secondary);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.rec-prev-btn:not(:disabled):hover {
+  color: var(--color-text);
+  border-color: color-mix(in oklab, var(--apple-indigo) 45%, transparent);
 }
 
 /* ============ 快捷键提示 ============ */

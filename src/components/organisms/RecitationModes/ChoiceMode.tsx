@@ -9,6 +9,7 @@ import { type PlanWord } from '@/store/learningPlanStore'
 import { useLearningStore } from '@/store/learningStore'
 import { speakWord } from '@/utils/speech'
 import { useReviewStore } from '@/store/reviewStore'
+import { usePreferenceStore } from '@/store/preferenceStore'
 import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
@@ -23,6 +24,7 @@ export const ChoiceMode: React.FC<ChoiceModeProps> = ({ words, onExit }) => {
   const { t } = useTranslation()
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
   const submitAttempt = useReviewStore((s) => s.submitAttempt)
+  const { audioEnabled } = usePreferenceStore()
 
   // 会话时长上报
   useLearningSession('choose')
@@ -146,7 +148,7 @@ export const ChoiceMode: React.FC<ChoiceModeProps> = ({ words, onExit }) => {
       <div className="rm-choice">
         <div className="rm-choice-word">
           <h2 className="rec-word-huge">{word.word}</h2>
-          <button className="rm-choice-play" onClick={() => speakWord(word.word)} aria-label={t('modes.play')}>
+          <button className="rm-choice-play" onClick={() => audioEnabled && speakWord(word.word)} aria-label={t('modes.play')}>
             <Volume2 size={18} />
           </button>
         </div>
