@@ -1,0 +1,216 @@
+/* src/components/organisms/CheckinCalendar/CheckinCalendar.css
+   P2 打卡日历：LeetCode 风格全屏玻璃浮层 + 月度打卡网格（明暗双态，Apple 质感） */
+
+.checkin-cal {
+  position: fixed;
+  inset: 0;
+  z-index: 9980;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  animation: cc-fade var(--dur-fast) var(--ease-spring-soft);
+}
+@keyframes cc-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.checkin-cal-inner {
+  width: min(94vw, 430px);
+  max-height: 88vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  animation: cc-card-in var(--dur-slow) var(--ease-spring-soft);
+}
+@keyframes cc-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.checkin-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.checkin-cal-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.checkin-cal-close {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--color-label-secondary);
+  background: var(--color-fill-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast);
+}
+.checkin-cal-close:hover { background: var(--color-fill-secondary); }
+
+.checkin-cal-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+}
+
+/* ===== 连续/累计统计条 ===== */
+.checkin-cal-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+.checkin-cal-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--br-lg);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+}
+.checkin-cal-stat-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+.checkin-cal-flame { color: var(--apple-orange); }
+.checkin-cal-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-secondary);
+}
+
+/* ===== 月度日历 ===== */
+.checkin-cal-month {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--br-xl);
+  background: var(--color-fill-secondary);
+  border: 0.5px solid var(--color-separator);
+}
+.checkin-cal-month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.checkin-cal-nav {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--br-md);
+  color: var(--color-label-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast), color var(--dur-fast);
+}
+.checkin-cal-nav:hover {
+  color: var(--color-text);
+  background: var(--color-fill-tertiary);
+}
+.checkin-cal-month-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.checkin-cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.checkin-cal-weekday {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-label-tertiary);
+  padding: 4px 0;
+}
+
+.checkin-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.checkin-cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--br-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  background: var(--color-fill-tertiary);
+  transition: transform var(--dur-fast) var(--ease-spring-soft);
+}
+.checkin-cal-cell.is-empty { background: transparent; }
+.checkin-cal-cell.is-checked {
+  color: #fff;
+  background-image: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--apple-indigo) 35%, transparent);
+}
+.checkin-cal-cell.is-checked:hover { transform: scale(1.08); }
+.checkin-cal-cell.is-today:not(.is-checked) {
+  box-shadow: inset 0 0 0 2px var(--apple-indigo);
+}
+.checkin-cal-cell.is-today.is-checked {
+  box-shadow:
+    0 4px 12px color-mix(in oklab, var(--apple-indigo) 35%, transparent),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+/* ===== 底部 ===== */
+.checkin-cal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.checkin-cal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-label-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--dur-fast);
+}
+.checkin-cal-back:hover { color: var(--color-text); }
+.checkin-cal-status {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+}
+.checkin-cal-status.is-done {
+  color: var(--apple-green);
+  font-weight: 600;
+}

@@ -3,7 +3,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ChevronDown, Gauge, Minus, Plus, Target } from 'lucide-react'
+import { CalendarDays, ChevronDown, Gauge, Minus, Plus, Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { HeaderSearch } from '@/components/atoms/HeaderSearch'
 import { useCatStore } from '@/store/catStore'
@@ -25,6 +25,8 @@ interface AppHeaderProps {
   onLogout: () => void
   /** 打开后台控制台看板 */
   onOpenAdmin: () => void
+  /** 打开打卡日历 */
+  onOpenCheckinCalendar: () => void
   /** 头部右侧动作插槽（主题/语言切换等全局入口），由 Layout/App 注入。 */
   headerActions?: React.ReactNode
 }
@@ -42,6 +44,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onShowLogin,
   onLogout,
   onOpenAdmin,
+  onOpenCheckinCalendar,
   headerActions,
 }) => {
   const { t } = useTranslation()
@@ -155,6 +158,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   </button>
                 </span>
               </div>
+
+              {/* 打卡日历（P2：头像下拉入口，LeetCode 风格月度日历） */}
+              <DropdownMenuItem onSelect={onOpenCheckinCalendar}>
+                <CalendarDays size={16} className="mr-2" />
+                {t('calendar.title')}
+              </DropdownMenuItem>
 
               {/* 数据与设置（占位） */}
               <DropdownMenuItem disabled>

@@ -29,6 +29,23 @@
     "comingSoon": "Coming soon",
     "subscribedWordbooks": "Subscribed wordbooks"
   },
+  "calendar": {
+    "title": "Check-in Calendar",
+    "subtitle": "Keep a daily check-in streak to stay motivated",
+    "currentStreak": "Current Streak",
+    "maxStreak": "Longest Streak",
+    "totalDays": "Total Days",
+    "monthFormat": "{{month}} {{year}}",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "backToday": "Back to today",
+    "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "checked": "Checked in",
+    "notChecked": "Not checked in",
+    "today": "Today",
+    "checkedToday": "Checked in today",
+    "notCheckedToday": "Not checked in today"
+  },
   "cat": {
     "title": "Cloud Cat",
     "adopt": "Adopt a Cat",

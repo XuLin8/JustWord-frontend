@@ -29,6 +29,23 @@
     "comingSoon": "功能建设中，敬请期待",
     "subscribedWordbooks": "已订阅词书"
   },
+  "calendar": {
+    "title": "打卡日历",
+    "subtitle": "坚持每日打卡，连续学习更有动力",
+    "currentStreak": "当前连续",
+    "maxStreak": "最长连续",
+    "totalDays": "累计打卡",
+    "monthFormat": "{{year}}年{{month}}月",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "backToday": "回到本月",
+    "weekdays": ["一", "二", "三", "四", "五", "六", "日"],
+    "checked": "已打卡",
+    "notChecked": "未打卡",
+    "today": "今天",
+    "checkedToday": "今日已打卡",
+    "notCheckedToday": "今日尚未打卡"
+  },
   "cat": {
     "title": "云养猫",
     "adopt": "领养猫咪",

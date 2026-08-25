@@ -18,6 +18,9 @@ export interface AppShellState {
   showAdmin: boolean
   openAdmin: () => void
   closeAdmin: () => void
+  showCheckinCalendar: boolean
+  openCheckinCalendar: () => void
+  closeCheckinCalendar: () => void
 }
 
 export function useAppShell(): AppShellState {
@@ -25,6 +28,7 @@ export function useAppShell(): AppShellState {
   const [showLogin, setShowLogin] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
+  const [showCheckinCalendar, setShowCheckinCalendar] = useState(false)
 
   const openLogin = useCallback(() => setShowLogin(true), [])
   const closeLogin = useCallback(() => setShowLogin(false), [])
@@ -32,6 +36,8 @@ export function useAppShell(): AppShellState {
   const closeRegister = useCallback(() => setShowRegister(false), [])
   const openAdmin = useCallback(() => setShowAdmin(true), [])
   const closeAdmin = useCallback(() => setShowAdmin(false), [])
+  const openCheckinCalendar = useCallback(() => setShowCheckinCalendar(true), [])
+  const closeCheckinCalendar = useCallback(() => setShowCheckinCalendar(false), [])
 
   const switchToRegister = useCallback(() => {
     setShowLogin(false)
@@ -57,5 +63,8 @@ export function useAppShell(): AppShellState {
     showAdmin,
     openAdmin,
     closeAdmin,
+    showCheckinCalendar,
+    openCheckinCalendar,
+    closeCheckinCalendar,
   }
 }
