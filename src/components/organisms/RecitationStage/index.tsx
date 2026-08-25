@@ -22,6 +22,8 @@ import { useUIStore } from '@/store/uiStore'
 import { speakWord, warmupSpeech } from '@/utils/speech'
 import { playMeow, playHiss } from '@/utils/catSound'
 import { useCatStore, CAT_REWARD } from '@/store/catStore'
+import { useFeatureStore } from '@/store/featureStore'
+import { useReviewStore } from '@/store/reviewStore'
 import './RecitationStage.css'
 
 interface RecitationStageProps {
@@ -39,6 +41,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const { checkIn, todayChecked, loadCheckins } = useCheckinStore()
   const showToast = useUIStore((s) => s.showToast)
   const earnCoins = useCatStore((s) => s.earnCoins)
+  const catEnabled = useFeatureStore((s) => s.cat)
 
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
@@ -47,6 +50,9 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const [dragging, setDragging] = useState(false)
   const [lastJudgement, setLastJudgement] = useState<Judgement | null>(null)
   const countsRef = useRef({ known: 0, unknown: 0 })
+
+  // SM-2 提交（A1）：认识=correct，不认识=wrong，让后端记忆曲线生效
+  const submitReview = useReviewStore((s) => s.submit)
 
   const word = words[index]
 
@@ -66,18 +72,26 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
         chinese: word.meaning,
         known: j === 'known',
       })
-      // 云养猫联动：认识 → 甜美喵声 + 2 币；不认识 → 哈气音 + 1 币
-      if (j === 'known') {
-        playMeow()
-        void earnCoins(CAT_REWARD.KNOWN)
-      } else {
-        playHiss()
-        void earnCoins(CAT_REWARD.UNKNOWN)
+      // SM-2 提交给后端（认识=correct，不认识=wrong）
+      void submitReview({
+        word_id: word.id,
+        result: j === 'known' ? 'correct' : 'wrong',
+        mode: 'review',
+      }).catch(() => undefined)
+      // 云养猫联动：认识 → 甜美喵声 + 2 币；不认识 → 哈气音 + 1 币（P0-5 屏蔽）
+      if (catEnabled) {
+        if (j === 'known') {
+          playMeow()
+          void earnCoins(CAT_REWARD.KNOWN)
+        } else {
+          playHiss()
+          void earnCoins(CAT_REWARD.UNKNOWN)
+        }
       }
       setLastJudgement(j)
       setRevealed(true)
     },
-    [word, revealed, finished, recordJudgement, earnCoins],
+    [word, revealed, finished, recordJudgement, earnCoins, submitReview],
   )
 
   /** 播发音 */
@@ -177,7 +191,7 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
                 const ok = await checkIn()
                 if (ok) {
                   showToast(t('recitation.checkinSuccess'), 'success')
-                  void earnCoins(CAT_REWARD.CHECKIN) // 云养猫：打卡得币
+                  if (catEnabled) void earnCoins(CAT_REWARD.CHECKIN) // 云养猫：打卡得币（P0-5 屏蔽）
                 }
               })()
             }}

@@ -9,7 +9,9 @@
     "close": "Close",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "decrease": "Decrease",
+    "increase": "Increase"
   },
   "nav": {
     "home": "Learn",
@@ -49,8 +51,13 @@
     "placeholder": "Learning home under construction…",
     "subscribeHint": "Subscribe a wordbook in the Wordbook tab to start learning",
     "goWordbook": "Pick a wordbook",
-    "searchPlaceholder": "🔍 Search a word (Ctrl+K)...",
+    "searchPlaceholder": "Search words...",
     "searchEmpty": "No matching words",
+    "searchAria": "Search words",
+    "noBook": "No book selected",
+    "loading": "Scheduling words by memory curve…",
+    "doneToday": "All today's words done, great job!",
+    "refresh": "Refresh queue",
     "taskTitle": "Today's tasks",
     "metricTarget": "Daily target",
     "metricNew": "New",
@@ -59,6 +66,8 @@
     "sourceLabel": "Source: ",
     "targetConfig": "Daily target:",
     "start": "Start learning",
+    "switchMode": "Switch",
+    "currentMode": "Mode: ",
     "back": "Back",
     "stageTitle": "Today · {{count}} words",
     "stageHint": "Recitation flow (know / don't know → word detail) lands in the next module",
@@ -487,5 +496,53 @@
     "synced": "Synced",
     "failed": "Sync failed, please retry later",
     "offline": "You're offline — showing local data"
+  },
+  "admin": {
+    "title": "Admin Console",
+    "featuresTitle": "Core feature toggles",
+    "featuresSub": "Runtime control of core capabilities (stored locally)",
+    "usageTitle": "Usage",
+    "usageSub": "Word progress & check-in overview",
+    "accessTitle": "Access info",
+    "accessSub": "Local access records",
+    "on": "On",
+    "off": "Off",
+    "reset": "Reset visits",
+    "resetConfirm": "Delete all visit records? This cannot be undone.",
+    "resetDone": "Visit records reset",
+    "never": "Never",
+    "footnote": "Data is stored locally, for demo & dashboard tuning",
+    "feature": {
+      "cat": "Cloud Cat",
+      "catDesc": "Cat companion, answer sounds & coins",
+      "review": "Review queue",
+      "reviewDesc": "Blend recent words into the daily plan",
+      "search": "Dictionary search",
+      "searchDesc": "Header search box for word lookup",
+      "speech": "Pronunciation",
+      "speechDesc": "TTS reading of words",
+      "checkin": "Daily check-in",
+      "checkinDesc": "Daily check-in entry"
+    },
+    "metric": {
+      "totalWords": "Total words",
+      "learned": "Learned",
+      "mastered": "Mastered",
+      "visits": "Total visits",
+      "todayVisits": "Today visits",
+      "streak": "Current streak",
+      "checkinDays": "Check-in days"
+    },
+    "accessField": {
+      "firstSeen": "First seen",
+      "lastSeen": "Last seen",
+      "browser": "Browser",
+      "os": "OS",
+      "viewport": "Viewport",
+      "screen": "Screen",
+      "language": "Language",
+      "theme": "Theme",
+      "standalone": "Standalone (PWA)"
+    }
   }
 }

@@ -1,6 +1,8 @@
 // src/utils/speech.ts
 // TTS 发音工具（Web Speech API · 无需后端/外部音源）
 // 若浏览器不支持 speechSynthesis，静默降级为不发声。
+// 是否发音由 featureStore 的「语音发音」开关运行期决定。
+import { useFeatureStore } from '@/store/featureStore'
 
 let cachedVoice: SpeechSynthesisVoice | null = null
 
@@ -28,6 +30,7 @@ export function warmupSpeech(): void {
 
 /** 朗读英文单词/短语 */
 export function speakWord(text: string): void {
+  if (!useFeatureStore.getState().enabled('speech')) return
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   window.speechSynthesis.cancel()
   const utter = new SpeechSynthesisUtterance(text)

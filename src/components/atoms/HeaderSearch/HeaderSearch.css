@@ -1,0 +1,72 @@
+/* src/components/atoms/HeaderSearch/HeaderSearch.css
+   P0-2 全局字典搜索条（嵌入 header，玻璃拟态，紧凑），结果浮层 z-index 高于 header */
+
+.hs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 220px;
+  max-width: 32vw;
+  border-radius: var(--br-lg);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.hs:focus-within {
+  border-color: color-mix(in oklab, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent);
+}
+.hs-input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+.hs-input::placeholder { color: var(--color-label-tertiary); }
+
+/* 搜索结果浮层 */
+.hs-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-pop);
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: var(--br-lg);
+  background: var(--card-glass-1);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: var(--shadow-popover);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  padding: var(--spacing-xs);
+}
+.hs-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-md);
+  width: 100%;
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--br-md);
+  cursor: pointer;
+  transition: background-color var(--dur-fast);
+}
+.hs-item:hover { background: var(--color-fill-secondary); }
+.hs-item-word { font-weight: 600; color: var(--color-text); font-size: var(--font-size-sm); }
+.hs-item-mean {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

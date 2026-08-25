@@ -2,6 +2,7 @@
 // 打卡 store（M2-E）：当日背诵完成后打卡，localforage 持久化历史记录
 import { create } from 'zustand'
 import localforage from 'localforage'
+import { useFeatureStore } from './featureStore'
 
 const checkinStorage = localforage.createInstance({
   name: 'JustWord',
@@ -44,6 +45,7 @@ export const useCheckinStore = create<CheckinStore>((set, get) => ({
   },
 
   checkIn: async () => {
+    if (!useFeatureStore.getState().enabled('checkin')) return false // 打卡功能开关关闭
     const today = todayStr()
     if (get().todayChecked) return false
     const next = [...get().checkins, today]

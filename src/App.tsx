@@ -7,14 +7,16 @@ import { useAuth } from './context/AuthContext'
 import { Layout } from './components/templates/Layout'
 import { LoginGate } from './pages/LoginGate'
 import { AuthModal } from './components/organisms/AuthModal'
-import { ImportExportPanel } from './components/organisms/ImportExportPanel'
 import { ToastContainer } from './components/organisms/ToastContainer'
 import { ConfirmDialog } from './components/organisms/ConfirmDialog'
 import { Spinner } from './components/atoms/Spinner'
 import { PWAUpdateToast } from './components/organisms/PWAUpdateToast'
 import { PWAInstallPrompt } from './components/organisms/PWAInstallPrompt'
 import { CatBoard } from './components/organisms/CatBoard'
+import { AdminConsole } from './components/organisms/AdminConsole'
 import { useCatStore } from './store/catStore'
+import { useFeatureStore } from './store/featureStore'
+import { useAccessStore } from './store/accessStore'
 import { setupAuthListener } from './api'
 import { useAppShell } from './hooks/useAppShell'
 import { useTheme } from './hooks/useTheme'
@@ -33,9 +35,6 @@ const WordBookPage = lazy(() =>
 const LearningHomePage = lazy(() =>
   import('./pages/LearningHomePage').then((m) => ({ default: m.LearningHomePage }))
 )
-const ProfilePage = lazy(() =>
-  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage }))
-)
 
 function App() {
   const shell = useAppShell()
@@ -46,10 +45,15 @@ function App() {
   const { isAuthenticated, isLoading, user, logout } = useAuth()
   const { init: initSync, reset: resetSync, syncNow } = useSyncStore()
   const loadCat = useCatStore((s) => s.load)
+  const loadFeatures = useFeatureStore((s) => s.load)
+  const recordVisit = useAccessStore((s) => s.recordVisit)
+  const catEnabled = useFeatureStore((s) => s.cat)
 
   useEffect(() => {
-    void loadCat() // 云养猫：全局加载猫咪状态（时间衰减 + 持久化）
-  }, [loadCat])
+    void loadFeatures() // 恢复核心功能开关
+    void recordVisit() // 采集本次访问
+    if (catEnabled) void loadCat() // 云养猫：加载猫咪状态（默认屏蔽）
+  }, [loadFeatures, recordVisit, catEnabled, loadCat])
 
   useEffect(() => {
     const cleanup = setupAuthListener()
@@ -76,15 +80,9 @@ function App() {
     }
   }, [isAuthenticated, loadWords, clearDashboard, initSync, resetSync, syncNow])
 
-  const handleImportComplete = () => {
-    loadWords()
-    shell.closeImportExport()
-  }
-
-  // 切换 Tab 时若离开单词本，自动关闭导入导出面板
+  // 切换 Tab
   const handleTabChange = (tab: AppTab) => {
     shell.setTab(tab)
-    if (tab !== 'word') shell.closeImportExport()
   }
 
   const headerActions = (
@@ -137,21 +135,15 @@ function App() {
         headerProps={{
           activeTab: shell.activeTab,
           onTabChange: handleTabChange,
-          showImportExport: shell.showImportExport,
-          onToggleImportExport: shell.toggleImportExport,
-          user: user ? { username: user.username } : null,
+          user: user ? { username: user.username, email: user.email } : null,
           onShowLogin: shell.openLogin,
           onLogout: logout,
+          onOpenAdmin: shell.openAdmin,
           headerActions,
         }}
         wordCount={words.length}
       >
         {authModal}
-
-        {/* 导入导出面板只在单词本 Tab 可见 */}
-        {shell.showImportExport && shell.activeTab === 'word' && (
-          <ImportExportPanel onImportComplete={handleImportComplete} />
-        )}
 
         <Suspense
           fallback={
@@ -171,15 +163,13 @@ function App() {
           {shell.activeTab === 'stats' && (
             <div key="stats" className="tab-panel"><DashboardPage /></div>
           )}
-          {shell.activeTab === 'profile' && (
-            <div key="profile" className="tab-panel"><ProfilePage /></div>
-          )}
         </Suspense>
       </Layout>
 
       <ToastContainer />
       <ConfirmDialog />
-      <CatBoard />
+      {catEnabled && <CatBoard />}
+      <AdminConsole open={shell.showAdmin} onClose={shell.closeAdmin} />
       <PWAUpdateToast />
       <PWAInstallPrompt />
     </>

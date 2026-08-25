@@ -5,6 +5,7 @@ import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
 import { WordList } from '../../components/organisms/WordList'
 import { WordbookSection } from '../../components/organisms/WordbookSection'
+import { ImportExportPanel } from '../../components/organisms/ImportExportPanel'
 import { Input } from '../../components/atoms/Input'
 import { useUIStore } from '../../store/uiStore'
 import './WordBookPage.css'
@@ -13,7 +14,7 @@ type DifficultyFilter = 0 | 1 | 2 | 3 | 4 | 5
 
 export const WordBookPage: React.FC = () => {
   const { t } = useTranslation()
-  const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate } =
+  const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate, loadWords } =
     useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
   const [difficulty, setDifficulty] = useState<DifficultyFilter>(0)
@@ -106,6 +107,9 @@ export const WordBookPage: React.FC = () => {
     <div className="word-book-page">
       {/* ============ 内置词书（订阅入口） ============ */}
       <WordbookSection />
+
+      {/* ============ 词库管理（导入 / 导出 / 清空，原 header「管理词库」按钮功能于此页呈现） ============ */}
+      <ImportExportPanel onImportComplete={() => void loadWords()} />
 
       {/* ============ 顶部 Overview 条带 ============ */}
       <section className="wb-overview">

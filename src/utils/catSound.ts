@@ -1,6 +1,8 @@
 // src/utils/catSound.ts
 // 云养猫音效：Web Audio 合成「喵声 / 哈气音 / 咕噜声」，无需外部音频资源。
 // 浏览器不支持 Web Audio 时静默降级。
+// 是否发声由 featureStore 的「云养猫」开关运行期决定（P0-5 默认屏蔽）。
+import { useFeatureStore } from '@/store/featureStore'
 
 let ctx: AudioContext | null = null
 
@@ -26,6 +28,7 @@ function envelope(gainNode: GainNode, peak: number, attack: number, release: num
 
 /** 甜美喵声（频率上滑再下滑的 "nya~"） */
 export function playMeow(): void {
+  if (!useFeatureStore.getState().enabled('cat')) return
   const ac = getCtx()
   if (!ac) return
   const t0 = ac.currentTime + 0.01
@@ -60,6 +63,7 @@ export function playMeow(): void {
 
 /** 生气哈气音（白噪声 + 带通滤波，低通扫频） */
 export function playHiss(): void {
+  if (!useFeatureStore.getState().enabled('cat')) return
   const ac = getCtx()
   if (!ac) return
   const t0 = ac.currentTime + 0.01
@@ -92,6 +96,7 @@ export function playHiss(): void {
 
 /** 咕噜声（低频锯齿脉冲，抚摸/进食反馈） */
 export function playPurr(): void {
+  if (!useFeatureStore.getState().enabled('cat')) return
   const ac = getCtx()
   if (!ac) return
   const t0 = ac.currentTime + 0.01

@@ -11,11 +11,10 @@ interface LayoutProps {
   headerProps: {
     activeTab: AppTab
     onTabChange: (tab: AppTab) => void
-    showImportExport: boolean
-    onToggleImportExport: () => void
     user: UserBrief | null
     onShowLogin: () => void
     onLogout: () => void
+    onOpenAdmin: () => void
     headerActions?: React.ReactNode
   }
 }

@@ -1,5 +1,5 @@
 /* src/pages/LearningHomePage/LearningHomePage.css
-   M2-D 核心学习首页：沉浸式大屏占比 + 渐变背景明暗双态 + 顶部字典搜索 + 今日任务卡片 */
+   M2-D 核心学习首页：沉浸式大屏占比 + 渐变背景明暗双态 + 今日任务卡片 */
 
 .learning-home {
   position: relative;
@@ -13,78 +13,44 @@
   background-size: cover;
 }
 
-/* ============ 顶部字典搜索条 ============ */
-.lh-search {
-  position: relative;
-  z-index: 2;
+/* ============ 顶部状态条（当前词库 + 模式切换） ============ */
+.lh-topbar {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--br-xl);
-  background: var(--card-glass-2);
-  border: 0.5px solid var(--color-separator);
-  box-shadow: var(--shadow-card-rest);
-  backdrop-filter: saturate(180%) blur(24px);
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  flex-wrap: wrap;
+  z-index: 2;
 }
-.lh-search:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
-}
-.lh-search-icon {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-.lh-search-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--color-text);
-  font-size: var(--font-size-lg);
-  padding: var(--spacing-sm) 0;
-}
-.lh-search-input::placeholder { color: var(--color-label-tertiary); }
-.lh-search-kbd {
-  flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  color: var(--color-label-secondary);
-  background: var(--color-fill-tertiary);
-  border-radius: var(--br-sm);
-  padding: 2px 7px;
-  border: 0.5px solid var(--color-separator);
-}
-
-/* 搜索结果浮层 */
-.lh-search-results {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  max-height: 320px;
-  overflow-y: auto;
-  border-radius: var(--br-lg);
+.lh-book-chip,
+.lh-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 8px 14px;
+  border-radius: var(--br-pill);
+  font-size: var(--font-size-sm);
+  color: var(--color-label);
   background: var(--card-glass-1);
   border: 0.5px solid var(--color-separator);
-  box-shadow: var(--shadow-popover);
-  backdrop-filter: saturate(180%) blur(24px);
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
-  padding: var(--spacing-xs);
-}
-.lh-search-item {
-  display: flex;
-  align-items: baseline;
-  gap: var(--spacing-md);
-  width: 100%;
-  text-align: left;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--br-md);
   cursor: pointer;
-  transition: background-color var(--dur-fast);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  box-shadow: var(--shadow-card-rest);
+  transition: background-color var(--dur-fast), transform var(--dur-fast) var(--ease-spring-soft);
 }
-.lh-search-item:hover { background: var(--color-fill-secondary); }
-.lh-search-item-word { font-weight: 600; color: var(--color-text); }
-.lh-search-item-mean { flex: 1; min-width: 0; font-size: var(--font-size-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lh-book-chip:hover:not(:disabled),
+.lh-mode-chip:hover {
+  background: var(--card-glass-2);
+  transform: translateY(-1px);
+}
+.lh-book-chip:disabled { cursor: default; opacity: 0.9; }
+.lh-mode-chip { color: var(--color-text); font-weight: 600; }
+.lh-book-chip-icon { color: var(--apple-blue); }
+.lh-book-chip-label { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.lh-book-chip-count { font-size: var(--font-size-xs); color: var(--color-label-tertiary); font-variant-numeric: tabular-nums; }
+
+.lh-spin { animation: lh-spin 1s linear infinite; }
+@keyframes lh-spin { to { transform: rotate(360deg); } }
 
 /* ============ 今日任务卡片 ============ */
 .lh-task {
@@ -204,6 +170,34 @@
 .lh-start-btn:active { transform: scale(0.97); }
 .lh-start-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
+/* 开始按钮行 + 常驻模式切换入口 */
+.lh-start-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+.lh-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 10px 16px;
+  border-radius: var(--br-pill);
+  font-size: var(--font-size-sm);
+  color: var(--color-label);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+  cursor: pointer;
+  transition: background-color var(--dur-fast), transform var(--dur-fast) var(--ease-spring-soft);
+}
+.lh-mode-switch:hover { background: var(--color-fill-secondary); transform: translateY(-1px); }
+.lh-mode-switch:active { transform: scale(0.97); }
+.lh-mode-switch em {
+  font-style: normal;
+  color: var(--color-label-tertiary);
+  margin-right: 4px;
+}
+
 /* 空态引导 */
 .lh-empty {
   display: flex;
@@ -213,6 +207,12 @@
   text-align: center;
   padding: var(--spacing-3xl) 0;
   color: var(--color-label-secondary);
+}
+.lh-empty-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 /* ============ 猫咪陪伴角落（M5 云养猫） ============ */

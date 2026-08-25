@@ -9,6 +9,7 @@ export { achievementsApi } from './endpoints/achievements.api'
 export { wordbooksApi } from './endpoints/wordbooks.api'
 export { textbooksApi } from './endpoints/textbooks.api'
 export { syncApi } from './endpoints/sync.api'
+export { preferencesApi, preferencesApiHttp } from './endpoints/preferences.api'
 export { API_PATH } from './paths'
 
 export type {
@@ -33,6 +34,10 @@ export type {
   WordStatItem,
   WrongWordSummaryResponse,
   ReviewSummaryResponse,
+  DueReviewItem,
+  DueReviewsResponse,
+  ReviewSubmitRequest,
+  ReviewSubmitResponse,
   LearningRecord,
   LearningStats,
 } from './endpoints/learning.api'
@@ -77,3 +82,8 @@ export type {
   SyncPushResponse,
   SyncPullResponse,
 } from './endpoints/sync.api'
+
+export type {
+  UserPreferences,
+  UpdatePreferencesRequest,
+} from './endpoints/preferences.api'

@@ -9,7 +9,9 @@
     "close": "关闭",
     "confirm": "确认",
     "cancel": "取消",
-    "saving": "保存中…"
+    "saving": "保存中…",
+    "decrease": "减少",
+    "increase": "增加"
   },
   "nav": {
     "home": "学习",
@@ -49,8 +51,13 @@
     "placeholder": "核心学习首页建设中…",
     "subscribeHint": "前往「词库」订阅词书后即可开始学习",
     "goWordbook": "去选词书",
-    "searchPlaceholder": "🔍 搜索单词（Ctrl+K 唤起）...",
+    "searchPlaceholder": "搜索单词...",
     "searchEmpty": "未找到匹配单词",
+    "searchAria": "搜索单词",
+    "noBook": "未选词库",
+    "loading": "正在按记忆曲线排词…",
+    "doneToday": "今日单词已全部学完，太棒了！",
+    "refresh": "刷新队列",
     "taskTitle": "今日任务",
     "metricTarget": "今日目标",
     "metricNew": "新词",
@@ -59,6 +66,8 @@
     "sourceLabel": "选词来源：",
     "targetConfig": "当日目标：",
     "start": "开始学习",
+    "switchMode": "切换",
+    "currentMode": "当前模式：",
     "back": "返回",
     "stageTitle": "今日背诵 · 共 {{count}} 词",
     "stageHint": "背诵流程（认识 / 不认识 → 单词详情）将在下一模块完善",
@@ -487,5 +496,53 @@
     "synced": "同步完成",
     "failed": "同步失败，请稍后重试",
     "offline": "当前处于离线状态，已加载本地数据"
+  },
+  "admin": {
+    "title": "后台控制台",
+    "featuresTitle": "功能开关",
+    "featuresSub": "运行期启停核心能力",
+    "usageTitle": "使用情况",
+    "usageSub": "学习与访问概览",
+    "accessTitle": "访问信息",
+    "accessSub": "当前设备与访问统计",
+    "on": "已开启",
+    "off": "已关闭",
+    "reset": "重置访问",
+    "resetConfirm": "确定要清空全部访问记录吗？此操作不可撤销。",
+    "resetDone": "已重置访问记录",
+    "never": "暂无",
+    "footnote": "数据仅存于本机，用于演示与调试后台控制台",
+    "feature": {
+      "cat": "云养猫",
+      "catDesc": "猫咪陪伴、答题音效与金币",
+      "review": "复习队列",
+      "reviewDesc": "计划内混入最近学习单词",
+      "search": "字典搜索",
+      "searchDesc": "头部搜索框查词",
+      "speech": "语音发音",
+      "speechDesc": "单词 TTS 朗读",
+      "checkin": "每日打卡",
+      "checkinDesc": "每日打卡入口"
+    },
+    "metric": {
+      "totalWords": "总单词",
+      "learned": "已学",
+      "mastered": "掌握",
+      "visits": "累计访问",
+      "todayVisits": "今日访问",
+      "streak": "连续打卡",
+      "checkinDays": "累计打卡"
+    },
+    "accessField": {
+      "firstSeen": "首次访问",
+      "lastSeen": "最近访问",
+      "browser": "浏览器",
+      "os": "系统",
+      "viewport": "视口尺寸",
+      "screen": "屏幕尺寸",
+      "language": "语言",
+      "theme": "主题",
+      "standalone": "独立窗口(PWA)"
+    }
   }
 }

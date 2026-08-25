@@ -6,6 +6,7 @@ import localforage from 'localforage'
 import { textbooksApi, type TextbookWord } from '../api/endpoints/textbooks.api'
 import { useTextbookStore } from './textbookStore'
 import { useLearningStore } from './learningStore'
+import { useFeatureStore } from './featureStore'
 
 const planStorage = localforage.createInstance({
   name: 'JustWord',
@@ -137,18 +138,20 @@ export const useLearningPlanStore = create<LearningPlanStore>((set, get) => ({
         if (newWords.length >= dailyTarget) break
       }
 
-      // 5. 复习队列：最近学习记录（lastLearnedAt 降序），补足今日任务
-      const reviewWords: PlanWord[] = [...records]
-        .sort((a, b) => (b.lastLearnedAt ?? 0) - (a.lastLearnedAt ?? 0))
-        .filter((r) => !masteredSet.has(r.wordId) || learnedMap.has(r.wordId))
-        .map((r) => ({
-          id: r.wordId,
-          word: r.english,
-          meaning: r.chinese,
-          source: 'review' as const,
-        }))
-        .filter((r) => !seen.has(r.word.toLowerCase()))
-        .slice(0, reviewSize)
+      // 5. 复习队列：最近学习记录（lastLearnedAt 降序），补足今日任务（可被功能开关关闭）
+      const reviewWords: PlanWord[] = useFeatureStore.getState().enabled('review')
+        ? [...records]
+            .sort((a, b) => (b.lastLearnedAt ?? 0) - (a.lastLearnedAt ?? 0))
+            .filter((r) => !masteredSet.has(r.wordId) || learnedMap.has(r.wordId))
+            .map((r) => ({
+              id: r.wordId,
+              word: r.english,
+              meaning: r.chinese,
+              source: 'review' as const,
+            }))
+            .filter((r) => !seen.has(r.word.toLowerCase()))
+            .slice(0, reviewSize)
+        : []
 
       const planDate = todayStr()
       set({ dailyTarget, planDate, newWords, reviewWords })
