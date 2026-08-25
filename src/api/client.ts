@@ -1,5 +1,6 @@
 // src/api/client.ts
 import { BASE_URL } from '../config'  // 从 config 导入，不是 config/api
+import { API_PATH } from './paths'
 import i18n from '@/i18n'
 
 // ============ 错误类型 ============
@@ -42,6 +43,8 @@ export function getErrorMessage(status: number): string {
 export interface RequestConfig extends RequestInit {
   requiresAuth?: boolean
   timeout?: number
+  /** 内部使用：已自动续期重试过一次，避免无限递归 */
+  retried?: boolean
 }
 
 // ============ 响应类型 ============
@@ -53,6 +56,52 @@ export interface ApiResponse<T = any> {
     message: string
     detail?: string
   }
+}
+
+// ============ 登录态存储与自动续期 ============
+const TOKEN_KEY = 'justword_token'
+const USER_KEY = 'justword_user'
+const REFRESH_KEY = 'justword_refresh_token'
+
+function getRefreshToken(): string | null {
+  return localStorage.getItem(REFRESH_KEY)
+}
+
+function clearAuthStorage() {
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(USER_KEY)
+  localStorage.removeItem(REFRESH_KEY)
+}
+
+/** 并发去重：同一时刻只发一次 refresh，其余请求等待结果 */
+let refreshPromise: Promise<string | null> | null = null
+
+async function tryRefreshToken(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise
+  refreshPromise = (async () => {
+    const refreshToken = getRefreshToken()
+    if (!refreshToken) return null
+    try {
+      const response = await fetch(`${BASE_URL}${API_PATH.auth.refresh}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      })
+      if (!response.ok) return null
+      const data = await response.json()
+      if (!data?.access_token) return null
+      localStorage.setItem(TOKEN_KEY, data.access_token)
+      if (data.refresh_token) {
+        localStorage.setItem(REFRESH_KEY, data.refresh_token)
+      }
+      return data.access_token as string
+    } catch {
+      return null
+    } finally {
+      refreshPromise = null
+    }
+  })()
+  return refreshPromise
 }
 
 // ============ 核心请求函数 ============
@@ -98,7 +147,7 @@ export async function request<T>(
 
   // 3. 需要认证时注入 Token
   if (requiresAuth) {
-    const token = localStorage.getItem('justword_token')
+    const token = localStorage.getItem(TOKEN_KEY)
     if (token) {
       requestHeaders['Authorization'] = `Bearer ${token}`
     } else {
@@ -130,6 +179,17 @@ export async function request<T>(
 
     // 处理 HTTP 错误
     if (!response.ok) {
+      // 401 自动续期：受保护接口因 token 过期返回 401 时，尝试用 refresh token 换取新 token 并重试一次
+      if (response.status === 401 && requiresAuth && !config.retried) {
+        const newToken = await tryRefreshToken()
+        if (newToken) {
+          return request<T>(url, { ...config, retried: true })
+        }
+        // 续期失败：登录态已失效
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'))
+        throw new AuthError()
+      }
+
       // 后端统一错误格式
       if (data?.error) {
         throw new ApiError(
@@ -139,7 +199,7 @@ export async function request<T>(
         )
       }
 
-      // 401 特殊处理
+      // 401 特殊处理（非受保护接口，如登录/刷新失败）
       if (response.status === 401) {
         window.dispatchEvent(new CustomEvent('auth:unauthorized'))
         throw new AuthError()
@@ -204,8 +264,7 @@ export const http = {
 // ============ 监听 401 事件 ============
 export function setupAuthListener() {
   const handleUnauthorized = () => {
-    localStorage.removeItem('justword_token')
-    localStorage.removeItem('justword_user')
+    clearAuthStorage()
   }
 
   window.addEventListener('auth:unauthorized', handleUnauthorized)

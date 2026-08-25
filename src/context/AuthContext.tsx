@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null)
       localStorage.removeItem('justword_token')
       localStorage.removeItem('justword_user')
+      localStorage.removeItem('justword_refresh_token')
       clearWords()
     }
 
@@ -106,10 +107,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (email: string, password: string) => {
     try {
       const data = await authApi.login({ email, password })
-      
-      // 保存 token
+
+      // 保存 token（access + refresh，供 401 自动续期）
       setToken(data.access_token)
       localStorage.setItem('justword_token', data.access_token)
+      localStorage.setItem('justword_refresh_token', data.refresh_token)
       
       // 获取用户信息
       try {
@@ -126,6 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 如果获取用户信息失败，可能是 token 无效
         setToken(null)
         localStorage.removeItem('justword_token')
+        localStorage.removeItem('justword_refresh_token')
         return { success: false, message: i18n.t('auth.fetchUserFailed') }
       }
       
@@ -157,8 +160,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(() => {
     setToken(null)
     setUser(null)
-    localStorage.removeItem('justword_token')
-    localStorage.removeItem('justword_user')
+    // 通知后端撤销 refresh token 并清除本地登录态
+    authApi.logout(localStorage.getItem('justword_refresh_token'))
     clearWords()
   }, [clearWords])
 

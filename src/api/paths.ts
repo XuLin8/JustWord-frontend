@@ -9,6 +9,7 @@ export const API_PATH = {
     register: '/api/auth/register',
     me: '/api/auth/me',
     logout: '/api/auth/logout',
+    refresh: '/api/auth/refresh',
   },
   words: {
     root: '/api/words',
@@ -54,9 +55,9 @@ export const API_PATH = {
     restore: (wordId: string) => `/api/learning/wrong-words/${wordId}/restore`,
   },
   review: {
+    due: '/api/learning/reviews/due',
     summary: '/api/learning/reviews/summary',
-    next: '/api/learning/reviews/next',
-    submit: '/api/learning/reviews/submit',
+    submit: '/api/learning/reviews',
   },
   analysis: {
     forgetting: '/api/analysis/forgetting',
@@ -65,6 +66,9 @@ export const API_PATH = {
   },
   ai: {
     judge: '/api/ai/judge',
+  },
+  preferences: {
+    root: '/api/preferences',
   },
   health: '/api/health',
 } as const
