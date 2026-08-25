@@ -169,6 +169,7 @@
   font-size: var(--font-size-md);
   color: var(--color-label-secondary);
   line-height: 1.6;
+  white-space: pre-line;
 }
 .rec-example-ico { flex-shrink: 0; margin-top: 3px; color: var(--apple-indigo); }
 

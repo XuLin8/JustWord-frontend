@@ -62,6 +62,7 @@ interface BackendLibraryWord {
   chinese: string
   phonetic: string | null
   part_of_speech: string | null
+  example: string | null
 }
 
 interface BackendLibraryWordsResponse {
@@ -107,6 +108,7 @@ function mapLibraryWord(w: BackendLibraryWord, level: string): TextbookWord {
     word: w.english,
     phonetic: w.phonetic ?? undefined,
     meaning: w.chinese,
+    example: w.example ?? undefined,
     level,
   }
 }

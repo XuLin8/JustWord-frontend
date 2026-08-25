@@ -209,6 +209,7 @@
 - [x] 词书列表展示名称 / 词数 / 级别，支持选择（M2-B 已验证）
 - [x] 词书词条可分页拉取，订阅后可进入学习（M2-B / M2-D 已验证）
 - [x] 四六级 / 考研各至少一本词书可用（`textbooks.mock` 种子：CET4 / CET6 / KAOYAN）
+- [x] 四级词库音标 / 例句已补齐（ECDICT 回填：4524 音标 + 4540 例句，4543 词全部更新；API `/api/library/{id}` 返回 `phonetic` / `example`，详情弹窗展示）（见 §15）
 
 ### 5.3 词库管理（回归）
 - [ ] 添加 / 编辑 / 删除 / 去重 / 搜索 / 导入导出全部可用
@@ -382,7 +383,7 @@
 
 | # | 缺口 | 现状 | 应对方案 | 需就绪 |
 |---|---|---|---|---|
-| 1 | TTS 发音（听词默写 / 单词详情） | 无 TTS 实现；词条无音标数据 | Web Speech API 起步 + 规则判定；音标数据随词书补充 | M2 |
+| 1 | TTS 发音（听词默写 / 单词详情） | TTS 已用 Web Speech API 起步；四级词条音标 / 例句已随词书补充（ECDICT 回填） | Web Speech API 起步 + 规则判定；音标数据随词书补充（已落地，见 §15） | M2 |
 | 2 | 内置词书数据源 | 无词书数据；仅自建词库 | 从公开大纲词表整理，先一本可用词书起步 | M2 前 |
 | 3 | 猫咪形象 / 动画 / 音效资产 | 无任何猫咪资产 | AI 生成形象（Seedream）+ CSS/SVG 待机动画；音效用 Web Audio 合成或短音频 | M2 |
 | 4 | textbooks / sync 后端接口 | textbooks 已接真实 `/api/library`；sync 契约已定义（§6.4） | 词书已跑通真实后端；sync 前端 mock 先行，后端后续补充 | M1 |
@@ -642,4 +643,34 @@
 - `tsc -b` 与 `vite build` 零错误；PWA precache 34 项（含 cat 资产）。
 - 浏览器实测：注册/登录 → 我的页入口 → 领养 Momo → 学习页右下角猫咪+金币 → 点击抚摸/打开看板 → 认识判定金币 0→2 → 刷新状态持久化；全程无 JS 报错（含修复前 `DataCloneError` 的回归验证）。
 - 遗留 / 后续（M5+）：随机属性（品种 / 性格 / 体重）、离家出走与找回、装扮 gacha、猫窝区域（喂食喂水 / 铲猫砂 / 玩具装饰）、成就联动解锁装扮。付费点搁置。
+- 未推送，本地提交。
+
+---
+
+## 15. 四级词库音标 / 例句补齐（ECDICT 回填 · 已完成）
+
+> 背景：四级词库（`library_id=1`，4543 词）由 `migrations/load_cet4.py` 载入 TSV，源数据**缺音标与例句**（`phonetic` 为 NULL，无 example 列），导致单词详情弹窗音标 / 例句区留白。
+> 方案：采用开源英汉词典库 **ECDICT**（77 万词）回填 `phonetic` + `example`（取英文释义 definition 充当例句，截断 500 字符）。
+
+### 15.1 后端改动
+
+| 文件 | 改动 |
+|---|---|
+| `migrations/versions/015_add_example_to_library_words.sql` | `library_words` 增加 `example VARCHAR(500) NULL`（幂等迁移 + 回滚脚本） |
+| `app/models.py` | `LibraryWord` 增加 `example = Column(String(500), nullable=True)` |
+| `app/schemas.py` | `LibraryWordResponse` 增加 `example: Optional[str] = None` |
+| `app/routers/library.py` | 词条响应返回 `example=w.example` |
+| `migrations/backfill_cet4_ecdict.py` | 回填脚本：读 ECDICT → 幂等加列 → 按 `english` 精确匹配四级库 → 批量 UPDATE |
+| `migrations/data/ecdict.csv` | ECDICT 数据源（62.88 MB，770611 词条）归位存放 |
+
+### 15.2 回填结果
+
+- `ecdict loaded: 770611`；四级库 4543 词**全部更新**。
+- 回填后统计：**音标 4524 / 例句 4540**（19 词无音标、3 词无例句，属 ECDICT 覆盖缺口，不影响功能）。
+
+### 15.3 前端改动与验证
+
+- `src/api/endpoints/textbooks.api.ts`：`BackendLibraryWord` 增加 `example`，`mapLibraryWord` 映射 `example`。
+- `src/components/organisms/RecitationStage/RecitationStage.css`：`.rec-example` 增加 `white-space: pre-line`，例句自动换行。
+- 验证：`tsc -b` 与 `vite build` 零错误；`GET /api/library/1?limit=3&offset=0` 返回 `a / abandon / ability` 均带 `phonetic` + `example`；浏览器详情弹窗音标 / 例句展示正常（UTF-8 无乱码）。
 - 未推送，本地提交。
