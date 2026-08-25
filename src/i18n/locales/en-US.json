@@ -2,6 +2,10 @@
   "app": {
     "name": "Just Word"
   },
+  "progress": {
+    "todayLearned": "Learned {{learned}} / {{target}} words",
+    "extraDone": "+{{extra}} extra"
+  },
   "common": {
     "login": "Sign in",
     "logout": "Sign out",
@@ -81,8 +85,6 @@
     "badgeNew": "New",
     "badgeReview": "Review",
     "play": "Pronounce",
-    "swipeHint": "Drag the card to judge",
-    "dragHint": "Swipe left = know · swipe right = don't know",
     "similar": "Similar-looking",
     "synonym": "Synonyms",
     "antonym": "Antonyms",
@@ -295,7 +297,8 @@
     "filteredByDifficulty": " · filtered by difficulty {{difficulty}}",
     "difficultyFilter": "Difficulty:",
     "all": "All",
-    "posDistribution": "Part-of-speech:"
+    "posDistribution": "Part-of-speech:",
+    "pagination": "Page {{page}} / {{pages}}"
   },
   "textbooks": {
     "title": "Built-in wordbooks",

@@ -10,32 +10,15 @@
   min-height: calc(100vh - 180px);
 }
 
-/* ============ 进度条 ============ */
-.rec-progress {
-  height: 6px;
-  border-radius: var(--br-pill);
-  background: var(--color-fill-tertiary);
-  overflow: hidden;
-}
-.rec-progress-bar {
-  height: 100%;
-  border-radius: var(--br-pill);
-  background-image: linear-gradient(90deg, var(--apple-blue), var(--apple-indigo));
-  transition: width 360ms var(--ease-spring-soft);
-}
-
 /* ============ 头部 ============ */
 .rec-stage-head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-md);
   flex-wrap: wrap;
 }
-.rec-stage-count {
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
-  color: var(--color-label-secondary);
-}
+.rec-head-exit { margin-left: auto; }
 .rec-chip {
   font-size: var(--font-size-xs);
   padding: 3px 10px;
@@ -52,12 +35,7 @@
   position: relative;
   flex: 1;
   min-height: 320px;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
 }
-.rec-card-wrap.is-dragging { cursor: grabbing; }
 
 .rec-card {
   position: absolute;
@@ -71,15 +49,12 @@
   backdrop-filter: saturate(180%) blur(24px);
   -webkit-backdrop-filter: saturate(180%) blur(24px);
   overflow: hidden;
-  transition: transform 420ms var(--ease-spring-soft), box-shadow 420ms var(--ease-spring-soft);
-}
-.rec-card-wrap.is-dragging .rec-card {
-  transition: none;
-  box-shadow: var(--shadow-popover);
+  transition: box-shadow 420ms var(--ease-spring-soft);
 }
 
 /* ============ 判定面 ============ */
 .rec-front {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -88,6 +63,11 @@
   gap: var(--spacing-lg);
   padding: var(--spacing-3xl);
   text-align: center;
+}
+.rec-front-chip {
+  position: absolute;
+  top: var(--spacing-lg);
+  left: var(--spacing-lg);
 }
 .rec-word-huge {
   font-size: clamp(56px, 12vw, 96px) !important;
@@ -98,13 +78,6 @@
   font-size: var(--font-size-xl);
   color: var(--color-label-secondary);
   font-family: var(--font-family-apple);
-}
-.rec-front-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--font-size-sm);
-  color: var(--color-label-tertiary);
 }
 
 /* ============ 详情面 ============ */
@@ -198,36 +171,6 @@
 .rec-tag.is-synonym { color: var(--apple-green); background: var(--apple-green-p); }
 .rec-tag.is-antonym { color: var(--apple-red); background: var(--apple-red-p); }
 
-/* ============ 拖拽方向提示 ============ */
-.rec-drag-hint {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--br-pill);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  opacity: 0;
-  transition: opacity 160ms var(--ease-spring-soft);
-  pointer-events: none;
-}
-.rec-drag-hint.is-known {
-  right: var(--spacing-xl);
-  color: var(--apple-green);
-  background: var(--apple-green-p);
-  border: 1px solid color-mix(in oklab, var(--apple-green) 40%, transparent);
-}
-.rec-drag-hint.is-unknown {
-  left: var(--spacing-xl);
-  color: var(--apple-red);
-  background: var(--apple-red-p);
-  border: 1px solid color-mix(in oklab, var(--apple-red) 40%, transparent);
-}
-.rec-drag-hint.is-active { opacity: 1; }
-
 /* ============ 底部操作区 ============ */
 .rec-actions {
   display: flex;
@@ -301,7 +244,6 @@
   padding: 2px 7px;
   border: 0.5px solid var(--color-separator);
 }
-.rec-kbd-divider { margin: 0 var(--spacing-xs); }
 
 /* ============ 完成页 ============ */
 .rec-done {

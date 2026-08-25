@@ -2,6 +2,10 @@
   "app": {
     "name": "Just Word"
   },
+  "progress": {
+    "todayLearned": "今日已学 {{learned}} / {{target}} 词",
+    "extraDone": "超额 +{{extra}}"
+  },
   "common": {
     "login": "登录",
     "logout": "退出登录",
@@ -81,8 +85,6 @@
     "badgeNew": "新词",
     "badgeReview": "复习",
     "play": "发音",
-    "swipeHint": "拖拽卡片进行判定",
-    "dragHint": "左滑认识 · 右滑不认识",
     "similar": "形近词",
     "synonym": "近义词",
     "antonym": "反义词",
@@ -295,7 +297,8 @@
     "filteredByDifficulty": " · 筛选难度 {{difficulty}}",
     "difficultyFilter": "难度筛选：",
     "all": "全部",
-    "posDistribution": "词性分布："
+    "posDistribution": "词性分布：",
+    "pagination": "第 {{page}} / {{pages}} 页"
   },
   "textbooks": {
     "title": "内置词书",

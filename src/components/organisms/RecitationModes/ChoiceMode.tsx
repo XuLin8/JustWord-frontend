@@ -9,7 +9,7 @@ import { type PlanWord } from '@/store/learningPlanStore'
 import { useLearningStore } from '@/store/learningStore'
 import { speakWord } from '@/utils/speech'
 import { useReviewStore } from '@/store/reviewStore'
-import { useProgressStore } from '@/store/progressStore'
+import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
 import './RecitationModes.css'
@@ -23,7 +23,6 @@ export const ChoiceMode: React.FC<ChoiceModeProps> = ({ words, onExit }) => {
   const { t } = useTranslation()
   const recordJudgement = useLearningStore((s) => s.recordJudgement)
   const submitAttempt = useReviewStore((s) => s.submitAttempt)
-  const progressStore = useProgressStore()
 
   // 会话时长上报
   useLearningSession('choose')
@@ -129,19 +128,11 @@ export const ChoiceMode: React.FC<ChoiceModeProps> = ({ words, onExit }) => {
 
   if (!word) return null
 
-  // 顶部进度条 = 今日学习进度（已学/目标），刷新/重进后从后端恢复
-  const progress = Math.min(100, (progressStore.todayCorrect / Math.max(1, progressStore.dailyTarget)) * 100)
-
   return (
     <div className="rec-stage rm-mode">
-      <div className="rec-progress">
-        <div className="rec-progress-bar" style={{ width: `${progress}%` }} />
-      </div>
+      <TodayProgressBar />
 
       <div className="rec-stage-head">
-        <span className="rec-stage-count">
-          {index + 1} / {queue.length}
-        </span>
         <span className="rm-mode-tag">
           <ListChecks size={14} />
           {t('modes.choiceTitle')}

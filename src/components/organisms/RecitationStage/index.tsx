@@ -1,13 +1,12 @@
 // src/components/organisms/RecitationStage/index.tsx
 // M2-E 背诵流程：认识/不认识判定 → 展开详情（TTS/音标/释义/例句/形近/近义/反义）
-// 三通道切换：鼠标拖拽手势（左滑=认识，右滑=不认识）/ 按钮 / 键盘（↑ 不认识 · ↓ 认识 · 空格 发音）
+// 输入通道：按钮 / 键盘（↑ 不认识 · ↓ 认识 · 空格 发音）
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
   Check,
   ChevronRight,
-  Clock,
   PartyPopper,
   RotateCcw,
   Sparkles,
@@ -24,6 +23,7 @@ import { useCatStore, CAT_REWARD } from '@/store/catStore'
 import { useFeatureStore } from '@/store/featureStore'
 import { useReviewStore } from '@/store/reviewStore'
 import { useProgressStore } from '@/store/progressStore'
+import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
 import './RecitationStage.css'
@@ -34,8 +34,6 @@ interface RecitationStageProps {
 }
 
 type Judgement = 'known' | 'unknown'
-
-const DRAG_THRESHOLD = 72 // 拖拽触发阈值（px）
 
 export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit }) => {
   const { t } = useTranslation()
@@ -50,8 +48,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const [finished, setFinished] = useState(false)
-  const [dragX, setDragX] = useState(0)
-  const [dragging, setDragging] = useState(false)
   const [lastJudgement, setLastJudgement] = useState<Judgement | null>(null)
   const countsRef = useRef({ known: 0, unknown: 0 })
   // 词序快照：判定过程中固定本轮词序列，不受 submit 从 store.todayWords 移除词
@@ -63,8 +59,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
   // 今日进度（后端为准，刷新/重进/换设备一致）：今日答对 / 每日目标
   const progressStore = useProgressStore()
-  const todayLearned = progressStore.todayCorrect
-  const dailyTarget = progressStore.dailyTarget
 
   const word = queue[index]
 
@@ -132,7 +126,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
     }
     setIndex((i) => i + 1)
     setRevealed(false)
-    setDragX(0)
     setLastJudgement(null)
   }, [index, queue.length])
 
@@ -141,7 +134,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
     setIndex(0)
     setRevealed(false)
     setFinished(false)
-    setDragX(0)
     setLastJudgement(null)
   }, [])
 
@@ -163,25 +155,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [judge, playAudio, finished])
-
-  /** 拖拽手势 */
-  const dragStart = useRef<{ x: number; id: number } | null>(null)
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    dragStart.current = { x: e.clientX, id: e.pointerId }
-    setDragging(true)
-  }
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragStart.current || dragStart.current.id !== e.pointerId) return
-    setDragX(e.clientX - dragStart.current.x)
-  }
-  const endDrag = () => {
-    if (dragStart.current && Math.abs(dragX) > DRAG_THRESHOLD && !revealed && !finished) {
-      judge(dragX < 0 ? 'known' : 'unknown')
-    }
-    dragStart.current = null
-    setDragging(false)
-    setDragX(0)
-  }
 
   // ============ 完成页 ============
   if (finished) {
@@ -225,44 +198,21 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
   if (!word) return null
 
-  // 顶部进度条 = 今日学习进度（已学/目标），刷新/重进后从持久化记录恢复，不清零
-  const progress = Math.min(100, (todayLearned / Math.max(1, dailyTarget)) * 100)
-
   return (
     <div className="rec-stage">
-      {/* 进度条 */}
-      <div className="rec-progress" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
-        <div className="rec-progress-bar" style={{ width: `${progress}%` }} />
-      </div>
+      {/* 今日学习进度（双段式：今日计划 + 超额完成） */}
+      <TodayProgressBar />
 
       <div className="rec-stage-head">
-        <span className="rec-stage-count">
-          {index + 1} / {queue.length}
-        </span>
-        <span className={`rec-chip ${word.source === 'new' ? 'is-new' : 'is-review'}`}>
-          {word.source === 'new' ? t('recitation.badgeNew') : t('recitation.badgeReview')}
-        </span>
-        <Button variant="ghost" size="sm" onClick={onExit}>
+        <Button variant="ghost" size="sm" className="rec-head-exit" onClick={onExit}>
           <ArrowLeft size={16} />
           {t('recitation.exit')}
         </Button>
       </div>
 
-      {/* 单词卡片（可拖拽） */}
-      <div
-        className={`rec-card-wrap ${dragging ? 'is-dragging' : ''} ${revealed ? 'is-revealed' : ''}`}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onPointerLeave={endDrag}
-      >
-        <div
-          className="rec-card"
-          style={{
-            transform: `translateX(${dragX}px) rotate(${dragX / 18}deg)`,
-          }}
-        >
+      {/* 单词卡片 */}
+      <div className={`rec-card-wrap ${revealed ? 'is-revealed' : ''}`}>
+        <div className="rec-card">
           {revealed ? (
             /* ============ 详情面 ============ */
             <div className="rec-detail">
@@ -323,26 +273,12 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
           ) : (
             /* ============ 判定面 ============ */
             <div className="rec-front">
+              <span className={`rec-chip rec-front-chip ${word.source === 'new' ? 'is-new' : 'is-review'}`}>
+                {word.source === 'new' ? t('recitation.badgeNew') : t('recitation.badgeReview')}
+              </span>
               <h2 className="rec-word-en rec-word-huge">{word.word}</h2>
               {word.phonetic && <p className="rec-front-phonetic">{word.phonetic}</p>}
-              <p className="rec-front-hint">
-                <Volume2 size={14} />
-                {t('recitation.swipeHint')}
-              </p>
             </div>
-          )}
-
-          {!revealed && (
-            <>
-              <span className={`rec-drag-hint is-known ${dragX < -DRAG_THRESHOLD * 0.5 ? 'is-active' : ''}`}>
-                <Check size={18} />
-                {t('recitation.known')}
-              </span>
-              <span className={`rec-drag-hint is-unknown ${dragX > DRAG_THRESHOLD * 0.5 ? 'is-active' : ''}`}>
-                <X size={18} />
-                {t('recitation.unknown')}
-              </span>
-            </>
           )}
         </div>
       </div>
@@ -372,9 +308,6 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
 
       <p className="rec-kbd-hint">
         <kbd>↑</kbd> {t('recitation.unknown')} · <kbd>↓</kbd> {t('recitation.known')} · <kbd>{t('recitation.space')}</kbd> {t('recitation.play')}
-        <span className="rec-kbd-divider">·</span>
-        <Clock size={12} />
-        {t('recitation.dragHint')}
       </p>
     </div>
   )

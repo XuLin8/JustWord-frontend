@@ -80,8 +80,13 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
   }, [loading, enrolledIds.length, todayWords.length])
 
   const exitMode = () => {
-    setRule(null)
-    setView('mode')
+    if (rule === null) {
+      // 判定模式（首页即背诵）：退出回到「背诵方式选择」层，避免状态不变导致退出按钮无反应
+      setView('rules')
+    } else {
+      setRule(null)
+      setView('mode')
+    }
     void loadDue() // 重新拉取剩余队列，供下一轮/再次进入
   }
 
