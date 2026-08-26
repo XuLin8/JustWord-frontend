@@ -276,9 +276,9 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
         </div>
 
         {/* 导入 */}
-        <div className="flex items-center gap-2">
-          <span className="w-10 text-sm font-medium text-muted-foreground">{t('importExport.import')}</span>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <span className="w-12 text-sm font-medium text-muted-foreground">{t('importExport.import')}</span>
+          <div className="flex items-center gap-2.5">
             <Button size="sm" variant="outline" asChild disabled={isImporting}>
               <label className="cursor-pointer">
                 <Upload className="size-4" />
