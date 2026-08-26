@@ -135,6 +135,7 @@ function App() {
           onLogout: logout,
           onOpenAdmin: shell.openAdmin,
           onOpenCheckinCalendar: shell.openCheckinCalendar,
+          onOpenProfile: () => shell.setTab('profile'),
           headerActions,
         }}
         wordCount={words.length}
@@ -149,8 +150,8 @@ function App() {
         {shell.activeTab === 'word' && (
           <div key="word" className="tab-panel"><WordBookPage /></div>
         )}
-        {shell.activeTab === 'stats' && (
-          <div key="stats" className="tab-panel"><DashboardPage /></div>
+        {shell.activeTab === 'profile' && (
+          <div key="profile" className="tab-panel"><DashboardPage /></div>
         )}
       </Layout>
 

@@ -31,6 +31,7 @@ export const API_PATH = {
   wordbooks: {
     root: '/api/wordbooks',
     detail: (id: number) => `/api/wordbooks/${id}`,
+    stats: '/api/wordbooks/stats',
     word: (bookId: number, wordId: string) => `/api/wordbooks/${bookId}/words/${wordId}`,
   },
   textbooks: {

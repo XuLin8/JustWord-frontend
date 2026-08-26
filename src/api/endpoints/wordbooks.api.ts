@@ -25,9 +25,24 @@ export interface UpdateWordbookRequest {
   description?: string
 }
 
+/** 单词本学习占比统计（GET /wordbooks/stats） */
+export interface WordbookStatsItem {
+  id: number
+  name: string
+  total: number
+  learned: number
+  mastered: number
+  learned_rate: number
+  mastered_rate: number
+}
+
 export const wordbooksApi = {
   list: () =>
     http.get<WordbookResponse[]>(API_PATH.wordbooks.root),
+
+  /** 单词本学习占比统计（总词数/已学/已掌握） */
+  getStats: () =>
+    http.get<WordbookStatsItem[]>(API_PATH.wordbooks.stats),
 
   create: (data: CreateWordbookRequest) =>
     http.post<WordbookResponse>(API_PATH.wordbooks.root, data),

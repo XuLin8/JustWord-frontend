@@ -10,7 +10,7 @@ import { useCatStore } from '@/store/catStore'
 import { useFeatureStore } from '@/store/featureStore'
 import { usePreferenceStore } from '@/store/preferenceStore'
 
-export type AppTab = 'home' | 'word' | 'stats'
+export type AppTab = 'home' | 'word' | 'profile'
 
 export interface UserBrief {
   username: string
@@ -27,6 +27,8 @@ interface AppHeaderProps {
   onOpenAdmin: () => void
   /** 打开打卡日历 */
   onOpenCheckinCalendar: () => void
+  /** 打开个人主页（LeetCode 式，头像下拉进入） */
+  onOpenProfile: () => void
   /** 头部右侧动作插槽（主题/语言切换等全局入口），由 Layout/App 注入。 */
   headerActions?: React.ReactNode
 }
@@ -34,7 +36,6 @@ interface AppHeaderProps {
 const TABS: Array<{ id: AppTab; labelKey: string }> = [
   { id: 'home',  labelKey: 'nav.home' },
   { id: 'word',  labelKey: 'nav.wordbook' },
-  { id: 'stats', labelKey: 'nav.stats' },
 ]
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -45,6 +46,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onLogout,
   onOpenAdmin,
   onOpenCheckinCalendar,
+  onOpenProfile,
   headerActions,
 }) => {
   const { t } = useTranslation()
@@ -94,14 +96,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-              {/* 账号信息 */}
-              <div className="flex items-center gap-3 px-2 py-1.5">
+              {/* 账号信息（点击进入个人主页，LeetCode 式两步入口） */}
+              <DropdownMenuItem
+                onSelect={onOpenProfile}
+                className="cursor-pointer gap-3 !py-2"
+              >
                 <span className="user-avatar !size-10 text-sm" aria-hidden>{usernameInitial}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{user.username}</p>
-                  <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                </div>
-              </div>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-foreground">{user.username}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{user.email}</span>
+                </span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
 
               {/* 云养猫入口（来自「我的」页；P0-5 屏蔽） */}

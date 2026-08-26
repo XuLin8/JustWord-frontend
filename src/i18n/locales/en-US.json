@@ -27,7 +27,11 @@
     "account": "Account",
     "dataAndSync": "Data & Sync",
     "comingSoon": "Coming soon",
-    "subscribedWordbooks": "Subscribed wordbooks"
+    "subscribedWordbooks": "Subscribed wordbooks",
+    "joined": "Joined {{date}}",
+    "streakDays": "Day streak",
+    "totalDays": "Days total",
+    "totalWords": "Words added"
   },
   "calendar": {
     "title": "Check-in Calendar",

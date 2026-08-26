@@ -1,8 +1,9 @@
 // src/store/vizStore.ts
-// P2 数据可视化数据源：每日聚合（热力图/雷达图）+ 单词快照（记忆曲线）
+// P2 数据可视化数据源：每日聚合（热力图/雷达图）+ 单词快照（记忆曲线）+ 单词本学习占比
 import { create } from 'zustand'
-import { learningApi, dashboardApi, checkinApi } from '@/api'
+import { learningApi, dashboardApi, checkinApi, wordbooksApi } from '@/api'
 import type { DailyStatItem, WordSnapshotItem } from '@/api/endpoints/learning.api'
+import type { WordbookStatsItem } from '@/api/endpoints/wordbooks.api'
 import type { RadarDimension } from '@/components/organisms/DataViz/AbilityRadar'
 import type { HeatDay } from '@/components/organisms/DataViz/HeatmapChart'
 import i18n from '@/i18n'
@@ -41,8 +42,11 @@ interface VizStore {
   snapshots: WordSnapshotItem[]
   snapshotWordId: string | null
   loadingSnapshots: boolean
+  bookStats: WordbookStatsItem[]
+  loadingBookStats: boolean
   loadDaily: () => Promise<void>
   loadSnapshots: (wordId: string) => Promise<void>
+  loadBookStats: () => Promise<void>
   clear: () => void
 }
 
@@ -54,6 +58,8 @@ export const useVizStore = create<VizStore>((set, get) => ({
   snapshots: [],
   snapshotWordId: null,
   loadingSnapshots: false,
+  bookStats: [],
+  loadingBookStats: false,
 
   loadDaily: async () => {
     if (get().loadingDaily) return
@@ -93,5 +99,26 @@ export const useVizStore = create<VizStore>((set, get) => ({
     }
   },
 
-  clear: () => set({ daily: [], heat: [], radar: [], snapshots: [], snapshotWordId: null }),
+  loadBookStats: async () => {
+    if (get().loadingBookStats) return
+    set({ loadingBookStats: true })
+    try {
+      const items = await wordbooksApi.getStats()
+      set({ bookStats: items })
+    } catch {
+      set({ bookStats: [] })
+    } finally {
+      set({ loadingBookStats: false })
+    }
+  },
+
+  clear: () =>
+    set({
+      daily: [],
+      heat: [],
+      radar: [],
+      snapshots: [],
+      snapshotWordId: null,
+      bookStats: [],
+    }),
 }))

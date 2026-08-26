@@ -835,3 +835,286 @@
   color: var(--color-label-tertiary);
   line-height: 1.6;
 }
+
+/* ================= 个人主页（LeetCode 式：左个人信息 + 右主体） ================= */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-2xl);
+}
+.profile-grid {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .profile-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- 左栏：个人信息卡 ---- */
+.profile-side {
+  position: sticky;
+  top: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border-radius: var(--br-2xl);
+  background: var(--card-glass-3);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-card-rest);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  text-align: center;
+  animation: fade-in-up 520ms var(--ease-spring) both;
+}
+@media (max-width: 900px) {
+  .profile-side { position: static; }
+}
+.profile-avatar {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(135deg, #0A84FF 0%, #5E5CE6 55%, #BF5AF2 100%);
+  box-shadow: 0 10px 24px -10px rgba(94, 92, 230, 0.55), inset 0 1px 0 rgba(255,255,255,0.3);
+  letter-spacing: -0.02em;
+}
+.profile-name {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-label);
+  line-height: 1.2;
+}
+.profile-email {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 100%;
+}
+.profile-joined {
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+  letter-spacing: var(--tracking-wide);
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin: var(--spacing-sm) 0;
+}
+.profile-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--spacing-sm) 2px;
+  border-radius: var(--br-lg);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--border);
+}
+.profile-stat b {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-label);
+  line-height: 1;
+}
+.profile-stat span {
+  font-size: 10px;
+  color: var(--color-label-tertiary);
+  letter-spacing: 0.02em;
+}
+.profile-cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-top: var(--spacing-sm);
+}
+.profile-cta [data-slot="button"] {
+  width: 100%;
+}
+.profile-cta [data-slot="button"]:first-child {
+  background-color: #0A84FF;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  border: none;
+  box-shadow: 0 8px 20px -8px rgba(10, 132, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+:root.dark .profile-cta [data-slot="button"]:first-child {
+  background-color: rgba(48, 106, 255, 0.32);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, rgba(62, 120, 255, 0.85) 0%, rgba(106, 96, 235, 0.8) 100%);
+  border: 0.5px solid rgba(120, 150, 255, 0.28);
+  color: #F2F4FF;
+  box-shadow: 0 6px 18px -10px rgba(40, 90, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* ---- 右栏主体 ---- */
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  min-width: 0;
+}
+
+/* ---- 热力图时间范围按钮（分段控件） ---- */
+.profile-heat-card .dash-card-head {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+.heat-range-btns {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-secondary);
+  box-shadow: inset 0 0 0 0.5px var(--border);
+}
+.heat-range-btn {
+  border: none;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: var(--br-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-label-secondary);
+  background: transparent;
+  transition: color var(--dur-fast), background-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.heat-range-btn:hover { color: var(--color-label); }
+.heat-range-btn.is-active {
+  color: var(--color-label);
+  background: var(--card-glass-3);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.10), inset 0 0 0 0.5px var(--border);
+}
+:root.dark .heat-range-btn.is-active {
+  background: linear-gradient(180deg, rgba(96, 100, 118, 0.55) 0%, rgba(58, 60, 74, 0.6) 100%);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* ---- 折叠区 ---- */
+.profile-more {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+.profile-more-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--br-pill);
+  border: 0.5px dashed var(--color-separator);
+  background: transparent;
+  color: var(--color-label-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: color var(--dur-fast), background-color var(--dur-fast), border-color var(--dur-fast);
+}
+.profile-more-toggle:hover {
+  color: var(--color-label);
+  background: var(--color-fill-tertiary);
+  border-color: var(--border);
+}
+.profile-more-toggle i {
+  width: 8px; height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--dur-fast);
+}
+.profile-more-toggle i.is-open {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+/* ---- 单词本学习占比 ---- */
+.book-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+.book-stats-summary {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-label-tertiary);
+  letter-spacing: 0.01em;
+}
+.book-stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+.book-stat-item {
+  padding: 4px 0;
+}
+.book-stat-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: 6px;
+}
+.book-stat-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-label);
+  letter-spacing: -0.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.book-stat-nums {
+  font-size: var(--font-size-xs);
+  color: var(--color-label-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.book-stat-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-fill-secondary);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 0.5px var(--border);
+}
+.book-stat-bar i {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  border-radius: inherit;
+}
+.book-stat-learned {
+  background: linear-gradient(90deg, #0A84FF, #5E5CE6);
+  transform-origin: left;
+  animation: prog-in 700ms var(--ease-spring) both;
+}
+.book-stat-mastered {
+  background: linear-gradient(90deg, #30D158, #30B0C7);
+  transform-origin: left;
+  animation: prog-in 760ms var(--ease-spring) both;
+  z-index: 1;
+}
+.book-stat-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--color-label-tertiary);
+  letter-spacing: 0.02em;
+}
+.book-stat-foot span:last-child { font-weight: 700; color: var(--color-label-secondary); }

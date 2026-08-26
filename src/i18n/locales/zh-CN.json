@@ -27,7 +27,11 @@
     "account": "账号",
     "dataAndSync": "数据与同步",
     "comingSoon": "功能建设中，敬请期待",
-    "subscribedWordbooks": "已订阅词书"
+    "subscribedWordbooks": "已订阅词书",
+    "joined": "加入于 {{date}}",
+    "streakDays": "连续打卡",
+    "totalDays": "累计打卡",
+    "totalWords": "收录单词"
   },
   "calendar": {
     "title": "打卡日历",
@@ -312,7 +316,19 @@
     "dimFocus": "专注度",
     "dimReview": "复习比",
     "dimStreak": "连续度",
-    "dimMastery": "掌握度"
+    "dimMastery": "掌握度",
+    "bookStatsTitle": "单词本学习占比",
+    "bookStatsSub": "各单词本已学 / 掌握进度",
+    "bookStatsEmpty": "暂无单词本，去「词库」创建或导入吧",
+    "bookStatsSummary": "共 {{books}} 个单词本 · 已学 {{learned}} / {{total}} 词",
+    "bookStatsLearned": "已学 {{learned}} / {{total}}",
+    "bookStatsMastered": "掌握 {{mastered}} 词",
+    "heatRangeLabel": "时间范围",
+    "heatRange7": "近 7 天",
+    "heatRange30": "近 30 天",
+    "heatRange90": "近 90 天",
+    "heatRange365": "近一年",
+    "moreStats": "更多数据（熟练度分布 / 作答构成 / 学习任务）"
   },
   "wordbook": {
     "totalLabel": "单词总数",

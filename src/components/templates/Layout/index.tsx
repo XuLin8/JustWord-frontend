@@ -16,6 +16,7 @@ interface LayoutProps {
     onLogout: () => void
     onOpenAdmin: () => void
     onOpenCheckinCalendar: () => void
+    onOpenProfile: () => void
     headerActions?: React.ReactNode
   }
 }
