@@ -551,6 +551,7 @@
   },
   "importExport": {
     "title": "词库管理",
+    "subtitle": "可从 JSON / CSV 文件导入你自己的单词，亦可导出、清空，跨设备同步",
     "export": "导出",
     "import": "导入",
     "clearAll": "清空词库",

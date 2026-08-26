@@ -535,6 +535,7 @@
   },
   "importExport": {
     "title": "Wordbook management",
+    "subtitle": "Import your own words from JSON / CSV files, or export and clear the wordbook, synced across devices",
     "export": "Export",
     "import": "Import",
     "clearAll": "Clear wordbook",
