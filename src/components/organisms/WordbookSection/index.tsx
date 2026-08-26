@@ -7,7 +7,7 @@ import { BookOpen, Check, Info, Loader2, Search, X } from 'lucide-react'
 import { textbooksApi, type Textbook, type TextbookWord } from '@/api/endpoints/textbooks.api'
 import { useTextbookStore } from '@/store/textbookStore'
 import { useUIStore } from '@/store/uiStore'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -188,38 +188,43 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((book) => {
-            const enrolled = isEnrolled(book.id)
-            return (
-              <Card
-                key={book.id}
-                id={`wordbook-card-${book.id}`}
-                className={`gap-3 wordbook-card ${enrolled ? 'wordbook-card-enrolled' : ''} ${pulseId === book.id ? 'wordbook-card-pulse' : ''}`}
-              >
-                <CardHeader className="gap-1.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base">{book.name}</CardTitle>
+        <div className="wordbook-list">
+          <div className="wordbook-list-head">
+            <span className="wordbook-list-col-name">{t('textbooks.colName')}</span>
+            <span className="wordbook-list-col-count">{t('textbooks.colCount')}</span>
+            <span className="wordbook-list-col-status">{t('textbooks.colStatus')}</span>
+            <span className="wordbook-list-col-action">{t('textbooks.colAction')}</span>
+          </div>
+          <div className="wordbook-list-body">
+            {filtered.map((book) => {
+              const enrolled = isEnrolled(book.id)
+              return (
+                <div
+                  key={book.id}
+                  id={`wordbook-card-${book.id}`}
+                  className={`wordbook-list-row ${enrolled ? 'wordbook-list-row-enrolled' : ''} ${pulseId === book.id ? 'wordbook-card-pulse' : ''}`}
+                >
+                  <div className="wordbook-list-col-name">
+                    <span className="wordbook-list-title">{book.name}</span>
+                    {book.tags && book.tags.length > 0 && (
+                      <span className="wordbook-list-tags">
+                        {book.tags.map((tg) => (
+                          <span key={tg} className="wordbook-list-tag">
+                            #{tg}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                  </div>
+                  <span className="wordbook-list-col-count wordbook-list-count">
+                    {t('textbooks.wordsCount', { count: book.word_count })}
+                  </span>
+                  <span className="wordbook-list-col-status">
                     <Badge variant={enrolled ? 'default' : 'outline'}>
                       {enrolled ? t('textbooks.learning') : t('textbooks.notSubscribed')}
                     </Badge>
-                  </div>
-                  <CardDescription className="line-clamp-2">{book.description}</CardDescription>
-                  {book.tags && book.tags.length > 0 && (
-                    <div className="wordbook-card-tags">
-                      {book.tags.map((tg) => (
-                        <Badge key={tg} variant="secondary" className="wordbook-tag">
-                          #{tg}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {t('textbooks.wordsCount', { count: book.word_count })}
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="wordbook-list-col-action wordbook-list-actions">
                     <Button variant="outline" size="sm" onClick={() => setBrowseBook(book)}>
                       {t('textbooks.browse')}
                     </Button>
@@ -238,17 +243,15 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
                         disabled={subscribingId === book.id}
                         onClick={() => void handleEnroll(book)}
                       >
-                        {subscribingId === book.id ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : null}
+                        {subscribingId === book.id ? <Loader2 className="size-4 animate-spin" /> : null}
                         {t('textbooks.subscribe')}
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 
