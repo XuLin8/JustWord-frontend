@@ -11,6 +11,8 @@ export interface Textbook {
   level: 'CET4' | 'CET6' | 'KAOYAN' | string
   word_count: number
   description: string
+  /** 词库标签，如 ["四级", "高频"] */
+  tags: string[]
   created_at: string
 }
 
@@ -21,6 +23,8 @@ export interface TextbookWord {
   meaning: string
   example?: string
   level: string
+  /** 词条标签（未单独标注时继承词库标签） */
+  tags: string[]
   /** 形近词（外观相近、易混） */
   similarWords?: string[]
   /** 近义词 */
@@ -54,6 +58,7 @@ interface BackendLibrary {
   name: string
   description: string
   words_count: number
+  tags: string[]
 }
 
 interface BackendLibraryWord {
@@ -63,6 +68,7 @@ interface BackendLibraryWord {
   phonetic: string | null
   part_of_speech: string | null
   example: string | null
+  tags: string[]
 }
 
 interface BackendLibraryWordsResponse {
@@ -98,6 +104,7 @@ function mapLibrary(lib: BackendLibrary): Textbook {
     level: deriveLevel(lib.name),
     word_count: lib.words_count,
     description: lib.description ?? '',
+    tags: lib.tags ?? [],
     created_at: '',
   }
 }
@@ -110,6 +117,7 @@ function mapLibraryWord(w: BackendLibraryWord, level: string): TextbookWord {
     meaning: w.chinese,
     example: w.example ?? undefined,
     level,
+    tags: w.tags ?? [],
   }
 }
 

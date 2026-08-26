@@ -10,7 +10,7 @@
   align-items: center;
   gap: var(--spacing-md);
 
-  padding: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-2xl);
   background: var(--card-glass-1);
   border-radius: var(--br-xl);
   border: 0.5px solid var(--border);
@@ -67,14 +67,48 @@
   opacity: 0.9;
 }
 
+.word-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
 .word-card-content {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  position: relative;
-  z-index: 1;
   min-width: 0;
-  flex: 1;
+  flex-wrap: wrap;
+}
+
+/* 标签行 */
+.word-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.word-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+  color: var(--color-label-secondary);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+  transition:
+    background-color var(--dur-fast),
+    color var(--dur-fast);
+}
+.word-tag:hover {
+  background: var(--color-fill-secondary);
+  color: var(--apple-blue);
 }
 
 .word-english {

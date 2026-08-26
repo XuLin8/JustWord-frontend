@@ -11,8 +11,6 @@ import { Input } from '../../components/atoms/Input'
 import { useUIStore } from '../../store/uiStore'
 import './WordBookPage.css'
 
-type DifficultyFilter = 0 | 1 | 2 | 3 | 4 | 5
-
 /** 词列表每页条数（订阅导入可能数千条，分页避免一次性全量渲染） */
 const PAGE_SIZE = 50
 
@@ -26,7 +24,7 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
   const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate, loadWords } =
     useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
-  const [difficulty, setDifficulty] = useState<DifficultyFilter>(0)
+  const [tagFilter, setTagFilter] = useState('')
   const [page, setPage] = useState(1)
   // false=全部单词，true=生词本（收藏）
   const [favView, setFavView] = useState(false)
@@ -35,20 +33,29 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
     const total = words.length
     const engLower = new Map<string, number>()
     const posSet = new Set<string>()
-    const diffBuckets = [0, 0, 0, 0, 0, 0] // 0（未标）/ 1 / 2 / 3 / 4 / 5
     for (const w of words) {
       const k = w.english.trim().toLowerCase()
       engLower.set(k, (engLower.get(k) ?? 0) + 1)
       const meta = w.meta_data
       const pos = meta?.wordType ?? meta?.partOfSpeech ?? meta?.part_of_speech
       if (pos) posSet.add(String(pos))
-      const d = Number(meta?.difficulty ?? 0) || 0
-      const bucket = Math.max(0, Math.min(5, Math.round(d)))
-      diffBuckets[bucket] += 1
     }
     const duplicateCount = total - engLower.size
     const duplicateRate = total > 0 ? duplicateCount / total : 0
-    return { total, uniqueCount: engLower.size, duplicateCount, duplicateRate, posCount: posSet.size, diffBuckets }
+    return { total, uniqueCount: engLower.size, duplicateCount, duplicateRate, posCount: posSet.size }
+  }, [words])
+
+  // 标签分布：词库内所有单词标签的计数（用于筛选 chips 与 Overview 展示）
+  const tagCounts = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const w of words) {
+      const tags = w.meta_data?.tags ?? []
+      for (const tag of tags) {
+        const key = String(tag)
+        m.set(key, (m.get(key) ?? 0) + 1)
+      }
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1])
   }, [words])
 
   const favCount = useMemo(() => words.filter((w) => w.favorited).length, [words])
@@ -62,13 +69,13 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
           w.english.toLowerCase().includes(query) || w.chinese.toLowerCase().includes(query)
         if (!match) return false
       }
-      if (difficulty > 0) {
-        const d = Number(w.meta_data?.difficulty ?? 0) || 0
-        if (Math.max(0, Math.min(5, Math.round(d))) !== difficulty) return false
+      if (tagFilter) {
+        const tags = w.meta_data?.tags ?? []
+        if (!tags.includes(tagFilter)) return false
       }
       return true
     })
-  }, [words, searchTerm, difficulty, favView])
+  }, [words, searchTerm, tagFilter, favView])
 
   const posDistribution = useMemo(() => {
     const m = new Map<string, number>()
@@ -85,7 +92,7 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
   // 筛选条件变化时回到第一页
   useEffect(() => {
     setPage(1)
-  }, [searchTerm, difficulty])
+  }, [searchTerm, tagFilter])
 
   // ============ 分页（每页 50 条） ============
   const totalPages = Math.max(1, Math.ceil(filteredWords.length / PAGE_SIZE))
@@ -195,46 +202,27 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
           )}
         </div>
         <div className="wb-overview-right">
-          <div className="wb-dist-stack" aria-hidden>
-            <span
-              className="wb-dist-seg wb-d-0"
-              style={{ width: `${(overview.diffBuckets[0] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle0', { count: overview.diffBuckets[0] })}
-            />
-            <span
-              className="wb-dist-seg wb-d-1"
-              style={{ width: `${(overview.diffBuckets[1] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle1', { count: overview.diffBuckets[1] })}
-            />
-            <span
-              className="wb-dist-seg wb-d-2"
-              style={{ width: `${(overview.diffBuckets[2] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle2', { count: overview.diffBuckets[2] })}
-            />
-            <span
-              className="wb-dist-seg wb-d-3"
-              style={{ width: `${(overview.diffBuckets[3] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle3', { count: overview.diffBuckets[3] })}
-            />
-            <span
-              className="wb-dist-seg wb-d-4"
-              style={{ width: `${(overview.diffBuckets[4] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle4', { count: overview.diffBuckets[4] })}
-            />
-            <span
-              className="wb-dist-seg wb-d-5"
-              style={{ width: `${(overview.diffBuckets[5] / Math.max(1, overview.total)) * 100}%` }}
-              title={t('wordbook.diffTitle5', { count: overview.diffBuckets[5] })}
-            />
+          <div className="wb-dist-legend" aria-hidden>
+            <span className="wb-dist-title">{t('wordbook.tagDistribution')}</span>
           </div>
-          <div className="wb-dist-legend">
-            <LegendDot color="#cbd5e1" label={t('wordbook.legendUnmarked', { count: overview.diffBuckets[0] })} />
-            <LegendDot color="#22c55e" label={`★ ${overview.diffBuckets[1]}`} />
-            <LegendDot color="#38bdf8" label={`★★ ${overview.diffBuckets[2]}`} />
-            <LegendDot color="#4a90d9" label={`★★★ ${overview.diffBuckets[3]}`} />
-            <LegendDot color="#8e44ad" label={`★★★★ ${overview.diffBuckets[4]}`} />
-            <LegendDot color="#e74c3c" label={`★★★★★ ${overview.diffBuckets[5]}`} />
-          </div>
+          {tagCounts.length > 0 ? (
+            <div className="wb-tag-dist">
+              {tagCounts.slice(0, 8).map(([tag, count]) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`wb-tag-pill ${tagFilter === tag ? 'wb-tag-pill-active' : ''}`}
+                  onClick={() => setTagFilter(tagFilter === tag ? '' : tag)}
+                  title={`#${tag} · ${count}`}
+                >
+                  #{tag}
+                  <em>{count}</em>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="wb-tag-none">{t('wordbook.tagNone')}</div>
+          )}
         </div>
       </section>
 
@@ -276,20 +264,28 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
           <div className="word-book-stats" aria-live="polite">
             {searchTerm
               ? t('wordbook.searchResult', { found: filteredWords.length, total: words.length })
-              : t('word.footerCount', { count: words.length }) + (difficulty ? t('wordbook.filteredByDifficulty', { difficulty }) : '')}
+              : t('word.footerCount', { count: words.length }) + (tagFilter ? t('wordbook.filteredByTag', { tag: tagFilter }) : '')}
           </div>
         </div>
 
         <div className="wb-filter-row">
-          <span className="wb-filter-label">{t('wordbook.difficultyFilter')}</span>
-          {([0, 1, 2, 3, 4, 5] as DifficultyFilter[]).map((lv) => (
+          <span className="wb-filter-label">{t('wordbook.tagFilter')}</span>
+          <button
+            className={`wb-chip ${!tagFilter ? 'wb-chip-active' : ''}`}
+            onClick={() => setTagFilter('')}
+            type="button"
+          >
+            {t('wordbook.all')}
+          </button>
+          {tagCounts.map(([tag, count]) => (
             <button
-              key={lv}
-              className={`wb-chip ${difficulty === lv ? 'wb-chip-active' : ''}`}
-              onClick={() => setDifficulty(lv)}
+              key={tag}
+              className={`wb-chip ${tagFilter === tag ? 'wb-chip-active' : ''}`}
+              onClick={() => setTagFilter(tagFilter === tag ? '' : tag)}
               type="button"
+              title={`#${tag} · ${count}`}
             >
-              {lv === 0 ? t('wordbook.all') : `${'★'.repeat(lv)}`}
+              #{tag}
             </button>
           ))}
         </div>
@@ -356,10 +352,3 @@ export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
     </div>
   )
 }
-
-const LegendDot: React.FC<{ color: string; label: string }> = ({ color, label }) => (
-  <span className="wb-legend-dot">
-    <i style={{ background: color }} />
-    {label}
-  </span>
-)

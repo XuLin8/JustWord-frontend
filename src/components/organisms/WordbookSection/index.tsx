@@ -1,8 +1,9 @@
 // src/components/organisms/WordbookSection/index.tsx
 // 词库页「内置词书」区块（M2-B）：词书列表 / 订阅 / 取消订阅 / 词条分页 + 关键词搜索
-import React, { useCallback, useEffect, useState } from 'react'
+// 词书列表以 typeahead 呈现：输入即时过滤 + 下拉建议，适配未来词书数量增长
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BookOpen, Check, Info, Loader2, Search } from 'lucide-react'
+import { BookOpen, Check, Info, Loader2, Search, X } from 'lucide-react'
 import { textbooksApi, type Textbook, type TextbookWord } from '@/api/endpoints/textbooks.api'
 import { useTextbookStore } from '@/store/textbookStore'
 import { useUIStore } from '@/store/uiStore'
@@ -34,14 +35,50 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
   const [subscribingId, setSubscribingId] = useState<number | null>(null)
   const [browseBook, setBrowseBook] = useState<Textbook | null>(null)
 
+  // ============ typeahead 状态 ============
+  const [query, setQuery] = useState('')
+  const [focused, setFocused] = useState(false)
+  const [pulseId, setPulseId] = useState<number | null>(null)
+  const typeaheadRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     void loadTextbooks()
   }, [loadTextbooks])
 
-  const levelLabel = (level: string): string => {
-    const key = `textbooks.level.${level}`
-    const label = t(key)
-    return label === key ? level : label
+  // 输入即时过滤：名称 / 描述 / 标签
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return textbooks
+    return textbooks.filter(
+      (b) =>
+        b.name.toLowerCase().includes(q) ||
+        (b.description || '').toLowerCase().includes(q) ||
+        (b.tags ?? []).some((tag) => tag.toLowerCase().includes(q)),
+    )
+  }, [textbooks, query])
+
+  // 点击外部关闭下拉
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (typeaheadRef.current && !typeaheadRef.current.contains(e.target as Node)) {
+        setFocused(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
+
+  // 选中建议：收窄列表并滚动到对应词书卡片
+  const handlePick = (book: Textbook) => {
+    setQuery(book.name)
+    setFocused(false)
+    setPulseId(book.id)
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`wordbook-card-${book.id}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+    window.setTimeout(() => setPulseId(null), 1600)
   }
 
   const handleEnroll = async (book: Textbook) => {
@@ -75,6 +112,57 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
         <p className="text-sm text-muted-foreground">{t('textbooks.subtitle')}</p>
       </div>
 
+      {/* typeahead：输入即时过滤 + 下拉建议 */}
+      <div className="wordbook-typeahead" ref={typeaheadRef}>
+        <div className="relative">
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9 pr-9"
+            value={query}
+            placeholder={t('textbooks.searchPlaceholder')}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => window.setTimeout(() => setFocused(false), 120)}
+            aria-label={t('textbooks.searchPlaceholder')}
+          />
+          {query && (
+            <button
+              type="button"
+              className="wordbook-clear"
+              onClick={() => setQuery('')}
+              aria-label={t('common.clear')}
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
+        {focused && query.trim() && filtered.length > 0 && (
+          <ul className="wordbook-suggest" role="listbox">
+            {filtered.slice(0, 8).map((s) => (
+              <li key={s.id}>
+                <button
+                  type="button"
+                  className="wordbook-suggest-item"
+                  role="option"
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    handlePick(s)
+                  }}
+                >
+                  <span className="wordbook-suggest-name">{s.name}</span>
+                  {s.tags && s.tags.length > 0 && (
+                    <span className="wordbook-suggest-tags">
+                      {s.tags.map((tg) => `#${tg}`).join(' ')}
+                    </span>
+                  )}
+                  <span className="wordbook-suggest-count">{s.word_count}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       {/* 订阅逻辑说明条：订阅 → 入词库 → 首页背诵（对标墨墨「选词」的引导） */}
       <div className="wordbook-how">
         <Info className="size-4 shrink-0 text-primary" aria-hidden />
@@ -93,26 +181,39 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
           <Loader2 className="size-4 animate-spin" />
           <span>{t('word.loading')}</span>
         </div>
-      ) : textbooks.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <Card>
           <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            {t('textbooks.empty')}
+            {query.trim() ? t('textbooks.noMatch') : t('textbooks.empty')}
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {textbooks.map((book) => {
+          {filtered.map((book) => {
             const enrolled = isEnrolled(book.id)
             return (
-              <Card key={book.id} className={`gap-3 wordbook-card ${enrolled ? 'wordbook-card-enrolled' : ''}`}>
+              <Card
+                key={book.id}
+                id={`wordbook-card-${book.id}`}
+                className={`gap-3 wordbook-card ${enrolled ? 'wordbook-card-enrolled' : ''} ${pulseId === book.id ? 'wordbook-card-pulse' : ''}`}
+              >
                 <CardHeader className="gap-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base">{book.name}</CardTitle>
                     <Badge variant={enrolled ? 'default' : 'outline'}>
-                      {enrolled ? t('textbooks.learning') : levelLabel(book.level)}
+                      {enrolled ? t('textbooks.learning') : t('textbooks.notSubscribed')}
                     </Badge>
                   </div>
                   <CardDescription className="line-clamp-2">{book.description}</CardDescription>
+                  {book.tags && book.tags.length > 0 && (
+                    <div className="wordbook-card-tags">
+                      {book.tags.map((tg) => (
+                        <Badge key={tg} variant="secondary" className="wordbook-tag">
+                          #{tg}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent className="flex items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">
@@ -217,7 +318,7 @@ const BrowseWordsDialog: React.FC<BrowseWordsDialogProps> = ({ book, onOpenChang
           />
         </div>
 
-        <div className="max-h-[50vh] space-y-1 overflow-y-auto pr-1">
+        <div className="max-h-[50vh] space-y-1.5 overflow-y-auto pr-1">
           {loading ? (
             <div className="flex items-center justify-center gap-2 py-10 text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
@@ -227,17 +328,25 @@ const BrowseWordsDialog: React.FC<BrowseWordsDialogProps> = ({ book, onOpenChang
             <div className="py-10 text-center text-sm text-muted-foreground">{t('textbooks.browseEmpty')}</div>
           ) : (
             items.map((it) => (
-              <div
-                key={it.id}
-                className="flex items-baseline justify-between gap-4 rounded-md border px-3 py-2"
-              >
+              <div key={it.id} className="wordbook-browse-row">
                 <div className="min-w-0">
                   <span className="font-medium">{it.word}</span>
                   {it.phonetic ? (
                     <span className="ml-2 text-sm text-muted-foreground">{it.phonetic}</span>
                   ) : null}
                 </div>
-                <div className="text-right text-sm text-muted-foreground">{it.meaning}</div>
+                <div className="wordbook-browse-right">
+                  <span className="text-right text-sm text-muted-foreground">{it.meaning}</span>
+                  {it.tags && it.tags.length > 0 && (
+                    <span className="wordbook-browse-tags">
+                      {it.tags.map((tg) => (
+                        <span key={tg} className="wordbook-browse-tag">
+                          #{tg}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </div>
               </div>
             ))
           )}

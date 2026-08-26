@@ -17,6 +17,7 @@ interface WordCardProps {
 }
 
 export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) => {
+  const tags = word.meta_data?.tags ?? []
   const [isEditing, setIsEditing] = useState(false)
   const [editEnglish, setEditEnglish] = useState(word.english)
   const [editChinese, setEditChinese] = useState(word.chinese)
@@ -131,10 +132,21 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
 
   return (
     <div className="word-card">
-      <div className="word-card-content">
-        <span className="word-english">{word.english}</span>
-        <span className="word-separator">-</span>
-        <span className="word-chinese">{word.chinese}</span>
+      <div className="word-card-main">
+        <div className="word-card-content">
+          <span className="word-english">{word.english}</span>
+          <span className="word-separator">-</span>
+          <span className="word-chinese">{word.chinese}</span>
+        </div>
+        {tags.length > 0 && (
+          <div className="word-tags">
+            {tags.map((tag) => (
+              <span key={tag} className="word-tag">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <div className="word-card-actions">
         <button

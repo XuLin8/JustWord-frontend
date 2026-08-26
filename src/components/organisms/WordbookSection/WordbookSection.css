@@ -96,3 +96,147 @@
   background: color-mix(in oklab, var(--apple-blue) 5%, var(--card));
   box-shadow: inset 0 0 0 0.5px color-mix(in oklab, var(--apple-blue) 20%, transparent);
 }
+
+/* ========== typeahead 搜索 ========== */
+.wordbook-typeahead {
+  position: relative;
+}
+.wordbook-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-fill-tertiary);
+  color: var(--color-label-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast),
+    color var(--dur-fast);
+}
+.wordbook-clear:hover {
+  background: var(--color-fill-secondary);
+  color: var(--color-label);
+}
+.wordbook-suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: var(--br-xl);
+  background: var(--card-glass-2);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-card-hover);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  animation: fade-in-up 260ms var(--ease-spring) both;
+}
+.wordbook-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--br-lg);
+  background: transparent;
+  color: var(--color-label);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--dur-fast);
+}
+.wordbook-suggest-item:hover {
+  background: var(--color-fill-secondary);
+}
+.wordbook-suggest-name {
+  font-weight: var(--font-weight-semibold);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wordbook-suggest-tags {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-label-tertiary);
+  font-size: 11px;
+}
+.wordbook-suggest-count {
+  flex-shrink: 0;
+  color: var(--color-label-tertiary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========== 词书卡片标签 ========== */
+.wordbook-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.wordbook-tag {
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
+}
+
+/* 选中建议时卡片脉冲高亮 */
+.wordbook-card-pulse {
+  animation: wb-card-pulse 1.6s var(--ease-spring) both;
+}
+@keyframes wb-card-pulse {
+  0%   { transform: scale(1); }
+  12%  { transform: scale(1.02); box-shadow: 0 0 0 3px color-mix(in oklab, var(--apple-blue) 45%, transparent); }
+  40%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* ========== 浏览词条行（LeetCode 风格内边距） ========== */
+.wordbook-browse-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--br-lg);
+  border: 0.5px solid var(--color-separator);
+  background: var(--color-bg, transparent);
+  transition: background-color var(--dur-fast), border-color var(--dur-fast);
+}
+.wordbook-browse-row:hover {
+  background: var(--color-fill-secondary);
+}
+.wordbook-browse-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+.wordbook-browse-tags {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.wordbook-browse-tag {
+  padding: 2px 8px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  color: var(--color-label-secondary);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+}
