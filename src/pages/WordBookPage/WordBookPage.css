@@ -80,11 +80,11 @@
   box-shadow: var(--shadow-card-pressed);
 }
 
-/* 左侧色条 */
+/* 左侧色条（避开卡片圆角：圆角 20px，故留 20px 上下安全区，避免两端被裁切） */
 .wb-metric::before {
   content: "";
   position: absolute;
-  left: 0; top: 10%; bottom: 10%;
+  left: 0; top: 20px; bottom: 20px;
   width: 3px;
   border-radius: 0 3px 3px 0;
   background: linear-gradient(180deg, #0A84FF, #5E5CE6);
@@ -115,10 +115,8 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--br-xl);
   border: none;
-  background: linear-gradient(135deg,
-              rgba(94, 92, 230, 0.16) 0%,
-              rgba(0, 122, 255, 0.14) 100%);
-  color: var(--apple-indigo);
+  background: var(--primary);
+  color: var(--color-on-primary, #fff);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition:
@@ -127,26 +125,14 @@
     background-color var(--dur-fast);
   font-size: var(--font-size-md);
   letter-spacing: -0.005em;
-  border: 0.5px solid rgba(94, 92, 230, 0.22);
-  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.7);
+  box-shadow: 0 2px 10px -4px rgba(0, 122, 255, 0.45);
 }
 .wb-dedup-btn::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg,
-              rgba(255,255,255,0.5) 0%,
-              rgba(255,255,255,0)   45%,
-              rgba(255,255,255,0)   65%,
-              rgba(255,255,255,0.25) 100%);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  opacity: 0.7;
+  display: none;
 }
 .wb-dedup-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow:
-    0 6px 18px -8px rgba(94, 92, 230, 0.45),
-    inset 0 0 0 0.5px rgba(255,255,255,0.8);
+  box-shadow: 0 6px 16px -6px rgba(0, 122, 255, 0.5);
 }
 .wb-dedup-btn:active:not(:disabled) {
   transform: scale(0.97);
@@ -155,30 +141,17 @@
   opacity: 0.7;
   cursor: default;
   background: var(--color-fill-tertiary);
-  border-color: var(--color-separator);
   color: var(--color-label-tertiary);
+  box-shadow: none;
 }
 
-/* 深色下去重控件：压淡顶部白高光与内描边，文字随主题反转 */
+/* 深色下：保持主色实心，文字随主题反转 */
 :root.dark .wb-dedup-btn {
-  background: linear-gradient(135deg,
-              rgba(94, 92, 230, 0.30) 0%,
-              rgba(0, 122, 255, 0.26) 100%);
-  color: var(--color-label);
-  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.10);
-}
-:root.dark .wb-dedup-btn::after {
-  background: linear-gradient(135deg,
-              rgba(255,255,255,0.10) 0%,
-              rgba(255,255,255,0)   45%,
-              rgba(255,255,255,0)   65%,
-              rgba(255,255,255,0.04) 100%);
-  opacity: 0.5;
+  background: var(--primary);
+  color: var(--color-on-primary, #fff);
 }
 :root.dark .wb-dedup-btn:hover:not(:disabled) {
-  box-shadow:
-    0 6px 18px -8px rgba(94, 92, 230, 0.45),
-    inset 0 0 0 0.5px rgba(255,255,255,0.14);
+  box-shadow: 0 6px 16px -6px rgba(0, 122, 255, 0.5);
 }
 
 .wb-overview-right {
@@ -207,7 +180,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px 7px 14px;
+  padding: 8px 18px 8px 18px;
   border-radius: var(--br-pill);
   border: 0.5px solid var(--color-separator);
   background: var(--card-glass-1);
@@ -242,19 +215,15 @@
   font-size: 11px;
 }
 .wb-tag-pill-active {
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-indigo) 100%);
-  color: #fff;
-  border-color: transparent;
-  box-shadow:
-    0 2px 8px -2px rgba(0, 122, 255, 0.5),
-    inset 0 0 0 0.5px rgba(255,255,255,0.3);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow: var(--shadow-card-rest);
   font-weight: var(--font-weight-semibold);
 }
 .wb-tag-pill-active em {
-  background: rgba(255,255,255,0.25);
-  color: #fff;
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
 }
 .wb-tag-none {
   font-size: var(--font-size-sm);
@@ -262,16 +231,11 @@
   line-height: 1.6;
 }
 
-/* ========== 视图切换：全部单词 / 生词本 ========== */
+/* ========== 视图切换：全部单词 / 生词本（方案 A：极简下划线） ========== */
 .wb-view-tabs {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border-radius: var(--br-pill);
-  background: var(--color-fill-tertiary);
-  border: 0.5px solid var(--color-separator);
-  box-shadow: inset 0 0 0 0.5px rgba(128,128,128,0.06);
+  gap: var(--spacing-xl);
   align-self: flex-start;
   animation: fade-in-up 520ms var(--ease-spring) both;
   animation-delay: 320ms;
@@ -280,9 +244,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 10px 2px;
   border: none;
-  border-radius: var(--br-pill);
+  border-radius: 0;
   background: transparent;
   color: var(--color-label-secondary);
   font-size: var(--font-size-sm);
@@ -290,33 +254,19 @@
   cursor: pointer;
   transition:
     color var(--dur-fast),
-    background-color var(--dur-fast),
     box-shadow var(--dur-fast),
     transform var(--dur-fast) var(--ease-spring-soft);
   line-height: 1;
   letter-spacing: -0.005em;
 }
-.wb-tab:hover {
-  color: var(--color-label);
-  background: var(--color-fill-secondary);
-}
+.wb-tab:hover { color: var(--color-label); }
 .wb-tab:active { transform: scale(0.96); }
 .wb-tab-active {
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-indigo) 100%);
-  color: #fff;
-  box-shadow:
-    0 2px 8px -2px rgba(0, 122, 255, 0.5),
-    inset 0 0 0 0.5px rgba(255,255,255,0.3);
+  color: var(--primary);
   font-weight: var(--font-weight-semibold);
+  box-shadow: inset 0 -2px 0 0 var(--primary);
 }
-.wb-tab-active:hover {
-  color: #fff;
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-indigo) 100%);
-}
+.wb-tab-active:hover { color: var(--primary); }
 .wb-tab-count {
   min-width: 20px;
   height: 20px;
@@ -332,10 +282,9 @@
   font-variant-numeric: tabular-nums;
 }
 .wb-tab-active .wb-tab-count {
-  background: rgba(255,255,255,0.25);
-  color: #fff;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
 }
-:root.dark .wb-tab-active { color: var(--color-label); }
 
 /* 生词本复习按钮（Overview 内） */
 .wb-review-btn {
@@ -459,7 +408,7 @@
 .wb-chip {
   position: relative;
   overflow: hidden;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: var(--br-pill);
   border: 0.5px solid transparent;
   background: var(--color-fill-tertiary);
@@ -485,35 +434,23 @@
   transform: scale(0.96);
 }
 .wb-chip-active {
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-indigo) 100%);
-  color: var(--card-glass-2);
-  border-color: transparent;
-  box-shadow:
-    0 2px 8px -2px rgba(0, 122, 255, 0.5),
-    inset 0 0 0 0.5px rgba(255,255,255,0.3);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
   font-weight: var(--font-weight-semibold);
 }
 .wb-chip-active::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg,
-              rgba(255,255,255,0.35) 0%,
-              rgba(255,255,255,0)   50%);
-  mix-blend-mode: screen;
-  pointer-events: none;
+  display: none;
 }
 .wb-chip-active:hover {
-  box-shadow:
-    0 4px 14px -4px rgba(0, 122, 255, 0.55),
-    inset 0 0 0 0.5px rgba(255,255,255,0.35);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  box-shadow: none;
 }
 
 .wb-pos-pill {
   position: relative;
   overflow: hidden;
-  padding: 5px 10px 5px 12px;
+  padding: 6px 14px 6px 16px;
   border-radius: var(--br-pill);
   background: linear-gradient(135deg,
               var(--apple-purple-p) 0%,
@@ -557,7 +494,7 @@
   border-top: 1px solid var(--color-border, rgba(0,0,0,0.06));
 }
 .wb-pg-btn {
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: var(--br-pill);
   border: 0.5px solid var(--color-border, rgba(0,0,0,0.08));
   background: var(--color-fill-tertiary, rgba(120,120,128,0.08));
@@ -604,13 +541,11 @@
 }
 .wb-pg-num:active { transform: scale(0.94); }
 .wb-pg-active {
-  background: linear-gradient(135deg,
-              var(--apple-blue) 0%,
-              var(--apple-indigo) 100%);
-  color: var(--card-glass-2, #fff);
+  background: var(--primary);
+  color: var(--color-on-primary, #fff);
   border-color: transparent;
-  box-shadow: 0 2px 8px -2px rgba(0, 122, 255, 0.5);
   font-weight: var(--font-weight-semibold);
+  box-shadow: none;
 }
 .wb-pg-ellipsis {
   color: var(--color-label-tertiary, #a0a0a5);
