@@ -53,6 +53,10 @@ export const authApi = {
   getMe: () =>
     http.get<UserResponse>(API_PATH.auth.me),
 
+  // 修改密码：校验原密码并更新为新密码
+  changePassword: (oldPassword: string, newPassword: string) =>
+    http.put<{ message: string }>(API_PATH.auth.password, { old_password: oldPassword, new_password: newPassword }),
+
   // 登出：通知后端撤销 refresh token，并清除本地登录态
   logout: (refreshToken?: string | null) => {
     if (refreshToken) {

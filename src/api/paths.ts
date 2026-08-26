@@ -10,6 +10,7 @@ export const API_PATH = {
     me: '/api/auth/me',
     logout: '/api/auth/logout',
     refresh: '/api/auth/refresh',
+    password: '/api/auth/password',
   },
   words: {
     root: '/api/words',

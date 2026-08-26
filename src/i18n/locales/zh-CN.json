@@ -33,6 +33,21 @@
     "totalDays": "累计打卡",
     "totalWords": "收录单词"
   },
+  "account": {
+    "changePassword": "修改密码",
+    "changePasswordDesc": "为保障账号安全，修改密码需验证原密码",
+    "oldPassword": "原密码",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "至少 6 位",
+    "confirmPassword": "确认新密码",
+    "confirmPasswordPlaceholder": "再次输入新密码",
+    "formIncomplete": "请填写完整密码信息",
+    "newPasswordTooShort": "新密码至少 6 位",
+    "confirmMismatch": "两次输入的新密码不一致",
+    "submit": "确认修改",
+    "changeSuccess": "密码修改成功",
+    "changeFailed": "密码修改失败，请重试"
+  },
   "calendar": {
     "title": "打卡日历",
     "subtitle": "坚持每日打卡，连续学习更有动力",

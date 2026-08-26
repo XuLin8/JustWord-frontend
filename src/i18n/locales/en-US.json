@@ -33,6 +33,21 @@
     "totalDays": "Days total",
     "totalWords": "Words added"
   },
+  "account": {
+    "changePassword": "Change password",
+    "changePasswordDesc": "Verify your current password to secure your account",
+    "oldPassword": "Current password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "At least 6 characters",
+    "confirmPassword": "Confirm new password",
+    "confirmPasswordPlaceholder": "Enter new password again",
+    "formIncomplete": "Please fill in all password fields",
+    "newPasswordTooShort": "New password must be at least 6 characters",
+    "confirmMismatch": "The two passwords do not match",
+    "submit": "Update password",
+    "changeSuccess": "Password changed",
+    "changeFailed": "Failed to change password, please retry"
+  },
   "calendar": {
     "title": "Check-in Calendar",
     "subtitle": "Keep a daily check-in streak to stay motivated",

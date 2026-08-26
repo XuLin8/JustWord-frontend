@@ -21,6 +21,9 @@ export interface AppShellState {
   showCheckinCalendar: boolean
   openCheckinCalendar: () => void
   closeCheckinCalendar: () => void
+  showChangePassword: boolean
+  openChangePassword: () => void
+  closeChangePassword: () => void
 }
 
 export function useAppShell(): AppShellState {
@@ -29,6 +32,7 @@ export function useAppShell(): AppShellState {
   const [showRegister, setShowRegister] = useState(false)
   const [showAdmin, setShowAdmin] = useState(false)
   const [showCheckinCalendar, setShowCheckinCalendar] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
 
   const openLogin = useCallback(() => setShowLogin(true), [])
   const closeLogin = useCallback(() => setShowLogin(false), [])
@@ -38,6 +42,8 @@ export function useAppShell(): AppShellState {
   const closeAdmin = useCallback(() => setShowAdmin(false), [])
   const openCheckinCalendar = useCallback(() => setShowCheckinCalendar(true), [])
   const closeCheckinCalendar = useCallback(() => setShowCheckinCalendar(false), [])
+  const openChangePassword = useCallback(() => setShowChangePassword(true), [])
+  const closeChangePassword = useCallback(() => setShowChangePassword(false), [])
 
   const switchToRegister = useCallback(() => {
     setShowLogin(false)
@@ -66,5 +72,8 @@ export function useAppShell(): AppShellState {
     showCheckinCalendar,
     openCheckinCalendar,
     closeCheckinCalendar,
+    showChangePassword,
+    openChangePassword,
+    closeChangePassword,
   }
 }

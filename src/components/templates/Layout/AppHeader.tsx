@@ -3,7 +3,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { CalendarDays, ChevronDown, Gauge, Minus, Plus, Target } from 'lucide-react'
+import { CalendarDays, ChevronDown, Gauge, LockKeyhole, Minus, Plus, Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { HeaderSearch } from '@/components/atoms/HeaderSearch'
 import { useCatStore } from '@/store/catStore'
@@ -29,6 +29,8 @@ interface AppHeaderProps {
   onOpenCheckinCalendar: () => void
   /** 打开个人主页（LeetCode 式，头像下拉进入） */
   onOpenProfile: () => void
+  /** 打开修改密码弹窗 */
+  onOpenChangePassword: () => void
   /** 头部右侧动作插槽（主题/语言切换等全局入口），由 Layout/App 注入。 */
   headerActions?: React.ReactNode
 }
@@ -47,6 +49,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenAdmin,
   onOpenCheckinCalendar,
   onOpenProfile,
+  onOpenChangePassword,
   headerActions,
 }) => {
   const { t } = useTranslation()
@@ -170,10 +173,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 {t('calendar.title')}
               </DropdownMenuItem>
 
-              {/* 数据与设置（占位） */}
-              <DropdownMenuItem disabled>
-                <span className="flex-1">{t('profile.dataAndSync')}</span>
-                <span className="text-xs text-muted-foreground">{t('profile.comingSoon')}</span>
+              {/* 账号安全：修改密码（原「数据与设置」占位） */}
+              <DropdownMenuItem onSelect={onOpenChangePassword}>
+                <span className="flex w-full items-center gap-2">
+                  <LockKeyhole size={16} className="mr-2" />
+                  <span className="flex-1">{t('account.changePassword')}</span>
+                </span>
               </DropdownMenuItem>
 
               {/* 后台控制台 */}

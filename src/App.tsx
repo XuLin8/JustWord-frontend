@@ -16,6 +16,7 @@ import { PWAInstallPrompt } from './components/organisms/PWAInstallPrompt'
 import { CatBoard } from './components/organisms/CatBoard'
 import { AdminConsole } from './components/organisms/AdminConsole'
 import { CheckinCalendar } from './components/organisms/CheckinCalendar'
+import { ChangePasswordDialog } from './components/organisms/ChangePasswordDialog'
 import { useCatStore } from './store/catStore'
 import { useFeatureStore } from './store/featureStore'
 import { useAccessStore } from './store/accessStore'
@@ -137,6 +138,7 @@ function App() {
           onOpenAdmin: shell.openAdmin,
           onOpenCheckinCalendar: shell.openCheckinCalendar,
           onOpenProfile: () => shell.setTab('profile'),
+          onOpenChangePassword: shell.openChangePassword,
           headerActions,
         }}
         wordCount={words.length}
@@ -169,6 +171,7 @@ function App() {
       {catEnabled && <CatBoard />}
       <AdminConsole open={shell.showAdmin} onClose={shell.closeAdmin} />
       <CheckinCalendar open={shell.showCheckinCalendar} onClose={shell.closeCheckinCalendar} />
+      <ChangePasswordDialog open={shell.showChangePassword} onClose={shell.closeChangePassword} />
       <PWAUpdateToast />
       <PWAInstallPrompt />
     </>
