@@ -1,6 +1,6 @@
 // src/pages/DashboardPage/index.tsx
 // 个人主页（LeetCode 式布局）：左栏个人信息，右栏能力指标 / 雷达 / 勋章 / 单词本占比 / 热力图 / 记忆曲线 / 最近通过 / 折叠区。
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useStatsStore } from '../../store/statsStore'
 import { useWordStore } from '../../store/wordStore'
@@ -38,6 +38,32 @@ const HEAT_RANGES = [
   { key: '365d', weeks: 53, label: 'viz.heatRange365' },
 ] as const
 type HeatRangeKey = (typeof HEAT_RANGES)[number]['key']
+
+// 记忆曲线选词器：独立 memo 组件。父页每次重渲染都会传同一份 curveWords（useMemo 稳定引用）
+// 与稳定 onChange，避免把数千个 <option> 全量重建（否则热力图切换范围时会卡顿数秒）。
+const CurveSelect = React.memo(function CurveSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: Array<{ id: string; english: string; chinese: string }>
+  value: string | null
+  onChange: (id: string) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <select value={value ?? ''} onChange={(e) => { const v = e.target.value; if (v) onChange(v) }}>
+      <option value="" disabled>
+        {t('viz.curveSelectPlaceholder')}
+      </option>
+      {options.map((w) => (
+        <option key={w.id} value={w.id}>
+          {w.english} · {w.chinese}
+        </option>
+      ))}
+    </select>
+  )
+})
 
 export const DashboardPage: React.FC = () => {
   const { t } = useTranslation()
@@ -153,6 +179,14 @@ export const DashboardPage: React.FC = () => {
   }, [dailyTrend])
 
   const heatWeeks = HEAT_RANGES.find((r) => r.key === heatRangeKey)?.weeks ?? 53
+
+  // 记忆曲线选词：稳定引用，让 CurveSelect(memo) 在父页重渲染时不必重建
+  const handleCurveChange = useCallback(
+    (v: string) => {
+      if (v) loadSnapshots(v)
+    },
+    [loadSnapshots],
+  )
 
   const handleCheckin = async () => {
     const r = await doCheckin()
@@ -350,22 +384,11 @@ export const DashboardPage: React.FC = () => {
             </div>
             <label className="viz-curve-select">
               <span>{t('viz.curveSelectLabel')}</span>
-              <select
-                value={snapshotWordId ?? ''}
-                onChange={(e) => {
-                  const v = e.target.value
-                  if (v) loadSnapshots(v)
-                }}
-              >
-                <option value="" disabled>
-                  {t('viz.curveSelectPlaceholder')}
-                </option>
-                {curveWords.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.english} · {w.chinese}
-                  </option>
-                ))}
-              </select>
+              <CurveSelect
+                options={curveWords}
+                value={snapshotWordId}
+                onChange={handleCurveChange}
+              />
             </label>
             {loadingSnapshots ? (
               <Spinner size="sm" />
