@@ -32,7 +32,7 @@
 
 | 任务 | 时间区间 | 提交 | 说明 |
 |---|---|---|---|
-| P1 `/profile` 直达 bug | 08-26 | 本迭代 | 根因：无路由，activeTab 内存态固定 'home'。为 useAppShell 注入轻量 hash 路由（#/home|word|profile ⇄ Tab 双向同步，支持浏览器前进/后退）；tsc + 浏览器验收 PASS（直达 #/profile 正确渲染个人页） |
+| P1 `/profile` 直达 bug | 08-26 | 1934ddf | 根因：无路由，activeTab 内存态固定 'home'。为 useAppShell 注入轻量 hash 路由（#/home|word|profile ⇄ Tab 双向同步，支持浏览器前进/后退）；tsc + 浏览器验收 PASS（直达 #/profile 正确渲染个人页） |
 | P1 修改密码 / 账号安全 | 08-26 | 4700eaa（前端）+ fd63814（后端） | 后端 auth 增 PUT /auth/password（原密码校验+新密码≥6+新旧不同）；前端头像下拉「数据与设置」占位 → 可点「修改密码」shadcn Dialog（旧/新/确认+错误提示+toast）；tsc + 生产构建 PASS + 接口 8/8（错旧密/过短/相同/成功/新旧登录） |
 | P0 生词本 / 收藏夹 | 08-26 | 63296e1 | 后端 Word 增 favorited_at + PUT /words/{id}/favorite + 收藏筛选；前端详情/判定处星标收藏（乐观更新）+ 词库页「生词本」Tab + 「复习生词」入口 + 独立收藏词复习会话（reviewStore session）；tsc + 接口 10/10 + 浏览器全流程验收 PASS |
 | P0 进度后端化 + 统一进度 + 打卡门槛 | 08-25 | 1e12dc1 等 | 背诵进度/偏好/打卡门槛后端化；多模式共用一份进度；每日 02:00 学习日边界 |
