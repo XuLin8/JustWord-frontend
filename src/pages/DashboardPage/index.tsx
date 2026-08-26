@@ -303,12 +303,13 @@ export const DashboardPage: React.FC = () => {
                 <EmptyHint text={t('dashboard.achieveEmpty')} />
               ) : (
                 <div className="achieve-grid">
-                  {achievements.slice(0, 4).map((a) => {
+                  {achievements.map((a) => {
                     const meta = getCategoryMeta(a.category)
+                    const isHolidayEgg = a.unlocked && a.category === 'holiday'
                     return (
                       <div
                         key={a.key}
-                        className={`ach-card ${a.unlocked ? 'ach-unlocked' : 'ach-locked'}`}
+                        className={`ach-card ${a.unlocked ? 'ach-unlocked' : 'ach-locked'} ${isHolidayEgg ? 'ach-holiday' : ''}`}
                         title={a.description}
                       >
                         <div className="ach-head">

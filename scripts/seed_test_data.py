@@ -31,6 +31,8 @@ from datetime import date, datetime, timedelta
 
 from pathlib import Path
 
+import lunardate
+
 
 def _locate_backend(explicit: str) -> Path:
     if explicit:
@@ -90,6 +92,53 @@ def _pick_day_times(learning_date: date, offset, n: int) -> list:
     start, end = daily_stats.learning_day_bounds(learning_date, offset)
     span = int((end - start).total_seconds())
     return [start + timedelta(seconds=random.randint(0, span - 1)) for _ in range(n)]
+
+
+# 节日清单（key, 名称, solar/lunar, 月, 日）—— 与后端 achievements 同步
+_FESTIVALS = [
+    ("festival_new_year", "元旦", "solar", 1, 1),
+    ("festival_valentine", "情人节", "solar", 2, 14),
+    ("festival_women", "妇女节", "solar", 3, 8),
+    ("festival_labor", "劳动节", "solar", 5, 1),
+    ("festival_children", "儿童节", "solar", 6, 1),
+    ("festival_national", "国庆节", "solar", 10, 1),
+    ("festival_christmas_eve", "平安夜", "solar", 12, 24),
+    ("festival_christmas", "圣诞节", "solar", 12, 25),
+    ("festival_spring", "春节", "lunar", 1, 1),
+    ("festival_lantern", "元宵节", "lunar", 1, 15),
+    ("festival_dragon", "端午节", "lunar", 5, 5),
+    ("festival_midautumn", "中秋节", "lunar", 8, 15),
+]
+
+
+def _festival_dates(year: int) -> dict:
+    """当年各节日的公历日期（农历节日经 lunardate 换算；少数年份跳过的丢弃）。"""
+    result = {}
+    for key, _name, kind, m, d in _FESTIVALS:
+        try:
+            if kind == "solar":
+                result[key] = date(year, m, d)
+            else:
+                result[key] = lunardate.LunarDate(year, m, d).toSolarDate()
+        except ValueError:
+            continue
+    return result
+
+
+async def _seed_festival_checkins(session, user_id: str) -> int:
+    """为今年已过去的每个节日补一条打卡，便于验收节日彩蛋（无需真实等到节日）。"""
+    today = date.today()
+    existing = set((await session.execute(
+        select(Checkin.date).where(Checkin.user_id == user_id)
+    )).scalars().all())
+    added = 0
+    for fdate in _festival_dates(today.year).values():
+        if fdate < today and fdate not in existing:
+            session.add(Checkin(user_id=user_id, date=fdate))
+            added += 1
+    if added:
+        await session.commit()
+    return added
 
 
 async def _ensure_user(session, email, password, username) -> User:
@@ -223,9 +272,13 @@ async def seed(args) -> dict:
             await daily_stats.recompute_day(db, user.id, learning_date, offset)
             await db.commit()
 
+        # 5) 为今年已过去的历史节日补打卡（验收节日彩蛋）
+        festival_checkins = await _seed_festival_checkins(db, user.id)
+
     return {"email": email, "password": password, "user": user,
             "words": len(user_words), "records": total_records,
-            "checkins": total_checkins, "days": days}
+            "checkins": total_checkins, "festival_checkins": festival_checkins,
+            "days": days}
 
 
 def main() -> None:
@@ -247,6 +300,7 @@ def main() -> None:
     print(f"  学习词  : {result['words']} 个")
     print(f"  学习记录: {result['records']} 条")
     print(f"  打卡    : {result['checkins']} 天 / {result['days']} 天")
+    print(f"  节日补卡: {result['festival_checkins']} 天（用于验收节日彩蛋）")
     print("  ==================================")
     print("  在 JustWord 前端用以上账号登录即可看到已填充的学习历史与可视化。")
     print("  如需清空该账号数据重新生成，请执行：")

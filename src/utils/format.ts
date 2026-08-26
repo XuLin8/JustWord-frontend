@@ -32,6 +32,7 @@ export function getCategoryMeta(key: string): { emoji: string; label: string } {
     checkin: '📅',
     answer: '✏️',
     wrong: '🧹',
+    holiday: '🎉',
   }
   return { emoji: emojiMap[key] ?? '🎖️', label: i18n.t(`dashboard.category.${key}`) }
 }

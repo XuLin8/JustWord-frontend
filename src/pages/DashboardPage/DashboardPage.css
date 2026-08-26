@@ -707,6 +707,28 @@
 }
 .ach-foot span:last-child { font-weight: 700; color: var(--apple-orange); }
 
+/* 节日彩蛋：已解锁卡片的强调动效 */
+.ach-card.ach-holiday {
+  background: linear-gradient(135deg,
+              rgba(255,204,0,0.18) 0%,
+              rgba(255,149,0,0.16) 100%);
+  border-color: rgba(255,185,0,0.45);
+  animation: ach-pop 720ms var(--ease-spring) both;
+}
+.ach-card.ach-holiday .ach-emoji {
+  background: linear-gradient(135deg, #FF9F0A, #FF3B30);
+  box-shadow: 0 4px 12px -4px rgba(255, 80, 0, 0.55);
+  animation: ach-wiggle 1.6s ease-in-out 340ms infinite;
+}
+@keyframes ach-pop {
+  0% { transform: scale(0.92); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ach-wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
 /* ---- Activity timeline ---- */
 .activity-list {
   list-style: none;
