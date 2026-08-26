@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { useWordStore } from '../../../store/wordStore'
 import { useUIStore } from '../../../store/uiStore'
 import { exportToJSON, exportToCSV } from '../../../utils/helpers'
-import { Button } from '../../atoms/Button'
-import './ImportExportPanel.css'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { FileJson, FileSpreadsheet, Package, Trash2, Upload } from 'lucide-react'
 
 interface ImportExportPanelProps {
   onImportComplete?: () => void
@@ -247,65 +248,83 @@ export const ImportExportPanel: React.FC<ImportExportPanelProps> = ({
   }
 
   return (
-    <div className="import-export-panel">
-      <div className="ie-header">
-        <span className="ie-title">{t('importExport.title')}</span>
-        <span className="ie-count">{t('word.footerCount', { count: words.length })}</span>
-      </div>
+    <Card className="import-export-panel">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Package className="size-4 text-primary" />
+          {t('importExport.title')}
+        </CardTitle>
+        <CardDescription>
+          {t('word.footerCount', { count: words.length })} · {t('importExport.subtitle')}
+        </CardDescription>
+      </CardHeader>
 
-      <div className="ie-actions">
+      <CardContent className="flex flex-wrap items-center gap-x-8 gap-y-4">
         {/* 导出 */}
-        <div className="ie-group">
-          <span className="ie-label">{t('importExport.export')}</span>
-          <div className="ie-buttons">
-            <Button size="sm" variant="secondary" onClick={handleExportJSON} disabled={isExporting || words.length === 0}>
-              📄 JSON
+        <div className="flex items-center gap-2">
+          <span className="w-10 text-sm font-medium text-muted-foreground">{t('importExport.export')}</span>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={handleExportJSON} disabled={isExporting || words.length === 0}>
+              <FileJson className="size-4" />
+              JSON
             </Button>
-            <Button size="sm" variant="secondary" onClick={handleExportCSV} disabled={isExporting || words.length === 0}>
-              📊 CSV
+            <Button size="sm" variant="outline" onClick={handleExportCSV} disabled={isExporting || words.length === 0}>
+              <FileSpreadsheet className="size-4" />
+              CSV
             </Button>
           </div>
         </div>
 
         {/* 导入 */}
-        <div className="ie-group">
-          <span className="ie-label">{t('importExport.import')}</span>
-          <div className="ie-buttons">
-            <label className="file-label">
-              📄 JSON
-              <input
-                type="file"
-                ref={jsonInputRef}
-                accept=".json"
-                onChange={handleImportJSON}
-                disabled={isImporting}
-                style={{ display: 'none' }}
-              />
-            </label>
-            <label className="file-label">
-              📊 CSV
-              <input
-                type="file"
-                ref={csvInputRef}
-                accept=".csv"
-                onChange={handleImportCSV}
-                disabled={isImporting}
-                style={{ display: 'none' }}
-              />
-            </label>
+        <div className="flex items-center gap-2">
+          <span className="w-10 text-sm font-medium text-muted-foreground">{t('importExport.import')}</span>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" asChild disabled={isImporting}>
+              <label className="cursor-pointer">
+                <Upload className="size-4" />
+                JSON
+                <input
+                  type="file"
+                  ref={jsonInputRef}
+                  accept=".json"
+                  onChange={handleImportJSON}
+                  disabled={isImporting}
+                  className="hidden"
+                />
+              </label>
+            </Button>
+            <Button size="sm" variant="outline" asChild disabled={isImporting}>
+              <label className="cursor-pointer">
+                <Upload className="size-4" />
+                CSV
+                <input
+                  type="file"
+                  ref={csvInputRef}
+                  accept=".csv"
+                  onChange={handleImportCSV}
+                  disabled={isImporting}
+                  className="hidden"
+                />
+              </label>
+            </Button>
           </div>
         </div>
 
         {/* 清空 */}
-        <div className="ie-group ie-danger">
-          <Button variant="danger" size="sm" onClick={handleClearAll} disabled={words.length === 0}>
+        <div className="ml-auto">
+          <Button variant="destructive" size="sm" onClick={handleClearAll} disabled={words.length === 0}>
+            <Trash2 className="size-4" />
             {t('importExport.clearAll')}
           </Button>
         </div>
-      </div>
 
-      {isImporting && <div className="ie-status">{t('importExport.importing')}</div>}
-      {isExporting && <div className="ie-status">{t('importExport.exporting')}</div>}
-    </div>
+        {isImporting && (
+          <span className="w-full text-center text-sm text-muted-foreground">{t('importExport.importing')}</span>
+        )}
+        {isExporting && (
+          <span className="w-full text-center text-sm text-muted-foreground">{t('importExport.exporting')}</span>
+        )}
+      </CardContent>
+    </Card>
   )
 }

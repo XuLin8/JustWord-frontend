@@ -372,7 +372,13 @@
   },
   "textbooks": {
     "title": "Built-in wordbooks",
-    "subtitle": "Subscribe to start learning on the home page",
+    "subtitle": "Subscribe to add words to your wordbook, then start learning on the Learn page",
+    "enrolledBadge": "{{count}} subscribed",
+    "learning": "Learning",
+    "howTitle": "How does subscribing work?",
+    "howStep1": "Tap Subscribe — every word in the book is added to your wordbook automatically",
+    "howStep2": "Words are scheduled into your daily new & review queues by the memory curve",
+    "howStep3": "Switch to the Learn page to start — multiple books share the same progress",
     "empty": "No wordbooks available",
     "wordsCount": "{{count}} words",
     "browse": "Browse",
@@ -528,10 +534,10 @@
     "unfavoriteAria": "Unfavorite {{word}}"
   },
   "importExport": {
-    "title": "📦 Wordbook management",
+    "title": "Wordbook management",
     "export": "Export",
     "import": "Import",
-    "clearAll": "🗑️ Clear wordbook",
+    "clearAll": "Clear wordbook",
     "importing": "⏳ Importing...",
     "exporting": "⏳ Exporting...",
     "emptyWarning": "The wordbook is empty, nothing to export",

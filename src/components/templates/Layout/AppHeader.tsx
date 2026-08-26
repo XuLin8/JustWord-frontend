@@ -2,8 +2,8 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { CalendarDays, ChevronDown, Gauge, LockKeyhole, Minus, Plus, Target } from 'lucide-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { CalendarDays, ChevronDown, Gauge, LockKeyhole, LogOut, Minus, Plus, Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { HeaderSearch } from '@/components/atoms/HeaderSearch'
 import { useCatStore } from '@/store/catStore'
@@ -99,7 +99,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
-              {/* 账号信息（点击进入个人主页，LeetCode 式两步入口） */}
+              {/* 个人资料（点击进入个人主页，LeetCode 式两步入口） */}
               <DropdownMenuItem
                 onSelect={onOpenProfile}
                 className="cursor-pointer gap-3 !py-2"
@@ -112,83 +112,96 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
 
-              {/* 云养猫入口（来自「我的」页；P0-5 屏蔽） */}
-              {catEnabled && (
-                <DropdownMenuItem onSelect={() => openCatBoard()}>
-                  <span className="flex w-full items-center gap-3">
-                    <img
-                      src="/cat/cat-main.png"
-                      alt={t('cat.title')}
-                      className="size-9 rounded-full object-cover"
-                      draggable={false}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium">{t('cat.title')}</span>
-                      <span className="block truncate text-xs text-muted-foreground">
-                        {catAdopted
-                          ? t('cat.profileCoins', { name: catName, coins: catCoins }) +
-                            ` · ` +
-                            t('cat.satietyShort', { n: catSatiety }) +
-                            ` · ` +
-                            t('cat.moodShort', { n: catMood })
-                          : t('cat.notAdopted')}
-                      </span>
-                    </span>
+              {/* 学习数据 */}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel inset>{t('userMenu.groupLearning')}</DropdownMenuLabel>
+
+                {/* 每日目标（自首页迁入「我的」；不关闭菜单的步进器） */}
+                <div className="flex items-center justify-between gap-3 px-2 py-1.5">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Target className="size-4 text-muted-foreground" />
+                    {t('learningHome.targetConfig')}
                   </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-muted px-1 py-0.5">
+                    <button
+                      type="button"
+                      aria-label={t('common.decrease')}
+                      disabled={dailyTarget <= 1}
+                      onClick={() => void setDailyTarget(dailyTarget - 1)}
+                      className="grid size-6 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <b className="min-w-9 text-center tabular-nums">{dailyTarget}</b>
+                    <button
+                      type="button"
+                      aria-label={t('common.increase')}
+                      disabled={dailyTarget >= 200}
+                      onClick={() => void setDailyTarget(dailyTarget + 1)}
+                      className="grid size-6 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </span>
+                </div>
+
+                {/* 打卡日历（P2：头像下拉入口，LeetCode 风格月度日历） */}
+                <DropdownMenuItem onSelect={onOpenCheckinCalendar} className="cursor-pointer">
+                  <CalendarDays className="size-4" />
+                  {t('calendar.title')}
                 </DropdownMenuItem>
-              )}
-
-              {/* 每日目标（自首页迁入「我的」；不关闭菜单的步进器） */}
-              <div className="flex items-center justify-between gap-3 px-2 py-1.5">
-                <span className="flex items-center gap-2 text-sm">
-                  <Target size={16} className="text-muted-foreground" />
-                  {t('learningHome.targetConfig')}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-1 py-0.5">
-                  <button
-                    type="button"
-                    aria-label={t('common.decrease')}
-                    disabled={dailyTarget <= 1}
-                    onClick={() => void setDailyTarget(dailyTarget - 1)}
-                    className="grid size-6 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <b className="min-w-9 text-center tabular-nums">{dailyTarget}</b>
-                  <button
-                    type="button"
-                    aria-label={t('common.increase')}
-                    disabled={dailyTarget >= 200}
-                    onClick={() => void setDailyTarget(dailyTarget + 1)}
-                    className="grid size-6 place-items-center rounded-full text-foreground hover:bg-background disabled:opacity-40"
-                  >
-                    <Plus size={14} />
-                  </button>
-                </span>
-              </div>
-
-              {/* 打卡日历（P2：头像下拉入口，LeetCode 风格月度日历） */}
-              <DropdownMenuItem onSelect={onOpenCheckinCalendar}>
-                <CalendarDays size={16} className="mr-2" />
-                {t('calendar.title')}
-              </DropdownMenuItem>
-
-              {/* 账号安全：修改密码（原「数据与设置」占位） */}
-              <DropdownMenuItem onSelect={onOpenChangePassword}>
-                <span className="flex w-full items-center gap-2">
-                  <LockKeyhole size={16} className="mr-2" />
-                  <span className="flex-1">{t('account.changePassword')}</span>
-                </span>
-              </DropdownMenuItem>
-
-              {/* 后台控制台 */}
-              <DropdownMenuItem onSelect={onOpenAdmin}>
-                <Gauge size={16} className="mr-2" />
-                {t('admin.title')}
-              </DropdownMenuItem>
+              </DropdownMenuGroup>
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onSelect={onLogout}>
+
+              {/* 账号设置 */}
+              <DropdownMenuGroup>
+                <DropdownMenuLabel inset className="text-xs font-semibold tracking-wide text-muted-foreground">
+                  {t('userMenu.groupAccount')}
+                </DropdownMenuLabel>
+
+                {/* 云养猫入口（来自「我的」页；P0-5 屏蔽） */}
+                {catEnabled && (
+                  <DropdownMenuItem onSelect={() => openCatBoard()} className="cursor-pointer">
+                    <span className="flex w-full items-center gap-3">
+                      <img
+                        src="/cat/cat-main.png"
+                        alt={t('cat.title')}
+                        className="size-9 rounded-full object-cover"
+                        draggable={false}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium">{t('cat.title')}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {catAdopted
+                            ? t('cat.profileCoins', { name: catName, coins: catCoins }) +
+                              ` · ` +
+                              t('cat.satietyShort', { n: catSatiety }) +
+                              ` · ` +
+                              t('cat.moodShort', { n: catMood })
+                            : t('cat.notAdopted')}
+                        </span>
+                      </span>
+                    </span>
+                  </DropdownMenuItem>
+                )}
+
+                {/* 账号安全：修改密码 */}
+                <DropdownMenuItem onSelect={onOpenChangePassword} className="cursor-pointer">
+                  <LockKeyhole className="size-4" />
+                  {t('account.changePassword')}
+                </DropdownMenuItem>
+
+                {/* 后台控制台 */}
+                <DropdownMenuItem onSelect={onOpenAdmin} className="cursor-pointer">
+                  <Gauge className="size-4" />
+                  {t('admin.title')}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onSelect={onLogout} className="cursor-pointer">
+                <LogOut className="size-4" />
                 {t('common.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>

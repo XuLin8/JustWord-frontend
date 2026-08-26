@@ -1,0 +1,98 @@
+/* src/components/organisms/WordbookSection/WordbookSection.css — Apple-style */
+
+.wordbook-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.wordbook-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wordbook-section-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ========== 订阅逻辑说明条 ========== */
+.wordbook-how {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--br-xl);
+  background: var(--card-glass-1);
+  border: 0.5px solid var(--border);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  box-shadow: var(--shadow-card-rest);
+  animation: fade-in-up 480ms var(--ease-spring) both;
+}
+.wordbook-how > svg {
+  margin-top: 2px;
+}
+.wordbook-how-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.wordbook-how-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-label);
+}
+.wordbook-how-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  font-size: var(--font-size-sm);
+  color: var(--color-label-secondary);
+  line-height: 1.6;
+}
+.wordbook-how-steps li {
+  counter-increment: step;
+  padding-left: 28px;
+  position: relative;
+}
+.wordbook-how-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--apple-blue), var(--apple-indigo));
+  color: #fff;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 18px;
+  text-align: center;
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.3);
+}
+
+/* ========== 已订阅词书卡片高亮 ========== */
+.wordbook-card {
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base);
+}
+.wordbook-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.wordbook-card-enrolled {
+  border-color: color-mix(in oklab, var(--apple-blue) 45%, transparent);
+  background: color-mix(in oklab, var(--apple-blue) 5%, var(--card));
+  box-shadow: inset 0 0 0 0.5px color-mix(in oklab, var(--apple-blue) 20%, transparent);
+}

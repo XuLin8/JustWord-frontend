@@ -2,7 +2,7 @@
 // 词库页「内置词书」区块（M2-B）：词书列表 / 订阅 / 取消订阅 / 词条分页 + 关键词搜索
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BookOpen, Check, Loader2, Search } from 'lucide-react'
+import { BookOpen, Check, Info, Loader2, Search } from 'lucide-react'
 import { textbooksApi, type Textbook, type TextbookWord } from '@/api/endpoints/textbooks.api'
 import { useTextbookStore } from '@/store/textbookStore'
 import { useUIStore } from '@/store/uiStore'
@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import './WordbookSection.css'
 
 const PAGE_SIZE = 20
 
@@ -27,7 +28,8 @@ interface WordbookSectionProps {
 
 export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) => {
   const { t } = useTranslation()
-  const { textbooks, loading, loadTextbooks, enroll, unsubscribe, isEnrolled } = useTextbookStore()
+  const { textbooks, loading, loadTextbooks, enroll, unsubscribe, isEnrolled, enrolledIds } =
+    useTextbookStore()
   const { showToast } = useUIStore()
   const [subscribingId, setSubscribingId] = useState<number | null>(null)
   const [browseBook, setBrowseBook] = useState<Textbook | null>(null)
@@ -66,8 +68,24 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
         <div className="wordbook-section-heading">
           <BookOpen className="size-5 text-primary" />
           <h2 className="text-lg font-semibold">{t('textbooks.title')}</h2>
+          {enrolledIds.length > 0 && (
+            <Badge variant="secondary">{t('textbooks.enrolledBadge', { count: enrolledIds.length })}</Badge>
+          )}
         </div>
         <p className="text-sm text-muted-foreground">{t('textbooks.subtitle')}</p>
+      </div>
+
+      {/* 订阅逻辑说明条：订阅 → 入词库 → 首页背诵（对标墨墨「选词」的引导） */}
+      <div className="wordbook-how">
+        <Info className="size-4 shrink-0 text-primary" aria-hidden />
+        <div className="wordbook-how-body">
+          <p className="wordbook-how-title">{t('textbooks.howTitle')}</p>
+          <ol className="wordbook-how-steps">
+            <li>{t('textbooks.howStep1')}</li>
+            <li>{t('textbooks.howStep2')}</li>
+            <li>{t('textbooks.howStep3')}</li>
+          </ol>
+        </div>
       </div>
 
       {loading && textbooks.length === 0 ? (
@@ -86,12 +104,12 @@ export const WordbookSection: React.FC<WordbookSectionProps> = ({ onEnrolled }) 
           {textbooks.map((book) => {
             const enrolled = isEnrolled(book.id)
             return (
-              <Card key={book.id} className="gap-3">
+              <Card key={book.id} className={`gap-3 wordbook-card ${enrolled ? 'wordbook-card-enrolled' : ''}`}>
                 <CardHeader className="gap-1.5">
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-base">{book.name}</CardTitle>
-                    <Badge variant={enrolled ? 'secondary' : 'outline'}>
-                      {levelLabel(book.level)}
+                    <Badge variant={enrolled ? 'default' : 'outline'}>
+                      {enrolled ? t('textbooks.learning') : levelLabel(book.level)}
                     </Badge>
                   </div>
                   <CardDescription className="line-clamp-2">{book.description}</CardDescription>
