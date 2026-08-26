@@ -1,6 +1,6 @@
 // src/pages/DashboardPage/index.tsx
 // 仪表盘页面：组装统计概览、趋势、成就与最近活动。业务展示块已拆入 molecules/atoms。
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { useStatsStore } from '../../store/statsStore'
 import { useWordStore } from '../../store/wordStore'
@@ -41,6 +41,7 @@ export const DashboardPage: React.FC = () => {
     loadingDashboard,
     loadingAchievements,
     loadingRecent,
+    loadedRecent,
     refreshAll,
     doCheckin,
   } = useStatsStore()
@@ -68,18 +69,40 @@ export const DashboardPage: React.FC = () => {
     if (isAuthenticated) loadDaily()
   }, [isAuthenticated, loadDaily])
 
-  // 记忆曲线：首次进入自动选中第一个单词加载快照
-  useEffect(() => {
-    if (isAuthenticated && !snapshotWordId && words.length > 0) {
-      loadSnapshots(words[0].id)
-    }
-  }, [isAuthenticated, snapshotWordId, words, loadSnapshots])
-
-  // 记忆曲线选词器候选：按英文升序便于查找
-  const curveWords = useMemo(
-    () => [...words].sort((a, b) => a.english.localeCompare(b.english)),
-    [words],
+  // 最近学过的 wordId（来自最近活动，保持最近在前且去重）
+  const recentWordIds = useMemo(
+    () => Array.from(new Set(recentActivity.map((a) => a.wordId))),
+    [recentActivity],
   )
+
+  // 记忆曲线选词器候选：最近学过的词排最前（便于默认展示），其余按英文升序
+  const curveWords = useMemo(() => {
+    const map = new Map(words.map((w) => [w.id, w]))
+    const recents = recentWordIds
+      .map((id) => map.get(id))
+      .filter((w): w is NonNullable<typeof w> => !!w)
+    const rest = words
+      .filter((w) => !recentWordIds.includes(w.id))
+      .sort((a, b) => a.english.localeCompare(b.english))
+    return [...recents, ...rest]
+  }, [words, recentWordIds])
+
+  // 记忆曲线默认选词：跟随最近学过的词（曲线词首项）。
+  // 用 ref 记录「上一次自动选中的默认词」：只要当前选中仍是自动默认（未被用户改过），
+  // 就随最近活动/词库加载完成自动纠正到最近词；用户手动切换后停止跟随。
+  const lastDefaultWordRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (!isAuthenticated || !loadedRecent) return
+    const first = curveWords[0]
+    if (!first) return
+    const isDefault = snapshotWordId === null || (lastDefaultWordRef.current !== null && snapshotWordId === lastDefaultWordRef.current)
+    if (isDefault) {
+      lastDefaultWordRef.current = first.id
+      loadSnapshots(first.id)
+    } else {
+      lastDefaultWordRef.current = null
+    }
+  }, [isAuthenticated, loadedRecent, curveWords, snapshotWordId, loadSnapshots])
 
   const totalWords = dashboard?.wordStats.total ?? words.length
   const masteredRate = totalWords > 0 ? (dashboard?.wordStats.mastered ?? 0) / totalWords : 0

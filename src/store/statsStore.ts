@@ -81,6 +81,8 @@ interface StatsStore {
   loadingDashboard: boolean
   loadingAchievements: boolean
   loadingRecent: boolean
+  /** 最近活动是否已加载完成（即使为空也置 true，用于记忆曲线默认选词） */
+  loadedRecent: boolean
   loadDashboard: () => Promise<void>
   loadAchievements: () => Promise<void>
   loadRecent: (limit?: number) => Promise<void>
@@ -107,6 +109,7 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
   loadingDashboard: false,
   loadingAchievements: false,
   loadingRecent: false,
+  loadedRecent: false,
 
   loadDashboard: async () => {
     set({ loadingDashboard: true })
@@ -209,7 +212,7 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
     } catch {
       set({ recentActivity: [] })
     } finally {
-      set({ loadingRecent: false })
+      set({ loadingRecent: false, loadedRecent: true })
     }
   },
 
@@ -249,5 +252,6 @@ export const useStatsStore = create<StatsStore>((set, get) => ({
       unlockedAchievementCount: 0,
       totalAchievementCount: 0,
       recentActivity: [],
+      loadedRecent: false,
     }),
 }))
