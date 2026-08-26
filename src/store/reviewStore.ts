@@ -33,8 +33,11 @@ interface ReviewStore {
   summary: ReviewSummary | null
   loading: boolean
   submitting: boolean
+  /** 当前背诵会话类型：normal=日常学习，favorite=生词本复习 */
+  session: 'normal' | 'favorite'
+  setSession: (s: 'normal' | 'favorite') => void
   /** 拉取待学词队列（limit 默认取偏好中的当日目标值对应的词数上限） */
-  loadDue: (opts?: { limit?: number }) => Promise<void>
+  loadDue: (opts?: { limit?: number; favoritedOnly?: boolean }) => Promise<void>
   /** 提交一次复习作答（SM-2 生效） */
   submit: (req: ReviewSubmitRequest) => Promise<void>
   /** 全模式统一判定提交：落后端 SM-2 + 学习记录 + 进度乐观累计 */
@@ -57,6 +60,7 @@ function toPlanWord(it: DueReviewItem): PlanWord {
     similarWords: meta.similarWords as string[] | undefined,
     synonyms: meta.synonyms as string[] | undefined,
     antonyms: meta.antonyms as string[] | undefined,
+    favorited: it.favorited ?? false,
   }
 }
 
@@ -66,12 +70,15 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
   summary: null,
   loading: false,
   submitting: false,
+  // 当前背诵会话类型：normal=日常学习，favorite=生词本复习
+  session: 'normal',
+  setSession: (s) => set({ session: s }),
 
-  loadDue: async ({ limit } = {}) => {
+  loadDue: async ({ limit, favoritedOnly } = {}) => {
     const l = limit ?? usePreferenceStore.getState().dailyTarget
     set({ loading: true })
     try {
-      const res = await learningApi.getDueReviews({ limit: l })
+      const res = await learningApi.getDueReviews({ limit: l, favorited_only: favoritedOnly })
       set({
         todayWords: res.items.map(toPlanWord),
         totalDue: res.total,
@@ -123,5 +130,5 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
     set({ todayWords: get().todayWords.filter((w) => w.id !== wordId) })
   },
 
-  clear: () => set({ todayWords: [], totalDue: 0, summary: null }),
+  clear: () => set({ todayWords: [], totalDue: 0, summary: null, session: 'normal' }),
 }))

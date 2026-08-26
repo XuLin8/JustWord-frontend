@@ -11,6 +11,8 @@ export interface Word {
   createdAt: number
   updatedAt?: number
   meta_data?: WordMetadata
+  /** 是否已收藏（生词本） */
+  favorited?: boolean
 }
 
 export interface WordMetadata {

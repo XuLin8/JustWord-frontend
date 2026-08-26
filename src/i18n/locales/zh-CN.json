@@ -83,6 +83,9 @@
     "loading": "正在按记忆曲线排词…",
     "doneToday": "今日单词已全部学完，太棒了！",
     "refresh": "刷新队列",
+    "favoriteReview": "生词本复习",
+    "favoriteEmpty": "生词本暂无单词，快去收藏喜欢的单词吧",
+    "exitFavorite": "退出复习",
     "taskTitle": "今日任务",
     "metricTarget": "今日目标",
     "metricNew": "新词",
@@ -357,7 +360,12 @@
     "difficultyFilter": "难度筛选：",
     "all": "全部",
     "posDistribution": "词性分布：",
-    "pagination": "第 {{page}} / {{pages}} 页"
+    "pagination": "第 {{page}} / {{pages}} 页",
+    "viewSwitch": "视图切换",
+    "allWords": "全部单词",
+    "favorites": "生词本",
+    "favoriteLabel": "已收藏",
+    "reviewFavorites": "复习生词"
   },
   "textbooks": {
     "title": "内置词书",
@@ -506,7 +514,15 @@
     "importResult": "成功导入 {{imported}} 个单词，跳过 {{skipped}} 个",
     "noDuplicate": "当前无重复单词",
     "dedupPartial": "去重完成：删除 {{removed}} 个重复项，失败 {{failed}} 个",
-    "dedupDone": "去重完成：共删除 {{removed}} 个重复项（保留最新一条）"
+    "dedupDone": "去重完成：共删除 {{removed}} 个重复项（保留最新一条）",
+    "favorite": "收藏",
+    "unfavorite": "取消收藏",
+    "favorited": "已收藏「{{word}}」",
+    "unfavorited": "已取消收藏「{{word}}」",
+    "favoriteFailed": "收藏失败，请重试",
+    "favoriteFailedRetry": "收藏失败，请重试",
+    "favoriteAria": "收藏 {{word}}",
+    "unfavoriteAria": "取消收藏 {{word}}"
   },
   "importExport": {
     "title": "📦 词库管理",

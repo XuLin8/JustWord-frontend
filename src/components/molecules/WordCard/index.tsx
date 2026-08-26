@@ -1,11 +1,13 @@
 // src/components/molecules/WordCard/index.tsx
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Star } from 'lucide-react'
 import { Button } from '../../atoms/Button'
 import { Input } from '../../atoms/Input'
 import type { Word } from '../../../types'
 import { isValidEnglish, isValidChinese } from '../../../utils/validation'
 import { useUIStore } from '../../../store/uiStore'
+import { useWordStore } from '../../../store/wordStore'
 import './WordCard.css'
 
 interface WordCardProps {
@@ -19,9 +21,23 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
   const [editEnglish, setEditEnglish] = useState(word.english)
   const [editChinese, setEditChinese] = useState(word.chinese)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [favBusy, setFavBusy] = useState(false)
 
   const { showToast, openConfirmDialog } = useUIStore()
+  const toggleFavorite = useWordStore((s) => s.toggleFavorite)
   const { t } = useTranslation()
+
+  const handleToggleFavorite = async () => {
+    if (favBusy) return
+    setFavBusy(true)
+    const target = !word.favorited
+    const r = await toggleFavorite(word.id, target)
+    showToast(
+      r.success ? (target ? t('word.favorited', { word: word.english }) : t('word.unfavorited', { word: word.english })) : r.message || t('word.favoriteFailed'),
+      r.success ? 'success' : 'error',
+    )
+    setFavBusy(false)
+  }
 
   const handleStartEdit = () => {
     setIsEditing(true)
@@ -121,6 +137,16 @@ export const WordCard: React.FC<WordCardProps> = ({ word, onDelete, onUpdate }) 
         <span className="word-chinese">{word.chinese}</span>
       </div>
       <div className="word-card-actions">
+        <button
+          type="button"
+          className={`word-fav-btn ${word.favorited ? 'is-fav' : ''}`}
+          onClick={handleToggleFavorite}
+          disabled={favBusy}
+          aria-label={word.favorited ? t('word.unfavoriteAria', { word: word.english }) : t('word.favoriteAria', { word: word.english })}
+          title={word.favorited ? t('word.unfavorite') : t('word.favorite')}
+        >
+          <Star size={16} fill={word.favorited ? 'currentColor' : 'none'} />
+        </button>
         <Button variant="secondary" size="sm" onClick={handleStartEdit}>
           {t('word.edit')}
         </Button>

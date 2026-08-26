@@ -112,6 +112,38 @@
   opacity: 1;
 }
 
+/* 收藏星标 */
+.word-fav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-label-tertiary);
+  cursor: pointer;
+  transition:
+    color var(--dur-fast),
+    background-color var(--dur-fast),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.word-fav-btn:hover {
+  background: var(--bg-hover, rgba(128,128,128,0.12));
+  color: var(--color-label-secondary);
+}
+.word-fav-btn.is-fav {
+  color: #f5b301;
+}
+.word-fav-btn.is-fav:hover {
+  color: #e2a100;
+}
+.word-fav-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .word-card.editing {
   padding: var(--spacing-md) var(--spacing-lg);
   background: linear-gradient(135deg,

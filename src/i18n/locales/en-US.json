@@ -83,6 +83,9 @@
     "loading": "Scheduling words by memory curve…",
     "doneToday": "All today's words done, great job!",
     "refresh": "Refresh queue",
+    "favoriteReview": "Favorite review",
+    "favoriteEmpty": "No favorite words yet. Tap the star to save words you want to review",
+    "exitFavorite": "Exit review",
     "taskTitle": "Today's tasks",
     "metricTarget": "Daily target",
     "metricNew": "New",
@@ -345,7 +348,12 @@
     "difficultyFilter": "Difficulty:",
     "all": "All",
     "posDistribution": "Part-of-speech:",
-    "pagination": "Page {{page}} / {{pages}}"
+    "pagination": "Page {{page}} / {{pages}}",
+    "viewSwitch": "View switch",
+    "allWords": "All words",
+    "favorites": "Favorites",
+    "favoriteLabel": "Favorited",
+    "reviewFavorites": "Review favorites"
   },
   "textbooks": {
     "title": "Built-in wordbooks",
@@ -494,7 +502,15 @@
     "importResult": "Imported {{imported}} words, skipped {{skipped}}",
     "noDuplicate": "No duplicate words",
     "dedupPartial": "Deduplicated: removed {{removed}} duplicates, {{failed}} failed",
-    "dedupDone": "Deduplicated: removed {{removed}} duplicates (kept the latest)"
+    "dedupDone": "Deduplicated: removed {{removed}} duplicates (kept the latest)",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite",
+    "favorited": "Favorited \"{{word}}\"",
+    "unfavorited": "Unfavorited \"{{word}}\"",
+    "favoriteFailed": "Failed to favorite, please retry",
+    "favoriteFailedRetry": "Failed to favorite, please retry",
+    "favoriteAria": "Favorite {{word}}",
+    "unfavoriteAria": "Unfavorite {{word}}"
   },
   "importExport": {
     "title": "📦 Wordbook management",

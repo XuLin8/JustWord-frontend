@@ -68,6 +68,8 @@ export interface DueReviewItem {
   repetitions: number
   interval_days: number
   next_review_at: string | null
+  /** 是否已收藏（生词本） */
+  favorited?: boolean
 }
 
 export interface DueReviewsResponse {
@@ -186,10 +188,17 @@ export const learningApi = {
     http.get<ReviewSummaryResponse>(API_PATH.review.summary),
 
   /** 待复习队列（SM-2 调度：新词 + 到期复习词，按到期排序） */
-  getDueReviews: (params?: { wordbook_id?: number; weak_only?: boolean; limit?: number; offset?: number }) => {
+  getDueReviews: (params?: {
+    wordbook_id?: number
+    weak_only?: boolean
+    favorited_only?: boolean
+    limit?: number
+    offset?: number
+  }) => {
     const qs = new URLSearchParams()
     if (params?.wordbook_id != null) qs.set('wordbook_id', String(params.wordbook_id))
     if (params?.weak_only != null) qs.set('weak_only', String(params.weak_only))
+    if (params?.favorited_only != null) qs.set('favorited_only', String(params.favorited_only))
     if (params?.limit != null) qs.set('limit', String(params.limit))
     if (params?.offset != null) qs.set('offset', String(params.offset))
     const s = qs.toString()

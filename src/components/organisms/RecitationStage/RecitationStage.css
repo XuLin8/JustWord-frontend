@@ -103,6 +103,45 @@
 .rec-verdict-badge.is-known { color: var(--apple-green); background: var(--apple-green-p); }
 .rec-verdict-badge.is-unknown { color: var(--apple-red); background: var(--apple-red-p); }
 
+/* 详情面顶部：判定徽章 + 收藏星标分居两端 */
+.rec-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+/* 收藏星标（详情面 / 判定面共用） */
+.rec-fav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-label-tertiary);
+  cursor: pointer;
+  transition:
+    color var(--dur-fast),
+    background-color var(--dur-fast),
+    transform var(--dur-fast) var(--ease-spring);
+}
+.rec-fav-btn:hover {
+  background: var(--color-fill-secondary);
+  color: var(--color-label-secondary);
+}
+.rec-fav-btn.is-fav { color: #f5b301; }
+.rec-fav-btn.is-fav:hover { color: #e2a100; }
+
+/* 判定面右上角收藏星标 */
+.rec-front-fav {
+  position: absolute;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+}
+
 .rec-word {
   display: flex;
   align-items: center;

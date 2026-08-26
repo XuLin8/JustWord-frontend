@@ -45,6 +45,7 @@ function toWord(response: WordResponse): Word {
     createdAt: new Date(response.created_at).getTime(),
     updatedAt: response.updated_at ? new Date(response.updated_at).getTime() : Date.now(),
     meta_data: response.meta_data || {},
+    favorited: !!response.favorited_at,
   }
 }
 
@@ -56,6 +57,8 @@ interface WordStore {
   addWord: (english: string, chinese: string, metadata?: WordMetadata) => Promise<OperationResult>
   deleteWord: (id: string) => Promise<OperationResult>
   updateWord: (id: string, english: string, chinese: string, metadata?: WordMetadata) => Promise<OperationResult>
+  /** 收藏 / 取消收藏（生词本） */
+  toggleFavorite: (id: string, favorited: boolean) => Promise<OperationResult>
   loadWords: () => Promise<void>
   refreshWords: () => Promise<void>
   setSearchTerm: (term: string) => void
@@ -189,6 +192,25 @@ export const useWordStore = create<WordStore>((set, get) => ({
     } catch (error: any) {
       console.error('更新失败:', error)
       return { success: false, message: error.message || i18n.t('word.updateFailedRetry') }
+    }
+  },
+
+  // ========== toggleFavorite ==========
+  toggleFavorite: async (id: string, favorited: boolean) => {
+    try {
+      const response = await wordsApi.toggleFavorite(id, favorited)
+      const favoritedNow = !!response.favorited_at
+
+      set((state) => ({
+        words: state.words.map((word) =>
+          word.id === id ? { ...word, favorited: favoritedNow, updatedAt: Date.now() } : word,
+        ),
+      }))
+      await persistCache(get().words, get().tombstones)
+      return { success: true }
+    } catch (error: any) {
+      console.error('收藏操作失败:', error)
+      return { success: false, message: error.message || i18n.t('word.favoriteFailedRetry') }
     }
   },
 

@@ -11,6 +11,7 @@ import {
   PartyPopper,
   RotateCcw,
   Sparkles,
+  Star,
   Volume2,
   VolumeX,
   X,
@@ -26,6 +27,7 @@ import { useFeatureStore } from '@/store/featureStore'
 import { useReviewStore } from '@/store/reviewStore'
 import { useProgressStore } from '@/store/progressStore'
 import { usePreferenceStore } from '@/store/preferenceStore'
+import { useWordStore } from '@/store/wordStore'
 import { TodayProgressBar } from '@/components/organisms/TodayProgressBar'
 import { CheckinButton } from '@/components/organisms/RecitationModes/CheckinButton'
 import { useLearningSession } from '@/hooks/useLearningSession'
@@ -58,15 +60,29 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
   // 词序快照：判定过程中固定本轮词序列，不受 submit 从 store.todayWords 移除词
   // 导致 words prop 缩短的影响（否则切词会错位、进度条/完成统计会错乱）
   const [queue] = useState<PlanWord[]>(() => words)
+  // 收藏状态（乐观更新，基于初始 favorited + 本地操作）
+  const [favMap, setFavMap] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(words.filter((w) => w.favorited).map((w) => [w.id, true])),
+  )
 
   // SM-2 提交（A1）：认识=correct，不认识=wrong，让后端记忆曲线生效
   const submitAttempt = useReviewStore((s) => s.submitAttempt)
+  const toggleFavorite = useWordStore((s) => s.toggleFavorite)
 
   // 今日进度（后端为准，刷新/重进/换设备一致）：今日答对 / 每日目标
   const progressStore = useProgressStore()
 
   const word = queue[index]
   const lastJudgement: Judgement | null = revealed ? (judgedMap[word?.id ?? ''] ?? null) : null
+  const isFav = word ? (favMap[word.id] ?? word.favorited ?? false) : false
+
+  /** 收藏 / 取消收藏当前词（乐观更新，不阻断判定/切词） */
+  const handleToggleFavorite = useCallback(() => {
+    if (!word) return
+    const target = !(favMap[word.id] ?? word.favorited ?? false)
+    setFavMap((m) => ({ ...m, [word.id]: target }))
+    void toggleFavorite(word.id, target).catch(() => undefined)
+  }, [word, favMap, toggleFavorite])
 
   // 反应耗时埋点：进入新词记录时间点，判定时算差
   const shownAtRef = useRef<number>(Date.now())
@@ -257,10 +273,21 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
           {revealed ? (
             /* ============ 详情面 ============ */
             <div className="rec-detail">
-              <span className={`rec-verdict-badge ${lastJudgement === 'known' ? 'is-known' : 'is-unknown'}`}>
-                {lastJudgement === 'known' ? <Check size={14} /> : <X size={14} />}
-                {lastJudgement === 'known' ? t('recitation.known') : t('recitation.unknown')}
-              </span>
+              <div className="rec-detail-top">
+                <span className={`rec-verdict-badge ${lastJudgement === 'known' ? 'is-known' : 'is-unknown'}`}>
+                  {lastJudgement === 'known' ? <Check size={14} /> : <X size={14} />}
+                  {lastJudgement === 'known' ? t('recitation.known') : t('recitation.unknown')}
+                </span>
+                <button
+                  type="button"
+                  className={`rec-fav-btn ${isFav ? 'is-fav' : ''}`}
+                  onClick={handleToggleFavorite}
+                  aria-label={isFav ? t('word.unfavorite') : t('word.favorite')}
+                  title={isFav ? t('word.unfavorite') : t('word.favorite')}
+                >
+                  <Star size={18} fill={isFav ? 'currentColor' : 'none'} />
+                </button>
+              </div>
 
               <div className="rec-word">
                 <h2 className="rec-word-en">{word.word}</h2>
@@ -317,6 +344,15 @@ export const RecitationStage: React.FC<RecitationStageProps> = ({ words, onExit 
               <span className={`rec-chip rec-front-chip ${word.source === 'new' ? 'is-new' : 'is-review'}`}>
                 {word.source === 'new' ? t('recitation.badgeNew') : t('recitation.badgeReview')}
               </span>
+              <button
+                type="button"
+                className={`rec-fav-btn rec-front-fav ${isFav ? 'is-fav' : ''}`}
+                onClick={handleToggleFavorite}
+                aria-label={isFav ? t('word.unfavorite') : t('word.favorite')}
+                title={isFav ? t('word.unfavorite') : t('word.favorite')}
+              >
+                <Star size={18} fill={isFav ? 'currentColor' : 'none'} />
+              </button>
               <h2 className="rec-word-en rec-word-huge">{word.word}</h2>
               {word.phonetic && <p className="rec-front-phonetic">{word.phonetic}</p>}
             </div>

@@ -4,6 +4,7 @@ import { useWordStore } from './store/wordStore'
 import { useStatsStore } from './store/statsStore'
 import { useSyncStore } from './store/syncStore'
 import { useAuth } from './context/AuthContext'
+import { useReviewStore } from './store/reviewStore'
 import { Layout } from './components/templates/Layout'
 import { LoginGate } from './pages/LoginGate'
 import { AuthModal } from './components/organisms/AuthModal'
@@ -148,7 +149,15 @@ function App() {
           </div>
         )}
         {shell.activeTab === 'word' && (
-          <div key="word" className="tab-panel"><WordBookPage /></div>
+          <div key="word" className="tab-panel">
+            <WordBookPage
+              onGoReview={() => {
+                // 生词本复习：切换至学习首页并进入收藏词复习会话
+                useReviewStore.getState().setSession('favorite')
+                shell.setTab('home')
+              }}
+            />
+          </div>
         )}
         {shell.activeTab === 'profile' && (
           <div key="profile" className="tab-panel"><DashboardPage /></div>

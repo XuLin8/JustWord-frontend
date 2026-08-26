@@ -233,6 +233,142 @@
   box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
 }
 
+/* ========== 视图切换：全部单词 / 生词本 ========== */
+.wb-view-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-tertiary);
+  border: 0.5px solid var(--color-separator);
+  box-shadow: inset 0 0 0 0.5px rgba(128,128,128,0.06);
+  align-self: flex-start;
+  animation: fade-in-up 520ms var(--ease-spring) both;
+  animation-delay: 320ms;
+}
+.wb-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--br-pill);
+  background: transparent;
+  color: var(--color-label-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition:
+    color var(--dur-fast),
+    background-color var(--dur-fast),
+    box-shadow var(--dur-fast),
+    transform var(--dur-fast) var(--ease-spring-soft);
+  line-height: 1;
+  letter-spacing: -0.005em;
+}
+.wb-tab:hover {
+  color: var(--color-label);
+  background: var(--color-fill-secondary);
+}
+.wb-tab:active { transform: scale(0.96); }
+.wb-tab-active {
+  background: linear-gradient(135deg,
+              var(--apple-blue) 0%,
+              var(--apple-indigo) 100%);
+  color: #fff;
+  box-shadow:
+    0 2px 8px -2px rgba(0, 122, 255, 0.5),
+    inset 0 0 0 0.5px rgba(255,255,255,0.3);
+  font-weight: var(--font-weight-semibold);
+}
+.wb-tab-active:hover {
+  color: #fff;
+  background: linear-gradient(135deg,
+              var(--apple-blue) 0%,
+              var(--apple-indigo) 100%);
+}
+.wb-tab-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--br-pill);
+  background: var(--color-fill-secondary);
+  color: var(--color-label-secondary);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.wb-tab-active .wb-tab-count {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+:root.dark .wb-tab-active { color: var(--color-label); }
+
+/* 生词本复习按钮（Overview 内） */
+.wb-review-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--br-xl);
+  border: none;
+  background: linear-gradient(135deg,
+              rgba(245, 179, 1, 0.20) 0%,
+              rgba(255, 159, 10, 0.16) 100%);
+  color: #b8860b;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border: 0.5px solid rgba(245, 179, 1, 0.30);
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.7);
+  transition:
+    transform var(--dur-fast) var(--ease-spring-soft),
+    box-shadow var(--dur-base) var(--ease-spring);
+  animation: fade-in-up 520ms var(--ease-spring) both;
+  animation-delay: 200ms;
+}
+.wb-review-btn::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg,
+              rgba(255,255,255,0.45) 0%,
+              rgba(255,255,255,0)   50%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.wb-review-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 18px -8px rgba(245, 179, 1, 0.5),
+    inset 0 0 0 0.5px rgba(255,255,255,0.8);
+}
+.wb-review-btn:active:not(:disabled) { transform: scale(0.97); }
+.wb-review-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+  background: var(--color-fill-tertiary);
+  border-color: var(--color-separator);
+  color: var(--color-label-tertiary);
+  box-shadow: none;
+}
+:root.dark .wb-review-btn {
+  color: #f5b301;
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.10);
+}
+:root.dark .wb-review-btn::after {
+  background: linear-gradient(135deg,
+              rgba(255,255,255,0.10) 0%,
+              rgba(255,255,255,0)   50%);
+  opacity: 0.5;
+}
+
 /* ========== Toolbar / 筛选 ========== */
 .word-book-toolbar {
   display: flex;

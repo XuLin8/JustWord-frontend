@@ -49,6 +49,23 @@
 .lh-book-chip-label { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 .lh-book-chip-count { font-size: var(--font-size-xs); color: var(--color-label-tertiary); font-variant-numeric: tabular-nums; }
 
+/* 生词本复习会话：静态模式标签（非交互） */
+.lh-mode-chip-static {
+  cursor: default;
+  color: #b8860b;
+  border-color: rgba(245, 179, 1, 0.30);
+  background: linear-gradient(135deg,
+              rgba(245, 179, 1, 0.14) 0%,
+              rgba(255, 159, 10, 0.10) 100%);
+}
+.lh-mode-chip-static:hover {
+  transform: none;
+  background: linear-gradient(135deg,
+              rgba(245, 179, 1, 0.14) 0%,
+              rgba(255, 159, 10, 0.10) 100%);
+}
+:root.dark .lh-mode-chip-static { color: #f5b301; }
+
 .lh-spin { animation: lh-spin 1s linear infinite; }
 @keyframes lh-spin { to { transform: rotate(360deg); } }
 

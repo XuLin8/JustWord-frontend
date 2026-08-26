@@ -26,6 +26,8 @@ export interface PlanWord {
   synonyms?: string[]
   /** 反义词 */
   antonyms?: string[]
+  /** 是否已收藏（生词本） */
+  favorited?: boolean
 }
 
 interface LearningPlanStore {

@@ -4,7 +4,7 @@
 // 发音/详情/模式/猫咪陪伴等交互延续 M2-E/F。
 import React, { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BookOpen, Coins, Layers, Loader, Sparkles } from 'lucide-react'
+import { BookMarked, BookOpen, Coins, Layers, Loader, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RecitationStage } from '@/components/organisms/RecitationStage'
 import { RulePicker, type RecitationRule } from '@/components/organisms/RecitationModes/RulePicker'
@@ -40,7 +40,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
   const { t } = useTranslation()
   const { recitationRule, setRecitationRule, loadPreferences } = usePreferenceStore()
   const { enrolledIds, textbooks, loadTextbooks } = useTextbookStore()
-  const { todayWords, loadDue, loading, totalDue } = useReviewStore()
+  const { todayWords, loadDue, loading, totalDue, session, setSession } = useReviewStore()
   const loadRecords = useLearningStore((s) => s.loadRecords)
   const catAdopted = useCatStore((s) => s.adopted)
   const catCoins = useCatStore((s) => s.coins)
@@ -69,17 +69,35 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 已订阅但尚未取词时：仅自动拉取一次（避免空队列无限循环请求）
+  // 已订阅但尚未取词时：仅自动拉取一次（避免空队列无限循环请求）；生词本复习会话不触发日常取词
   useEffect(() => {
+    if (session !== 'normal') return
     if (autoLoadAttempted.current) return
     if (!loading && enrolledIds.length > 0 && todayWords.length === 0 && view === 'mode') {
       autoLoadAttempted.current = true
       void loadDue()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, enrolledIds.length, todayWords.length])
+  }, [loading, enrolledIds.length, todayWords.length, session, view])
+
+  // 生词本复习会话：强制回到判定模式并加载收藏词队列（保留今日进度条/打卡，判定仍走 SM-2）
+  useEffect(() => {
+    if (session !== 'favorite') return
+    setRule(null)
+    setView('mode')
+    void loadDue({ favoritedOnly: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session])
 
   const exitMode = () => {
+    if (session === 'favorite') {
+      // 生词本复习退出：恢复日常会话并重新拉取日常队列
+      setSession('normal')
+      setRule(null)
+      setView('mode')
+      void loadDue()
+      return
+    }
     if (rule === null) {
       // 判定模式（首页即背诵）：退出回到「背诵方式选择」层，避免状态不变导致退出按钮无反应
       setView('rules')
@@ -98,7 +116,7 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
     </button>
   )
 
-  /** 顶部状态条：当前词库 + 模式切换 */
+  /** 顶部状态条：当前词库 + 模式切换（生词本复习会话显示静态「生词本复习」标签） */
   const statusBar = (
     <div className="lh-topbar">
       <button type="button" className="lh-book-chip" onClick={onGoWordbook} disabled={!onGoWordbook}>
@@ -106,10 +124,17 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
         <span className="lh-book-chip-label">{bookName}</span>
         <span className="lh-book-chip-count">{totalDue ? `已约 ${totalDue}` : ''}</span>
       </button>
-      <button type="button" className="lh-mode-chip" onClick={() => setView('rules')} title={t('learningHome.switchMode')}>
-        <Layers size={15} />
-        <span>{t(RULE_TITLE[recitationRule])}</span>
-      </button>
+      {session === 'favorite' ? (
+        <span className="lh-mode-chip lh-mode-chip-static" title={t('learningHome.favoriteReview')}>
+          <BookMarked size={15} />
+          <span>{t('learningHome.favoriteReview')}</span>
+        </span>
+      ) : (
+        <button type="button" className="lh-mode-chip" onClick={() => setView('rules')} title={t('learningHome.switchMode')}>
+          <Layers size={15} />
+          <span>{t(RULE_TITLE[recitationRule])}</span>
+        </button>
+      )}
     </div>
   )
 
@@ -150,15 +175,19 @@ export const LearningHomePage: React.FC<LearningHomePageProps> = ({ onGoWordbook
       )
     }
 
-    // 今日无待学
+    // 今日无待学 / 生词本为空
     if (todayWords.length === 0) {
       return (
         <section className="learning-home" aria-label={t('nav.home')}>
           {statusBar}
           <div className="lh-empty">
-            <Sparkles size={40} className="lh-search-icon" />
-            <p>{t('learningHome.doneToday')}</p>
-            <Button variant="outline" onClick={() => void loadDue()}>{t('learningHome.refresh')}</Button>
+            {session === 'favorite' ? <BookMarked size={40} className="lh-search-icon" /> : <Sparkles size={40} className="lh-search-icon" />}
+            <p>{session === 'favorite' ? t('learningHome.favoriteEmpty') : t('learningHome.doneToday')}</p>
+            {session === 'favorite' ? (
+              <Button variant="outline" onClick={exitMode}>{t('learningHome.exitFavorite')}</Button>
+            ) : (
+              <Button variant="outline" onClick={() => void loadDue()}>{t('learningHome.refresh')}</Button>
+            )}
           </div>
           {catEnabled && catAdopted && (
             <div className={`lh-cat-corner ${catAsBoard ? 'is-board' : ''}`}>

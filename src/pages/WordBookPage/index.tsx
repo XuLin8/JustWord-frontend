@@ -1,6 +1,7 @@
 // src/pages/WordBookPage/index.tsx
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BookMarked, Play } from 'lucide-react'
 import { useWordStore } from '../../store/wordStore'
 import { WordForm } from '../../components/organisms/WordForm'
 import { WordList } from '../../components/organisms/WordList'
@@ -15,13 +16,20 @@ type DifficultyFilter = 0 | 1 | 2 | 3 | 4 | 5
 /** 词列表每页条数（订阅导入可能数千条，分页避免一次性全量渲染） */
 const PAGE_SIZE = 50
 
-export const WordBookPage: React.FC = () => {
+interface WordBookPageProps {
+  /** 生词本「复习生词」：切换至学习首页并进入生词复习会话 */
+  onGoReview?: () => void
+}
+
+export const WordBookPage: React.FC<WordBookPageProps> = ({ onGoReview }) => {
   const { t } = useTranslation()
   const { words, loading, searchTerm, setSearchTerm, addWord, deleteWord, updateWord, deduplicate, loadWords } =
     useWordStore()
   const { showToast, openConfirmDialog } = useUIStore()
   const [difficulty, setDifficulty] = useState<DifficultyFilter>(0)
   const [page, setPage] = useState(1)
+  // false=全部单词，true=生词本（收藏）
+  const [favView, setFavView] = useState(false)
 
   const overview = useMemo(() => {
     const total = words.length
@@ -43,9 +51,12 @@ export const WordBookPage: React.FC = () => {
     return { total, uniqueCount: engLower.size, duplicateCount, duplicateRate, posCount: posSet.size, diffBuckets }
   }, [words])
 
+  const favCount = useMemo(() => words.filter((w) => w.favorited).length, [words])
+
   const filteredWords = useMemo(() => {
     const query = searchTerm.trim().toLowerCase()
     return words.filter((w) => {
+      if (favView && !w.favorited) return false
       if (query) {
         const match =
           w.english.toLowerCase().includes(query) || w.chinese.toLowerCase().includes(query)
@@ -57,7 +68,7 @@ export const WordBookPage: React.FC = () => {
       }
       return true
     })
-  }, [words, searchTerm, difficulty])
+  }, [words, searchTerm, difficulty, favView])
 
   const posDistribution = useMemo(() => {
     const m = new Map<string, number>()
@@ -149,24 +160,39 @@ export const WordBookPage: React.FC = () => {
       <section className="wb-overview">
         <div className="wb-overview-left">
           <div className="wb-metric">
-            <span className="wb-metric-label">{t('wordbook.totalLabel')}</span>
-            <b className="wb-metric-value">{overview.total}</b>
+            <span className="wb-metric-label">{favView ? t('wordbook.favoriteLabel') : t('wordbook.totalLabel')}</span>
+            <b className="wb-metric-value">{favView ? favCount : overview.total}</b>
           </div>
-          <div className="wb-metric">
-            <span className="wb-metric-label">{t('wordbook.uniqueLabel')}</span>
-            <b className="wb-metric-value">{overview.uniqueCount}</b>
-          </div>
-          <div className={`wb-metric ${overview.duplicateCount > 0 ? 'wb-metric-warn' : ''}`}>
-            <span className="wb-metric-label">{t('wordbook.duplicateLabel')}</span>
-            <b className="wb-metric-value">{overview.duplicateCount}</b>
-          </div>
-          <div className="wb-metric">
-            <span className="wb-metric-label">{t('wordbook.posLabel')}</span>
-            <b className="wb-metric-value">{overview.posCount}</b>
-          </div>
-          <button className="wb-dedup-btn" onClick={handleDeduplicate} disabled={overview.duplicateCount === 0}>
-            🧹 {t('wordbook.dedupTitle')} · {overview.duplicateCount === 0 ? t('wordbook.dedupClean') : t('wordbook.dedupSave', { count: overview.duplicateCount })}
-          </button>
+          {favView ? (
+            <button
+              type="button"
+              className="wb-review-btn"
+              onClick={() => onGoReview?.()}
+              disabled={favCount === 0}
+              title={t('wordbook.reviewFavorites')}
+            >
+              <Play size={15} />
+              {t('wordbook.reviewFavorites')}
+            </button>
+          ) : (
+            <>
+              <div className="wb-metric">
+                <span className="wb-metric-label">{t('wordbook.uniqueLabel')}</span>
+                <b className="wb-metric-value">{overview.uniqueCount}</b>
+              </div>
+              <div className={`wb-metric ${overview.duplicateCount > 0 ? 'wb-metric-warn' : ''}`}>
+                <span className="wb-metric-label">{t('wordbook.duplicateLabel')}</span>
+                <b className="wb-metric-value">{overview.duplicateCount}</b>
+              </div>
+              <div className="wb-metric">
+                <span className="wb-metric-label">{t('wordbook.posLabel')}</span>
+                <b className="wb-metric-value">{overview.posCount}</b>
+              </div>
+              <button className="wb-dedup-btn" onClick={handleDeduplicate} disabled={overview.duplicateCount === 0}>
+                🧹 {t('wordbook.dedupTitle')} · {overview.duplicateCount === 0 ? t('wordbook.dedupClean') : t('wordbook.dedupSave', { count: overview.duplicateCount })}
+              </button>
+            </>
+          )}
         </div>
         <div className="wb-overview-right">
           <div className="wb-dist-stack" aria-hidden>
@@ -211,6 +237,30 @@ export const WordBookPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* ============ 视图切换：全部单词 / 生词本 ============ */}
+      <div className="wb-view-tabs" role="tablist" aria-label={t('wordbook.viewSwitch')}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={!favView}
+          className={`wb-tab ${!favView ? 'wb-tab-active' : ''}`}
+          onClick={() => setFavView(false)}
+        >
+          {t('wordbook.allWords')}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={favView}
+          className={`wb-tab ${favView ? 'wb-tab-active' : ''}`}
+          onClick={() => setFavView(true)}
+        >
+          <BookMarked size={16} />
+          {t('wordbook.favorites')}
+          <span className="wb-tab-count">{favCount}</span>
+        </button>
+      </div>
 
       <WordForm onSubmit={handleAddWord} />
 
